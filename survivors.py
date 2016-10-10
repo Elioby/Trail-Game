@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+from items import items
+
 # This file contains data about the survivors in the game
 
 # You start with 100 HP (hit points / health points)
@@ -9,7 +11,7 @@ default_health = 100.0
 group_money = 200.0
 
 # The MPH (miles per tick in this case) the car is curently moving at
-car_speed = 40.0
+car_speed = 20.0
 
 group_inventory = [
 
@@ -43,6 +45,8 @@ survivors = [
 
 		"bitten": False,
 
+		"ticks_since_bitten": 0, 
+
 		"zombified": False,
 
 		"alive": True
@@ -56,6 +60,8 @@ survivors = [
 		"max_health": default_health,
 
 		"bitten": False,
+
+		"ticks_since_bitten": 0,
 
 		"zombified": False,
 
@@ -71,6 +77,8 @@ survivors = [
 
 		"bitten": False,
 
+		"ticks_since_bitten": 0,
+
 		"zombified": False,
 
 		"alive": True
@@ -84,6 +92,8 @@ survivors = [
 		"max_health": default_health,
 
 		"bitten": False,
+
+		"ticks_since_bitten": 0,
 
 		"zombified": False,
 
