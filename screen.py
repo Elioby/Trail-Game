@@ -37,10 +37,14 @@ from debug import *
 width = 0
 height = 0
 
-foreground_buffer = None
+# Holds "pixel" data on the currently shown screen
+front_buffer = None
+
+# Holds "pixel" data on the currently rendering and next to be shown screen
 back_buffer = None
 
 def init():
+	global front_buffer
 	global back_buffer
 	global width
 	global height
@@ -48,11 +52,11 @@ def init():
 	width = shutil.get_terminal_size()[0] - 1
 	height = shutil.get_terminal_size()[1] - 1
 
+	front_buffer = numpy.chararray((width, height))
 	back_buffer = numpy.chararray((width, height))
-	foreground_buffer = numpy.chararray((width, height))
 
+	front_buffer.fill("")
 	back_buffer.fill("")
-	foreground_buffer.fill("")
 
 def clear():
 	sys.stdout.write("\x1B[2J")
@@ -88,6 +92,14 @@ def draw_notification(message):
 
 	sys.stdout.write(message)
 
+	for j in range(-1, 2):
+		set_cursor(x_start - 3, y_start + j)
+		sys.stdout.write("║")
+
+	for j in range(-1, 2):
+		set_cursor(x_start + message_length + 2, y_start + j)
+		sys.stdout.write("║")
+
 	set_cursor(x_start - 3, y_start + 2)
 
 	sys.stdout.write("╚" + "═" * (message_length + 4) + "╝")
@@ -97,10 +109,21 @@ def draw_notification(message):
 def set_cursor(cursor_x, cursor_y):
 	sys.stdout.write("\033[" + str(max(int(cursor_y), 0)) + ";" + str(max(int(cursor_x), 0)) + "H")
 
+# Re-renders the front buffer to the screen
+def refresh():
+	render_buffer(front_buffer)
+
 def flush():
+	render_buffer(back_buffer)
+
+	numpy.copyto(front_buffer, back_buffer)
+
+	back_buffer.fill("")
+
+def render_buffer(buffer_to_render):
 	clear()
 
-	for col in back_buffer.T:
+	for col in buffer_to_render.T:
 		content = ""
 		for cell in col:
 			cell_string = str(cell)[2:3]
@@ -110,5 +133,3 @@ def flush():
 				content += " "
 
 		print(content)
-
-	back_buffer.fill("")

@@ -168,23 +168,19 @@ def main():
     screen.init()
     screen.clear()
 
-    screen.draw_notification("bobby browie was bitten by a zombie.")
+    print("Welcome to the Trail Game!")
 
-    wait_key()
+    display_starting_screen()
 
-    # print("Welcome to the Trail Game!")
+    # TODO: display the city screen for Los Angeles, as this is where you start
 
-    # display_starting_screen()
+    # The main game loop
+    while True:
+        # Simulate one game tick
+        game_tick()
 
-    # # TODO: display the city screen for Los Angeles, as this is where you start
-
-    # # The main game loop
-    # while True:
-    #     # Simulate one game tick
-    #     game_tick()
-
-    #     # Sleep for 2 seconds until we're ready to run the next tick
-    #     time.sleep(2)
+        # Sleep for 2 seconds until we're ready to run the next tick
+        time.sleep(2)
 
 
 # Are we being run as a script? If so, run main().
