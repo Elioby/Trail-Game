@@ -73,7 +73,9 @@ def game_tick():
 
             if event_function is not None:
                 notification = event_function()
-                dprint(notification)
+
+                if notification != None:
+                    dprint(notification)
 
 
     # TODO: If the current time is 8pm, do food consumption

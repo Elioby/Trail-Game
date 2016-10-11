@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+import random
+
 from survivors import survivors
 
 # This file contains misc utility functions that have no other place
@@ -13,7 +15,45 @@ def format_time(datetime_object):
     return str(datetime_object.time())
 
 # TODO: This should return a single random survivor from the list in survivors.py
-# TODO: If if_player is false, don't return the player, if if_infected is false, don't return any infected players, 
+# TODO: If if_player is false, don't return the player, if if_bitten is false, don't return any bitten players, 
 # TODO: If if_dead is false, don't return any dead players
-def get_random_survivor(if_player=True, if_infected=True, if_dead=False):
-	return survivors[0]
+def get_random_survivor(if_player=True, if_bitten=True, if_dead=False):
+	survivor_count = len(survivors)
+
+	while True:
+		random_survivor_index = random.randrange(survivor_count)
+
+		if not if_player and random_survivor_index == 0:
+			continue
+
+		random_survivor = survivors[random_survivor_index]
+
+		if not if_bitten and random_survivor["bitten"]:
+			continue
+
+		if not if_dead and not random_survivor["alive"]:
+			continue
+
+		return random_survivor
+
+def count_survivors(if_player=True, if_bitten=True, if_dead=False):
+	survivor_count = len(survivors)
+
+	remaining_survivor_count = 0
+
+	for survivor_index in range(survivor_count):
+		if not if_player and survivor_index == 0:
+			continue
+
+		random_survivor = survivors[survivor_index]
+
+		if not if_bitten and random_survivor["bitten"]:
+			continue
+
+		if not if_dead and not random_survivor["alive"]:
+			continue
+
+		remaining_survivor_count += 1
+
+	return remaining_survivor_count
+

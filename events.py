@@ -4,9 +4,14 @@ from misc_utils import *
 
 # This file contains data and functions about the random events definined in the game
 
-# This is an example event function, it returns the message to notify the player with
+# This is an example event function, it returns the message to notify the player with, return None to cancel the event
 def event_bitten_by_zombie():
-	random_survivor = get_random_survivor(False, False)
+	if count_survivors(False, False, False) == 0:
+		return None
+
+	random_survivor = get_random_survivor(False, False, False)
+
+	random_survivor["bitten"] = True
 
 	return random_survivor["name"] + " was bitten by a zombie."
 
@@ -18,7 +23,7 @@ events = [
 	{
 		# The percentage chance for this event to happen
 		# TODO: change this back to a small percentage, this is just for testing
-		"occurrence_chance": 50.0,
+		"occurrence_chance": 2.5,
 
 		"notification_handler_function": event_bitten_by_zombie
 	}
