@@ -7,6 +7,8 @@
 cities = {
 	
 	"Los Angeles": {
+		"name": "Los Angeles",
+
 		# A brief (1 sentence?) description of the city
 		"description": "",
 
@@ -15,6 +17,8 @@ cities = {
 	},
 	
 	"Phoenix": {
+		"name": "Phoenix",
+
 		# A brief (1 sentence?) description of the city
 		"description": "",
 
@@ -23,6 +27,8 @@ cities = {
 	},
 	
 	"Albuquerque": {
+		"name": "Albuquerque",
+
 		# A brief (1 sentence?) description of the city
 		"description": "",
 
@@ -31,6 +37,8 @@ cities = {
 	},
 	
 	"Oklahoma City": {
+		"name": "Oklahoma City",
+
 		# A brief (1 sentence?) description of the city
 		"description": "",
 
@@ -39,6 +47,8 @@ cities = {
 	},
 	
 	"St Louis": {
+		"name": "St Louis",
+
 		# A brief (1 sentence?) description of the city
 		"description": "",
 
@@ -47,6 +57,8 @@ cities = {
 	},
 	
 	"Indianapolis": {
+		"name": "Indianapolis",
+
 		# A brief (1 sentence?) description of the city
 		"description": "",
 
@@ -55,6 +67,8 @@ cities = {
 	},
 	
 	"Columbus": {
+		"name": "Columbus",
+
 		# A brief (1 sentence?) description of the city
 		"description": "",
 
@@ -63,6 +77,8 @@ cities = {
 	},
 	
 	"Pittsburgh": {
+		"name": "Pittsburgh",
+
 		# A brief (1 sentence?) description of the city
 		"description": "",
 
@@ -71,6 +87,8 @@ cities = {
 	},
 
 	"New York": {
+		"name": "New York",
+
 		# A brief (1 sentence?) description of the city
 		"description": "",
 

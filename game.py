@@ -44,14 +44,20 @@ def display_dead_screen():
     # TODO: This function should never return (use quit() ? unless that's a bad idea for some reason)
 
     # TODO: Replace with something else
+    screen.clear()
+
     print("You died!")
+
     quit()
 
-def display_city_screen():
+def display_city_screen(city):
     # TODO: Code for the city screen goes here
     # TODO: This function should not return until they leave the city
 
-    pass
+    # TODO: Replace with something else
+    screen.clear()
+
+    ingored_input = input("What would you like to do? ")
 
 # This is called every tick of the game
 def game_tick():
@@ -82,7 +88,6 @@ def game_tick():
 
                 if notification != None:
                     dprint(notification)
-
 
     # TODO: If the current time is 8pm, do food consumption
     if current_datetime.hour == 20:
@@ -115,8 +120,6 @@ def game_tick():
                     # TODO: show as notification
                     dprint("A zombified " + survivor["name"] + " bit " + random_survivor["name"] + ".")
 
-
-
     for survivor in survivors:
         if survivor["alive"] and survivor["bitten"] and not survivor["zombified"]:
             ticks_since_bitten = survivor["ticks_since_bitten"]
@@ -139,8 +142,15 @@ def game_tick():
 
             survivor["ticks_since_bitten"] = ticks_since_bitten + 1
 
-    # TODO: If distance to next city is smaller than car_speed, show city screen
-    # TODO: display_city_screen()
+    next_city = get_next_city(distance_travelled)
+
+    if next_city["distance_from_start"] - distance_travelled <= car_speed:
+        # TODO: show as notification
+        dprint("You arrived in " + next_city["name"] + "!")
+
+        display_city_screen(next_city)
+    else:
+        dprint("The next city is: " + next_city["name"])
 
     for survivor in survivors:
         if survivor["alive"] and survivor["health"] <= 0:
@@ -158,17 +168,23 @@ def main():
     screen.init()
     screen.clear()
 
-    print("Welcome to the Trail Game!")
+    screen.draw_notification("bobby browie was bitten by a zombie.")
 
-    display_starting_screen()
+    wait_key()
 
-    # The main game loop
-    while True:
-        # Simulate one game tick
-        game_tick()
+    # print("Welcome to the Trail Game!")
 
-        # Sleep for 2 seconds until we're ready to run the next tick
-        time.sleep(2)
+    # display_starting_screen()
+
+    # # TODO: display the city screen for Los Angeles, as this is where you start
+
+    # # The main game loop
+    # while True:
+    #     # Simulate one game tick
+    #     game_tick()
+
+    #     # Sleep for 2 seconds until we're ready to run the next tick
+    #     time.sleep(2)
 
 
 # Are we being run as a script? If so, run main().

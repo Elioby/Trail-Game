@@ -9,7 +9,6 @@ import sys
 import math
 import time
 import shutil
-import platform
 import subprocess
 
 should_restart = False
@@ -38,6 +37,7 @@ from debug import *
 width = 0
 height = 0
 
+foreground_buffer = None
 back_buffer = None
 
 def init():
@@ -49,14 +49,13 @@ def init():
 	height = shutil.get_terminal_size()[1] - 1
 
 	back_buffer = numpy.chararray((width, height))
+	foreground_buffer = numpy.chararray((width, height))
 
 	back_buffer.fill("")
+	foreground_buffer.fill("")
 
 def clear():
-	if platform.system() == "Windows":
-		os.system('cls')
-	else:
-		os.system('clear')
+	sys.stdout.write("\x1B[2J")
 
 def get_width():
 	return width
@@ -75,8 +74,28 @@ def draw_rect(rect_x, rect_y, rect_width, rect_height, fill = True):
 		for y in range(min_y, max_y):
 			back_buffer[x][y] = "#"
 
+def draw_notification(message):
+	message_length = len(message)
+
+	x_start = (width / 2) - (message_length / 2)
+	y_start = (height / 2)
+
+	set_cursor(x_start - 3, y_start - 2)
+
+	sys.stdout.write("╔" + "═" * (message_length + 4) + "╗")
+
+	set_cursor(x_start, y_start)
+
+	sys.stdout.write(message)
+
+	set_cursor(x_start - 3, y_start + 2)
+
+	sys.stdout.write("╚" + "═" * (message_length + 4) + "╝")
+
+	set_cursor(1, 1)
+
 def set_cursor(cursor_x, cursor_y):
-	sys.stdout.write("\033[" + str(cursor_x) + ";" + str(cursor_y) + "H")
+	sys.stdout.write("\033[" + str(max(int(cursor_y), 0)) + ";" + str(max(int(cursor_x), 0)) + "H")
 
 def flush():
 	clear()
