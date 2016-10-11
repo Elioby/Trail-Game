@@ -6,12 +6,18 @@
 import os
 import pip
 import math
+import time
 import shutil
 import platform
+import subprocess
 
-pip.main(['install', 'numpy'])
-
-import numpy
+try:
+	import numpy
+except ImportError:
+	print("ERROR: Importing numpy failed, installing and restarting now..")
+	pip.main(['install', 'numpy', '--user'])
+	subprocess.call(['python', 'game.py'])
+	quit()
 
 from debug import *
 
