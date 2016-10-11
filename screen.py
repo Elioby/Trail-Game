@@ -5,17 +5,31 @@
 
 import os
 import pip
+import sys
 import math
 import time
 import shutil
 import platform
 import subprocess
 
+should_restart = False
+
 try:
 	import numpy
 except ImportError:
 	print("ERROR: Importing numpy failed, installing and restarting now..")
 	pip.main(['install', 'numpy', '--user'])
+	should_restart = True
+
+try:
+	from colorama import init
+	init()
+except ImportError:
+	print("ERROR: Importing colorama failed, installing and restarting now..")
+	pip.main(['install', 'colorama', '--user'])
+	should_restart = True
+
+if should_restart:
 	subprocess.call(['python', 'game.py'])
 	quit()
 
@@ -62,7 +76,7 @@ def draw_rect(rect_x, rect_y, rect_width, rect_height, fill = True):
 			back_buffer[x][y] = "#"
 
 def set_cursor(cursor_x, cursor_y):
-	print("\033[" + str(cursor_x) + ";" + str(cursor_y) + "H")
+	sys.stdout.write("\033[" + str(cursor_x) + ";" + str(cursor_y) + "H")
 
 def flush():
 	clear()

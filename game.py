@@ -43,7 +43,9 @@ def display_dead_screen():
     # TODO: Code for the dead screen goes here
     # TODO: This function should never return (use quit() ? unless that's a bad idea for some reason)
 
-    pass
+    # TODO: Replace with something else
+    print("You died!")
+    quit()
 
 def display_city_screen():
     # TODO: Code for the city screen goes here
@@ -57,14 +59,13 @@ def game_tick():
     global current_datetime
     global distance_travelled
 
-    # TODO: Check if the player is dead, if so, show the dead screen
-    # TODO: display_dead_screen()
+    if not survivors[0]["alive"]:
+        display_dead_screen()
 
     dprint("Start of game tick: " + str(ticks_elapsed))
     dprint("Current date: " + format_date(current_datetime))
     dprint("Current time: " + format_time(current_datetime))
 
-    # TODO: Pick a random event if any (it's not going to happen most ticks, it should be relatively rare)
     event_random = random.uniform(0.0, 100.0)
 
     for event in events:
@@ -90,15 +91,16 @@ def game_tick():
     for survivor in survivors:
         if survivor["alive"] and survivor["zombified"]:
             random_number = random.randrange(1, 100)
-            random_survivor = get_random_survivor()
 
             if random_number <= 50:
+                random_survivor = get_random_survivor(True, True, False, False)
                 survivor["alive"] = False
 
                 # TODO: show as notification
                 # TODO: subtract a bullet from ammo?
                 dprint(random_survivor["name"] + " managed to shoot a zombified " + survivor["name"] + " dead.")
             elif random_number <= 90:
+                random_survivor = get_random_survivor(True, True, False, False)
                 random_damage = random.randrange(1, 20)
 
                 random_survivor["health"] -= random_damage 
@@ -106,10 +108,12 @@ def game_tick():
                 # TODO: show as notification
                 dprint("A zombified " + survivor["name"] + " damaged " + random_survivor["name"] + " for " + str(random_damage) + " damage.")
             else:
-                # TODO: bite another survivor
+                if count_survivors(False, False, False, False) > 0:
+                    random_survivor = get_random_survivor(False, False, False, False)
+                    random_survivor["bitten"] = True
 
-                # TODO: show as notification
-                dprint()
+                    # TODO: show as notification
+                    dprint("A zombified " + survivor["name"] + " bit " + random_survivor["name"] + ".")
 
 
 
@@ -128,15 +132,22 @@ def game_tick():
                     should_turn = True
 
                 if should_turn:
-                    # TODO: show as notification
                     survivor["zombified"] = True
 
+                    # TODO: show as notification
                     dprint(survivor["name"] + " turned into a zombie.")
 
             survivor["ticks_since_bitten"] = ticks_since_bitten + 1
 
     # TODO: If distance to next city is smaller than car_speed, show city screen
     # TODO: display_city_screen()
+
+    for survivor in survivors:
+        if survivor["alive"] and survivor["health"] <= 0:
+            survivor["alive"] = False
+
+            # TODO: make notification
+            dprint(survivor["name"] + " died.")
 
     ticks_elapsed += 1
     current_datetime += timedelta(hours=1)
@@ -158,7 +169,6 @@ def main():
 
         # Sleep for 2 seconds until we're ready to run the next tick
         time.sleep(2)
-        screen.set_cursor(10, 10)
 
 
 # Are we being run as a script? If so, run main().

@@ -14,7 +14,7 @@ def format_date(datetime_object):
 def format_time(datetime_object):
     return str(datetime_object.time())
 
-def get_random_survivor(if_player=True, if_bitten=True, if_dead=False):
+def get_random_survivor(if_player=True, if_bitten=True, if_zombified=False, if_dead=False):
 	survivor_count = len(survivors)
 
 	while True:
@@ -31,9 +31,12 @@ def get_random_survivor(if_player=True, if_bitten=True, if_dead=False):
 		if not if_dead and not random_survivor["alive"]:
 			continue
 
+		if not if_zombified and random_survivor["zombified"]:
+			continue
+
 		return random_survivor
 
-def count_survivors(if_player=True, if_bitten=True, if_dead=False):
+def count_survivors(if_player=True, if_bitten=True, if_zombified=False, if_dead=False):
 	survivor_count = len(survivors)
 
 	remaining_survivor_count = 0
@@ -48,6 +51,9 @@ def count_survivors(if_player=True, if_bitten=True, if_dead=False):
 			continue
 
 		if not if_dead and not random_survivor["alive"]:
+			continue
+
+		if not if_zombified and random_survivor["zombified"]:
 			continue
 
 		remaining_survivor_count += 1
