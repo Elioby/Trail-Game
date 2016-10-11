@@ -14,9 +14,6 @@ def format_date(datetime_object):
 def format_time(datetime_object):
     return str(datetime_object.time())
 
-# TODO: This should return a single random survivor from the list in survivors.py
-# TODO: If if_player is false, don't return the player, if if_bitten is false, don't return any bitten players, 
-# TODO: If if_dead is false, don't return any dead players
 def get_random_survivor(if_player=True, if_bitten=True, if_dead=False):
 	survivor_count = len(survivors)
 

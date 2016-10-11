@@ -24,6 +24,7 @@ current_datetime = start_datetime
 # Total distance travelled so far, in miles 
 distance_travelled = 0
 
+# The amount of ticks gone by since the start of the game (1 tick = 1 hour)
 ticks_elapsed = 0
 
 # TODO: These display functions might work better in their own file
@@ -31,6 +32,10 @@ def display_starting_screen():
     # TODO: Code for the starting screen goes here
     # TODO: This function should not return until they have picked all 4 characters' names
     # TODO: These names should be updated in the survivors list in survivors.py, where survivors[0] is the main player
+
+    # TODO: use the input function to ask for the players name, and for three other friends they can count on eg: input("What is your name? ")
+
+    # TODO: update the names in survivors.py by using the survivors list eg: survivors[0] = player_name
 
     pass
 
@@ -79,12 +84,56 @@ def game_tick():
 
 
     # TODO: If the current time is 8pm, do food consumption
+    if current_datetime.hour == 20:
+        dprint("Do food consumption")
 
-    # TODO: For each player: if player is not dead and if player is zombified: 
-    # TODO:         50% chance to be shot by another survivor, 40% chance to damage another player, 10% chance to bite another survivor 
+    for survivor in survivors:
+        if survivor["alive"] and survivor["zombified"]:
+            random_number = random.randrange(1, 100)
+            random_survivor = get_random_survivor()
 
-    # TODO: For each player: if player is not dead and if player is bitten and ticks_since_bitten is bigger than 4 (it's been more than 4 hours):
-    # TODO:         if ticks_since_bitten is smaller than 24: (5% chance to change to zombie) else: (100% chance to change to zombie)
+            if random_number <= 50:
+                survivor["alive"] = False
+
+                # TODO: show as notification
+                # TODO: subtract a bullet from ammo?
+                dprint(random_survivor["name"] + " managed to shoot a zombified " + survivor["name"] + " dead.")
+            elif random_number <= 90:
+                random_damage = random.randrange(1, 20)
+
+                random_survivor["health"] -= random_damage 
+
+                # TODO: show as notification
+                dprint("A zombified " + survivor["name"] + " damaged " + random_survivor["name"] + " for " + str(random_damage) + " damage.")
+            else:
+                # TODO: bite another survivor
+
+                # TODO: show as notification
+                dprint()
+
+
+
+    for survivor in survivors:
+        if survivor["alive"] and survivor["bitten"] and not survivor["zombified"]:
+            ticks_since_bitten = survivor["ticks_since_bitten"]
+
+            if ticks_since_bitten > 4:
+                should_turn = False
+
+                if ticks_since_bitten < 24:
+                    random_number = random.randrange(1, 100)
+
+                    should_turn = random_number <= ticks_since_bitten * 2
+                else:
+                    should_turn = True
+
+                if should_turn:
+                    # TODO: show as notification
+                    survivor["zombified"] = True
+
+                    dprint(survivor["name"] + " turned into a zombie.")
+
+            survivor["ticks_since_bitten"] = ticks_since_bitten + 1
 
     # TODO: If distance to next city is smaller than car_speed, show city screen
     # TODO: display_city_screen()
@@ -109,6 +158,7 @@ def main():
 
         # Sleep for 1 second until we're ready to run the next tick
         time.sleep(2)
+        screen.set_cursor(10, 10)
 
 
 # Are we being run as a script? If so, run main().

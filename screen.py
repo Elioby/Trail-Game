@@ -55,6 +55,9 @@ def draw_rect(rect_x, rect_y, rect_width, rect_height, fill = True):
 		for y in range(min_y, max_y):
 			back_buffer[x][y] = "#"
 
+def set_cursor(cursor_x, cursor_y):
+	print("\033[" + str(cursor_x) + ";" + str(cursor_y) + "H")
+
 def flush():
 	clear()
 
