@@ -107,7 +107,7 @@ def main():
         # Simulate one game tick
         game_tick()
 
-        # Sleep for 1 second until we're ready to run the next tick
+        # Sleep for 2 seconds until we're ready to run the next tick
         time.sleep(2)
 
 
