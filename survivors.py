@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from items import items
+import items
 
 # This file contains data about the survivors in the game
 
@@ -15,17 +15,17 @@ car_speed = 20.0
 
 group_inventory = [
 
-	{
-		"item": items["Medkit"],
+    {
+        "item": items.item_list["Medkit"],
 
-		"amount": 1
-	},
+        "amount": 1
+    },
 
-	{
-		"item": items["Food"],
+    {
+        "item": items.item_list["Food"],
 
-		"amount": 100
-	},
+        "amount": 100
+    },
 
 ]
 
@@ -33,70 +33,68 @@ group_inventory = [
 # 	The names of the survivors will be added in code after the user has entered this information.
 #	Realistically, this information should be initialized in code, but since there are only
 #	4 survivors, and for simplicity, they are entered as data below.
-#
-# TODO: Should this be a dictionary itself, or just a list?
-survivors = [
-	{
-		"name": "Survivor 1",
+survivor_list = [
+    {
+        "name": "Survivor 1",
 
-		"health": default_health,
+        "health": default_health,
 
-		"max_health": default_health,
+        "max_health": default_health,
 
-		"bitten": False,
+        "bitten": False,
 
-		"ticks_since_bitten": 0, 
+        "ticks_since_bitten": 0,
 
-		"zombified": False,
+        "zombified": False,
 
-		"alive": True
-	},
+        "alive": True
+    },
 
-	{
-		"name": "Survivor 2",
+    {
+        "name": "Survivor 2",
 
-		"health": default_health,
+        "health": default_health,
 
-		"max_health": default_health,
+        "max_health": default_health,
 
-		"bitten": False,
+        "bitten": False,
 
-		"ticks_since_bitten": 0,
+        "ticks_since_bitten": 0,
 
-		"zombified": False,
+        "zombified": False,
 
-		"alive": True
-	},
-	
-	{
-		"name": "Survivor 3",
+        "alive": True
+    },
 
-		"health": default_health,
+    {
+        "name": "Survivor 3",
 
-		"max_health": default_health,
+        "health": default_health,
 
-		"bitten": False,
+        "max_health": default_health,
 
-		"ticks_since_bitten": 0,
+        "bitten": False,
 
-		"zombified": False,
+        "ticks_since_bitten": 0,
 
-		"alive": True
-	},
-	
-	{
-		"name": "Survivor 4",
+        "zombified": False,
 
-		"health": default_health,
+        "alive": True
+    },
 
-		"max_health": default_health,
+    {
+        "name": "Survivor 4",
 
-		"bitten": False,
+        "health": default_health,
 
-		"ticks_since_bitten": 0,
+        "max_health": default_health,
 
-		"zombified": False,
+        "bitten": False,
 
-		"alive": True
-	},
+        "ticks_since_bitten": 0,
+
+        "zombified": False,
+
+        "alive": True
+    },
 ]
