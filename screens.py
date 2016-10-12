@@ -21,7 +21,6 @@ def set_current_screen(new_screen):
     current_screen = new_screen
 
 
-# TODO: These display functions might work better in their own file
 def draw_starting_screen():
     # TODO: Code for the starting screen goes here
     # TODO: This function should not return until they have picked all 4 characters' names
@@ -64,6 +63,39 @@ def draw_city_screen(city):
     set_current_screen(screen_list["city"])
 
     ignored_input = input("You are in " + city["name"] + ", what would you like to do? ")
+
+
+def draw_trading_screen():
+    # TODO: Code for the trading screen goes here
+
+    # TODO: Replace with something else
+    screen.clear()
+
+    print("This is the trading screen")
+
+    wait_key()
+
+
+def draw_resting_screen():
+    # TODO: Code for the resting screen goes here
+
+    # TODO: Replace with something else
+    screen.clear()
+
+    print("This is the resting screen")
+
+    wait_key()
+
+
+def draw_put_down_screen():
+    # TODO: Code for the put down screen goes here
+
+    # TODO: Replace with something else
+    screen.clear()
+
+    print("This is the put down screen")
+
+    wait_key()
 
 
 def draw_travelling_screen():
@@ -151,6 +183,24 @@ screen_list = {
         "name": "city",
 
         "draw_function": draw_city_screen
+    },
+
+    "trading": {
+        "name": "trading",
+
+        "draw_function": draw_trading_screen
+    },
+
+    "resting": {
+        "name": "resting",
+
+        "draw_function": draw_resting_screen
+    },
+
+    "put_down": {
+        "name": "put_down",
+
+        "draw_function": draw_put_down_screen
     },
 
     "travelling": {
