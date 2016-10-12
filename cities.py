@@ -10,7 +10,7 @@ city_list = {
         "name": "Los Angeles",
 
         # A brief (1 sentence?) description of the city
-        "description": "",
+        "description": "The second-largest city in the United States. Known for being the center of the American entertainment industry",
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 0,
@@ -20,7 +20,7 @@ city_list = {
         "name": "Phoenix",
 
         # A brief (1 sentence?) description of the city
-        "description": "",
+        "description": "The capital and largest city of the state of Arizona. It has a desert climate.",
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 300,
@@ -30,7 +30,7 @@ city_list = {
         "name": "Albuquerque",
 
         # A brief (1 sentence?) description of the city
-        "description": "",
+        "description": "The most populous city in the state of New Mexico, situated in the central part of the state.",
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 700,
@@ -40,7 +40,7 @@ city_list = {
         "name": "Oklahoma City",
 
         # A brief (1 sentence?) description of the city
-        "description": "",
+        "description": "The capital and largest city of the state of Oklahoma.",
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 1300,
@@ -50,7 +50,7 @@ city_list = {
         "name": "St Louis",
 
         # A brief (1 sentence?) description of the city
-        "description": "",
+        "description": "An independent city and inland port in the state of Missouri.",
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 1800,
@@ -60,7 +60,7 @@ city_list = {
         "name": "Indianapolis",
 
         # A brief (1 sentence?) description of the city
-        "description": "",
+        "description": "The capital and largest city of the state of Indiana ",
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 2000,
@@ -70,7 +70,7 @@ city_list = {
         "name": "Columbus",
 
         # A brief (1 sentence?) description of the city
-        "description": "",
+        "description": "The capital and largest city of the state of Ohio.",
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 2200,
@@ -80,7 +80,7 @@ city_list = {
         "name": "Pittsburgh",
 
         # A brief (1 sentence?) description of the city
-        "description": "",
+        "description": "A city in Pennsylvania. Known as both "the Steel City" for its more than 300 steel-related businesses, and as the "City of Bridges" for its 446 bridges.",
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 2600,
@@ -90,7 +90,7 @@ city_list = {
         "name": "New York",
 
         # A brief (1 sentence?) description of the city
-        "description": "",
+        "description": "A global city in the state of New York. Known for being the most populous in the United States.",
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 3000,
