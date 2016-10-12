@@ -25,7 +25,7 @@ events = [
     {
         # The percentage chance for this event to happen
         # TODO: change this back to a small percentage, this is just for testing
-        "occurrence_chance": 10.0,
+        "occurrence_chance": 1.0,
 
         "notification_handler_function": event_bitten_by_zombie
     },

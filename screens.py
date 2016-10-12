@@ -73,22 +73,25 @@ def draw_travelling_screen():
     car_wheel_image_1 = ascii_helper.load_image("resources/car_wheel_1.ascii")
     car_wheel_image_2 = ascii_helper.load_image("resources/car_wheel_2.ascii")
 
+    car_x = int((screen.get_width() / 2) - (car_body_image["width"] / 2))
+    car_y = int((screen.get_height() / 2) - car_body_image["height"])
+
     # TODO: this is kinda messy
     iterations = 0
     wheel = 0
     road = 0
 
     while True:
-        screen.draw_ascii_image(1, 1, car_body_image)
+        screen.draw_ascii_image(car_x, car_y, car_body_image)
 
         if wheel == 0:
-            screen.draw_ascii_image(15, 8, car_wheel_image_2)
-            screen.draw_ascii_image(54, 8, car_wheel_image_2)
+            screen.draw_ascii_image(car_x + 14, car_y + 7, car_wheel_image_2)
+            screen.draw_ascii_image(car_x + 53, car_y + 7, car_wheel_image_2)
         else:
-            screen.draw_ascii_image(15, 8, car_wheel_image_1)
-            screen.draw_ascii_image(54, 8, car_wheel_image_1)
+            screen.draw_ascii_image(car_x + 14, car_y + 7, car_wheel_image_1)
+            screen.draw_ascii_image(car_x + 53, car_y + 7, car_wheel_image_1)
 
-        for x in range(car_body_image["width"] + 1):
+        for x in range(screen.get_width()):
             pixel_char = "="
 
             if road < 1:
@@ -98,7 +101,7 @@ def draw_travelling_screen():
                 if x % 2 != 0:
                     pixel_char = "-"
 
-            screen.draw_pixel(x, 11, pixel_char)
+            screen.draw_pixel(x, car_y + car_body_image["height"] + 2, pixel_char)
 
         screen.flush()
 
@@ -108,7 +111,7 @@ def draw_travelling_screen():
         if wheel > 1:
             iterations += 1
 
-            if iterations > 3:
+            if iterations > 2:
                 return
 
         if road > 1:

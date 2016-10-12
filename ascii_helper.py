@@ -13,9 +13,15 @@ except ImportError:
 
 from debug import *
 
+image_cache = {}
+
 
 # TODO: add local cache
 def load_image(filename):
+    if filename in image_cache:
+        dprint("got image from cache!")
+        return image_cache[filename]
+
     file = open(filename, 'r')
 
     lines = file.readlines()
@@ -57,7 +63,11 @@ def load_image(filename):
         image_x = 0
         image_y += 1
 
-    return {"width": width, "height": height, "image_buffer": image_buffer}
+    image = {"width": width, "height": height, "image_buffer": image_buffer}
+
+    image_cache[filename] = image
+
+    return image
 
 
 def flip_image_x():

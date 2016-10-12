@@ -44,6 +44,10 @@ front_buffer = None
 # Holds "pixel" data on the currently rendering and next to be shown screen
 back_buffer = None
 
+# These variables are used to optimise printing the buffer by skipping with the cursor to the start, and finishing before the end
+buffer_start = {"x": None, "y": None}
+buffer_end = {"x": 0, "y": 0}
+
 
 def init():
     global front_buffer
@@ -101,7 +105,7 @@ def draw_ascii_image(image_x, image_y, ascii_image):
 
     for x in range(min_x, max_x):
         for y in range(min_y, max_y):
-            back_buffer[x][y] = image_buffer[image_x][image_y]
+            draw_pixel(x, y, image_buffer[image_x][image_y])
 
             image_y += 1
 
@@ -110,6 +114,13 @@ def draw_ascii_image(image_x, image_y, ascii_image):
 
 
 def draw_pixel(pixel_x, pixel_y, pixel_char):
+    if pixel_char != "" and pixel_char != " ":
+        if buffer_start["y"] is None or pixel_y < buffer_start["y"]:
+            buffer_start["y"] = pixel_y
+
+        if buffer_end["y"] is None or pixel_y > buffer_end["y"]:
+            buffer_end["y"] = pixel_y
+
     back_buffer[pixel_x][pixel_y] = pixel_char
 
 
@@ -178,10 +189,37 @@ def flush():
     back_buffer.fill("")
 
 
+# TODO: it may be possible to optimise further for flickering here (skip whitespace)
 def render_buffer(buffer_to_render):
     clear()
 
+    start_x = buffer_start["x"]
+    start_y = buffer_start["y"]
+
+    end_x = buffer_end["x"]
+    end_y = buffer_end["y"]
+
+    if start_x is None:
+        start_x = 1
+
+    if start_y is None:
+        start_y = 1
+
+    if end_x is None:
+        end_x = 1
+
+    if end_y is None:
+        end_y = 1
+
+    set_cursor(start_x, start_y)
+
+    y = 0
     for col in buffer_to_render.T:
+        y += 1
+
+        if y < start_y:
+            continue
+
         content = ""
         for cell in col:
             cell_string = str(cell)[2:3]
@@ -191,3 +229,6 @@ def render_buffer(buffer_to_render):
                 content += " "
 
         print(content)
+
+        if y > end_y:
+            break
