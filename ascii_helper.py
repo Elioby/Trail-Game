@@ -3,22 +3,21 @@
 # This file contains functions for reading, processing and altering ascii art
 
 import pip
+import subprocess
 
 try:
     import numpy
 except ImportError:
     print("ERROR: Importing numpy failed, installing and restarting now..")
     pip.main(['install', 'numpy', '--user'])
-    should_restart = True
-
-from debug import *
+    subprocess.call(['python', 'game.py'])
+    quit()
 
 image_cache = {}
 
 
 def load_image(filename):
     if filename in image_cache:
-        dprint("got image from cache!")
         return image_cache[filename]
 
     file = open(filename, 'r')

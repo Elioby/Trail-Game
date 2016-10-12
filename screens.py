@@ -6,8 +6,6 @@ import time
 import screen
 import ascii_helper
 
-from misc_utils import *
-
 # TODO: These are currently useless because of the front buffer, maybe they won't be in future though?
 previous_screen = None
 current_screen = None
@@ -36,7 +34,7 @@ def draw_starting_screen():
 
     print("This is the starting screen")
 
-    wait_key()
+    screen.wait_key()
 
 
 def draw_dead_screen():
@@ -73,7 +71,7 @@ def draw_trading_screen():
 
     print("This is the trading screen")
 
-    wait_key()
+    screen.wait_key()
 
 
 def draw_resting_screen():
@@ -84,7 +82,7 @@ def draw_resting_screen():
 
     print("This is the resting screen")
 
-    wait_key()
+    screen.wait_key()
 
 
 def draw_put_down_screen():
@@ -95,7 +93,7 @@ def draw_put_down_screen():
 
     print("This is the put down screen")
 
-    wait_key()
+    screen.wait_key()
 
 
 def draw_travelling_screen():
@@ -113,7 +111,10 @@ def draw_travelling_screen():
     wheel = 0
     road = 0
 
+    screen.set_cursor(0, 0)
+
     while True:
+        # Draw the car
         screen.draw_ascii_image(car_x, car_y, car_body_image)
 
         if wheel <= 0.25:

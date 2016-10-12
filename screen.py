@@ -5,33 +5,22 @@
 
 import os
 import pip
+import sys
 import ctypes
 import shutil
+import platform
 import subprocess
-
-from misc_utils import *
-
-should_restart = False
+import win32_structs
 
 try:
     import numpy
 except ImportError:
     print("ERROR: Importing numpy failed, installing and restarting now..")
     pip.main(['install', 'numpy', '--user'])
-    should_restart = True
-
-try:
-    from colorama import init, win32
-
-    init()
-except ImportError:
-    print("ERROR: Importing colorama failed, installing and restarting now..")
-    pip.main(['install', 'colorama', '--user'])
-    should_restart = True
-
-if should_restart:
     subprocess.call(['python', 'game.py'])
     quit()
+
+stdout = None
 
 width = 0
 height = 0
@@ -48,10 +37,14 @@ buffer_end = {"x": 0, "y": 0}
 
 
 def init():
+    global stdout
     global front_buffer
     global back_buffer
     global width
     global height
+
+    # Get the handle of the console's standard output (stdout)
+    stdout = ctypes.windll.kernel32.GetStdHandle(-11)
 
     width = shutil.get_terminal_size()[0] - 1
     height = shutil.get_terminal_size()[1] - 1
@@ -63,13 +56,39 @@ def init():
     back_buffer.fill("")
 
 
+def wait_key():
+    result = None
+    if platform.system() == "Windows":
+        import msvcrt
+        result = msvcrt.getch()
+    else:
+        import termios
+        fd = sys.stdin.fileno()
+
+        old_term = termios.tcgetattr(fd)
+        new_attr = termios.tcgetattr(fd)
+        new_attr[3] = new_attr[3] & ~termios.ICANON & ~termios.ECHO
+        termios.tcsetattr(fd, termios.TCSANOW, new_attr)
+
+        try:
+            result = sys.stdin.read(1)
+        except IOError:
+            pass
+        finally:
+            termios.tcsetattr(fd, termios.TCSAFLUSH, old_term)
+
+    return result
+
+
 def clear():
     if platform.system() == "Windows":
-        console_buffer_info = win32.GetConsoleScreenBufferInfo(win32.STDOUT)
-        cells_in_screen = console_buffer_info.dwSize.X * console_buffer_info.dwSize.Y
+        console_buffer_info = win32_structs.CONSOLE_SCREEN_BUFFER_INFO()
+        ctypes.windll.kernel32.GetConsoleScreenBufferInfo(stdout, ctypes.byref(console_buffer_info))
 
-        win32.FillConsoleOutputCharacter(win32.STDOUT, ' ', cells_in_screen, win32.COORD(0, 0))
-        set_cursor(1, 1)
+        cells_in_screen = console_buffer_info.dwSize.x * console_buffer_info.dwSize.y
+
+        ctypes.windll.kernel32.FillConsoleOutputCharacterA(stdout, ctypes.c_char(b" "), cells_in_screen, win32_structs.COORD(0, 0), 0)
+        set_cursor(0, 0)
     else:
         os.system("clear")
 
@@ -148,47 +167,57 @@ def print_notification(message):
 
     set_cursor(x_start - 3, y_start - 2)
 
-    sys.stdout.write("╔" + "═" * (message_length + 4) + "╗")
+    stdout_write_flush("╔" + "═" * (message_length + 4) + "╗")
 
     set_cursor(x_start - 2, y_start - 1)
 
-    sys.stdout.write(" " * (message_length + 4))
+    stdout_write_flush(" " * (message_length + 4))
 
     set_cursor(x_start, y_start)
 
-    sys.stdout.write(message)
+    stdout_write_flush(message)
 
     set_cursor(x_start - 2, y_start + 1)
 
-    sys.stdout.write(" " * (message_length + 4))
+    stdout_write_flush(" " * (message_length + 4))
 
     for j in range(-1, 2):
         set_cursor(x_start - 3, y_start + j)
-        sys.stdout.write("║")
+        stdout_write_flush("║")
 
     for j in range(-1, 2):
         set_cursor(x_start + message_length + 2, y_start + j)
-        sys.stdout.write("║")
+        stdout_write_flush("║")
 
     set_cursor(x_start - 2, y_start)
-    sys.stdout.write(" " * 2)
+    stdout_write_flush(" " * 2)
 
     set_cursor(x_start + message_length, y_start)
-    sys.stdout.write(" " * 2)
+    stdout_write_flush(" " * 2)
 
     set_cursor(x_start - 3, y_start + 2)
 
-    sys.stdout.write("╚" + "═" * (message_length + 4) + "╝")
+    stdout_write_flush("╚" + "═" * (message_length + 4) + "╝")
 
-    set_cursor(1, 1)
+    set_cursor(0, 0)
 
     wait_key()
 
     refresh()
 
 
+def stdout_write_flush(message):
+    sys.stdout.write(message)
+    sys.stdout.flush()
+
+
 def set_cursor(cursor_x, cursor_y):
-    win32.SetConsoleCursorPosition(win32.STDOUT, (max(int(cursor_y), 1), max(int(cursor_x), 1)))
+    if platform.system() == "Windows":
+        adjusted_position = win32_structs.COORD(int(cursor_x), int(cursor_y))
+
+        ctypes.windll.kernel32.SetConsoleCursorPosition(stdout, adjusted_position)
+    else:
+        stdout_write_flush("\033[" + str(int(cursor_y) + 1) + ";" + str(int(cursor_x) + 1) + "H")
 
 
 # Re-renders the front buffer to the screen
@@ -205,24 +234,8 @@ def flush():
 
 
 def render_buffer(buffer_to_render):
-
-
-
-
     if platform.system() == "Windows":
-        # Win32API structs
-        class SMALL_RECT(ctypes.Structure):
-            _fields_ = ('left', ctypes.c_short), ('top', ctypes.c_short), ('right', ctypes.c_short), ('bottom', ctypes.c_short)
-
-
-        class COORD(ctypes.Structure):
-            _fields_ = ('x', ctypes.c_short), ('y', ctypes.c_short)
-
-
-        class CHAR_INFO(ctypes.Structure):
-            _fields_ = ('ascii', ctypes.c_char), ('attr', ctypes.c_uint16)
-
-        buf = (CHAR_INFO * (width * height))()
+        buf = (win32_structs.CHAR_INFO * (width * height))()
 
         x = 0
         y = 0
@@ -254,7 +267,9 @@ def render_buffer(buffer_to_render):
         if console_handle == 0:
             raise ctypes.WinError()
 
-        if ctypes.windll.kernel32.WriteConsoleOutputA(console_handle, ctypes.byref(buf), COORD(width, height), COORD(0, 0), ctypes.byref(SMALL_RECT(0, 0, width - 1, height - 1))) == 0:
+        if ctypes.windll.kernel32.WriteConsoleOutputA(console_handle, ctypes.byref(buf), win32_structs.COORD(width, height),
+                                                      win32_structs.COORD(0, 0),
+                                                      ctypes.byref(win32_structs.SMALL_RECT(0, 0, width - 1, height - 1))) == 0:
             raise ctypes.WinError()
     else:
         clear()
@@ -262,7 +277,6 @@ def render_buffer(buffer_to_render):
         start_x = buffer_start["x"]
         start_y = buffer_start["y"]
 
-        end_x = buffer_end["x"]
         end_y = buffer_end["y"]
 
         if start_x is None:
@@ -270,9 +284,6 @@ def render_buffer(buffer_to_render):
 
         if start_y is None:
             start_y = 1
-
-        if end_x is None:
-            end_x = 1
 
         if end_y is None:
             end_y = 1

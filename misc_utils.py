@@ -1,9 +1,7 @@
 #!/usr/bin/python3
 
-import sys
 import random
 import cities
-import platform
 import survivors
 
 
@@ -33,6 +31,9 @@ def get_next_city(distance):
 
 
 def get_random_survivor(if_player=True, if_bitten=True, if_zombified=False, if_dead=False):
+    if count_survivors(if_player, if_bitten, if_zombified, if_dead) == 0:
+        return None
+
     survivor_count = len(survivors.survivor_list)
 
     while True:
@@ -78,27 +79,3 @@ def count_survivors(if_player=True, if_bitten=True, if_zombified=False, if_dead=
         remaining_survivor_count += 1
 
     return remaining_survivor_count
-
-
-def wait_key():
-    result = None
-    if platform.system() == "Windows":
-        import msvcrt
-        result = msvcrt.getch()
-    else:
-        import termios
-        fd = sys.stdin.fileno()
-
-        old_term = termios.tcgetattr(fd)
-        new_attr = termios.tcgetattr(fd)
-        new_attr[3] = new_attr[3] & ~termios.ICANON & ~termios.ECHO
-        termios.tcsetattr(fd, termios.TCSANOW, new_attr)
-
-        try:
-            result = sys.stdin.read(1)
-        except IOError:
-            pass
-        finally:
-            termios.tcsetattr(fd, termios.TCSAFLUSH, old_term)
-
-    return result

@@ -35,7 +35,6 @@ def pass_time(hours):
     if current_datetime.hour == 20 or (int(current_datetime.hour) < 20 < int(current_datetime.hour + hours)):
         screen.print_notification("Food consumption should happen now.")
 
-    # TODO: do we need this tick counter if we have the time?
     ticks_elapsed += 1
     current_datetime += timedelta(hours=hours)
     distance_travelled += survivors.car_speed
@@ -63,10 +62,7 @@ def game_tick():
             # TODO: Add support for other handler functions that are more complex than a notification
 
             if event_function is not None:
-                notification = event_function()
-
-                if notification is not None:
-                    screen.print_notification(notification)
+                event_function()
 
                 # NOTE: we don't want more than one event per tick
                 break
@@ -87,11 +83,11 @@ def game_tick():
 
                 random_survivor["health"] -= random_damage
 
-                screen.print_notification("A zombified " + survivor["name"] + " damaged " + random_survivor["name"] + " for " + str(
-                    random_damage) + " damage.")
+                screen.print_notification("A zombified " + survivor["name"] + " damaged " + random_survivor["name"] + " for " + str(random_damage) + " damage.")
             else:
-                if count_survivors(False, False, False, False) > 0:
-                    random_survivor = get_random_survivor(False, False, False, False)
+                random_survivor = get_random_survivor(False, False, False, False)
+
+                if random_survivor is not None:
                     random_survivor["bitten"] = True
 
                     screen.print_notification("A zombified " + survivor["name"] + " bit " + random_survivor["name"] + ".")
