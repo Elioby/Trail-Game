@@ -145,8 +145,7 @@ def game_tick():
     next_city = get_next_city(distance_travelled)
 
     if next_city["distance_from_start"] - distance_travelled <= car_speed:
-        # TODO: show as notification
-        dprint("You arrived in " + next_city["name"] + "!")
+        screen.draw_notification("You arrived in " + next_city["name"] + "!")
 
         display_city_screen(next_city)
     else:
@@ -180,7 +179,7 @@ def main():
         game_tick()
 
         # Sleep for 2 seconds until we're ready to run the next tick
-        time.sleep(2)
+        time.sleep(1)
 
 
 # Are we being run as a script? If so, run main().

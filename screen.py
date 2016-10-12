@@ -78,6 +78,7 @@ def draw_rect(rect_x, rect_y, rect_width, rect_height, fill = True):
 		for y in range(min_y, max_y):
 			back_buffer[x][y] = "#"
 
+# NOTE: this function does not use the front or back buffer as we want this buffer to stay intact
 def draw_notification(message):
 	message_length = len(message)
 
@@ -88,9 +89,17 @@ def draw_notification(message):
 
 	sys.stdout.write("╔" + "═" * (message_length + 4) + "╗")
 
+	set_cursor(x_start - 2, y_start - 1)
+
+	sys.stdout.write(" " * (message_length + 4))
+
 	set_cursor(x_start, y_start)
 
 	sys.stdout.write(message)
+
+	set_cursor(x_start - 2, y_start + 1)
+
+	sys.stdout.write(" " * (message_length + 4))
 
 	for j in range(-1, 2):
 		set_cursor(x_start - 3, y_start + j)
@@ -100,11 +109,21 @@ def draw_notification(message):
 		set_cursor(x_start + message_length + 2, y_start + j)
 		sys.stdout.write("║")
 
+	set_cursor(x_start - 2, y_start)
+	sys.stdout.write(" " * 2)
+
+	set_cursor(x_start + message_length, y_start)
+	sys.stdout.write(" " * 2)
+
 	set_cursor(x_start - 3, y_start + 2)
 
 	sys.stdout.write("╚" + "═" * (message_length + 4) + "╝")
 
 	set_cursor(1, 1)
+
+	wait_key()
+
+	refresh()
 
 def set_cursor(cursor_x, cursor_y):
 	sys.stdout.write("\033[" + str(max(int(cursor_y), 0)) + ";" + str(max(int(cursor_x), 0)) + "H")
