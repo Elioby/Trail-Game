@@ -2,7 +2,7 @@
 
 # This file contains some useful debug tools
 
-debug_mode = True
+debug_mode = False
 
 def dprint(message):
 	if debug_mode:

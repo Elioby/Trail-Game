@@ -11,6 +11,8 @@ import time
 import shutil
 import subprocess
 
+from misc_utils import *
+
 should_restart = False
 
 try:
@@ -78,7 +80,7 @@ def draw_rect(rect_x, rect_y, rect_width, rect_height, fill = True):
 		for y in range(min_y, max_y):
 			back_buffer[x][y] = "#"
 
-# NOTE: this function does not use the front or back buffer as we want this buffer to stay intact
+# NOTE: this function does not use the front or back buffer as we want the front buffer to stay intact
 def draw_notification(message):
 	message_length = len(message)
 

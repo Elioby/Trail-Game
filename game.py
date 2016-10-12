@@ -12,6 +12,7 @@ from events import events
 from cities import cities
 from survivors import survivors, car_speed
 from datetime import datetime, timedelta
+from screens import screens
 
 # This is the main file for the trail game.
 
@@ -27,46 +28,26 @@ distance_travelled = 0
 # The amount of ticks gone by since the start of the game (1 tick = 1 hour)
 ticks_elapsed = 0
 
-# TODO: These display functions might work better in their own file
-def display_starting_screen():
-    # TODO: Code for the starting screen goes here
-    # TODO: This function should not return until they have picked all 4 characters' names
-    # TODO: These names should be updated in the survivors list in survivors.py, where survivors[0] is the main player
-
-    # TODO: use the input function to ask for the players name, and for three other friends they can count on eg: input("What is your name? ")
-
-    # TODO: update the names in survivors.py by using the survivors list eg: survivors[0] = player_name
-
-    pass
-
-def display_dead_screen():
-    # TODO: Code for the dead screen goes here
-    # TODO: This function should never return (use quit() ? unless that's a bad idea for some reason)
-
-    # TODO: Replace with something else
-    screen.clear()
-
-    print("You died!")
-
-    quit()
-
-def display_city_screen(city):
-    # TODO: Code for the city screen goes here
-    # TODO: This function should not return until they leave the city
-
-    # TODO: Replace with something else
-    screen.clear()
-
-    ingored_input = input("What would you like to do? ")
-
-# This is called every tick of the game
-def game_tick():
+def pass_time(hours):
     global ticks_elapsed
     global current_datetime
     global distance_travelled
 
+    # TODO: If the current time is 8pm, do food consumption
+    if current_datetime.hour == 20 or (current_datetime.hour < 20 and current_datetime.hour + hours > 20):
+        dprint("Do food consumption")
+
+    # TODO: do we need this tick counter if we have the time?
+    ticks_elapsed += 1
+    current_datetime += timedelta(hours=hours)
+    distance_travelled += car_speed
+
+# This is called every tick of the game
+def game_tick():
     if not survivors[0]["alive"]:
-        display_dead_screen()
+        screens["dead"]["draw_function"]()
+
+    screens["travelling"]["draw_function"]()
 
     dprint("Start of game tick: " + str(ticks_elapsed))
     dprint("Current date: " + format_date(current_datetime))
@@ -88,10 +69,6 @@ def game_tick():
 
                 if notification != None:
                     dprint(notification)
-
-    # TODO: If the current time is 8pm, do food consumption
-    if current_datetime.hour == 20:
-        dprint("Do food consumption")
 
     for survivor in survivors:
         if survivor["alive"] and survivor["zombified"]:
@@ -147,7 +124,7 @@ def game_tick():
     if next_city["distance_from_start"] - distance_travelled <= car_speed:
         screen.draw_notification("You arrived in " + next_city["name"] + "!")
 
-        display_city_screen(next_city)
+        screens["city"]["draw_function"](next_city)
     else:
         dprint("The next city is: " + next_city["name"])
 
@@ -158,9 +135,7 @@ def game_tick():
             # TODO: make notification
             dprint(survivor["name"] + " died.")
 
-    ticks_elapsed += 1
-    current_datetime += timedelta(hours=1)
-    distance_travelled += car_speed
+    pass_time(1.5)
 
 # This is the program entry point
 def main():
@@ -169,9 +144,9 @@ def main():
 
     print("Welcome to the Trail Game!")
 
-    display_starting_screen()
+    screens["starting"]["draw_function"]()
 
-    # TODO: display the city screen for Los Angeles, as this is where you start
+    screens["city"]["draw_function"](cities["Los Angeles"])
 
     # The main game loop
     while True:

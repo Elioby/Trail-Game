@@ -7,8 +7,8 @@ from items import items
 # You start with 100 HP (hit points / health points)
 default_health = 100.0
 
-# You start with $200.0
-group_money = 200.0
+# You start with $40.0
+group_money = 40.0
 
 # The MPH (miles per tick in this case) the car is curently moving at
 car_speed = 20.0
