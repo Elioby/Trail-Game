@@ -5,9 +5,7 @@
 
 import os
 import pip
-import sys
-import math
-import time
+import ctypes
 import shutil
 import subprocess
 
@@ -23,7 +21,7 @@ except ImportError:
     should_restart = True
 
 try:
-    from colorama import init
+    from colorama import init, win32
 
     init()
 except ImportError:
@@ -66,7 +64,14 @@ def init():
 
 
 def clear():
-    os.system("cls")
+    if platform.system() == "Windows":
+        console_buffer_info = win32.GetConsoleScreenBufferInfo(win32.STDOUT)
+        cells_in_screen = console_buffer_info.dwSize.X * console_buffer_info.dwSize.Y
+
+        win32.FillConsoleOutputCharacter(win32.STDOUT, ' ', cells_in_screen, win32.COORD(0, 0))
+        set_cursor(1, 1)
+    else:
+        os.system("clear")
 
 
 def get_width():
@@ -121,7 +126,17 @@ def draw_pixel(pixel_x, pixel_y, pixel_char):
         if buffer_end["y"] is None or pixel_y > buffer_end["y"]:
             buffer_end["y"] = pixel_y
 
+    if pixel_x >= width or pixel_y >= height:
+        return
+
     back_buffer[pixel_x][pixel_y] = pixel_char
+
+
+def draw_text(text_x, text_y, text):
+    text_length = len(text)
+
+    for x in range(text_length):
+        draw_pixel(x + text_x, text_y, text[x])
 
 
 # NOTE: this function does not use the front or back buffer as we want the front buffer to stay intact, this is why it's called print instead of draw
@@ -173,7 +188,7 @@ def print_notification(message):
 
 
 def set_cursor(cursor_x, cursor_y):
-    sys.stdout.write("\033[" + str(max(int(cursor_y), 0)) + ";" + str(max(int(cursor_x), 0)) + "H")
+    win32.SetConsoleCursorPosition(win32.STDOUT, (max(int(cursor_y), 1), max(int(cursor_x), 1)))
 
 
 # Re-renders the front buffer to the screen
@@ -189,46 +204,97 @@ def flush():
     back_buffer.fill("")
 
 
-# TODO: it may be possible to optimise further for flickering here (skip whitespace)
 def render_buffer(buffer_to_render):
-    clear()
 
-    start_x = buffer_start["x"]
-    start_y = buffer_start["y"]
 
-    end_x = buffer_end["x"]
-    end_y = buffer_end["y"]
 
-    if start_x is None:
-        start_x = 1
 
-    if start_y is None:
-        start_y = 1
+    if platform.system() == "Windows":
+        # Win32API structs
+        class SMALL_RECT(ctypes.Structure):
+            _fields_ = ('left', ctypes.c_short), ('top', ctypes.c_short), ('right', ctypes.c_short), ('bottom', ctypes.c_short)
 
-    if end_x is None:
-        end_x = 1
 
-    if end_y is None:
-        end_y = 1
+        class COORD(ctypes.Structure):
+            _fields_ = ('x', ctypes.c_short), ('y', ctypes.c_short)
 
-    set_cursor(start_x, start_y)
 
-    y = 0
-    for col in buffer_to_render.T:
-        y += 1
+        class CHAR_INFO(ctypes.Structure):
+            _fields_ = ('ascii', ctypes.c_char), ('attr', ctypes.c_uint16)
 
-        if y < start_y:
-            continue
+        buf = (CHAR_INFO * (width * height))()
 
-        content = ""
-        for cell in col:
-            cell_string = str(cell)[2:3]
-            if cell_string != "":
-                content += cell_string
-            else:
-                content += " "
+        x = 0
+        y = 0
 
-        print(content)
+        for c in buf:
+            pixel = buffer_to_render[x][y]
 
-        if y > end_y:
-            break
+            if pixel == "":
+                pixel = b" "
+
+            c.ascii = pixel
+            c.attr = 7
+
+            x += 1
+
+            if x >= width:
+                x = 0
+                y += 1
+
+        console_handle = ctypes.windll.kernel32.CreateFileA(
+            ctypes.create_string_buffer(b"CONOUT$"),
+            0x40000000 | 0x80000000,  # Generic read and write permissions
+            1 | 2,  # We want read and write permissions
+            0,
+            3,  # Open the file only if it exists
+            0,
+            0)
+
+        if console_handle == 0:
+            raise ctypes.WinError()
+
+        if ctypes.windll.kernel32.WriteConsoleOutputA(console_handle, ctypes.byref(buf), COORD(width, height), COORD(0, 0), ctypes.byref(SMALL_RECT(0, 0, width - 1, height - 1))) == 0:
+            raise ctypes.WinError()
+    else:
+        clear()
+
+        start_x = buffer_start["x"]
+        start_y = buffer_start["y"]
+
+        end_x = buffer_end["x"]
+        end_y = buffer_end["y"]
+
+        if start_x is None:
+            start_x = 1
+
+        if start_y is None:
+            start_y = 1
+
+        if end_x is None:
+            end_x = 1
+
+        if end_y is None:
+            end_y = 1
+
+        set_cursor(start_x, start_y)
+
+        y = 0
+        for col in buffer_to_render.T:
+            y += 1
+
+            if y < start_y:
+                continue
+
+            content = ""
+            for cell in col:
+                cell_string = str(cell)[2:3]
+                if cell_string != "":
+                    content += cell_string
+                else:
+                    content += " "
+
+            print(content)
+
+            if y > end_y:
+                break

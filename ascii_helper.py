@@ -16,7 +16,6 @@ from debug import *
 image_cache = {}
 
 
-# TODO: add local cache
 def load_image(filename):
     if filename in image_cache:
         dprint("got image from cache!")

@@ -116,7 +116,7 @@ def draw_travelling_screen():
     while True:
         screen.draw_ascii_image(car_x, car_y, car_body_image)
 
-        if wheel == 0:
+        if wheel <= 0.25:
             screen.draw_ascii_image(car_x + 14, car_y + 7, car_wheel_image_2)
             screen.draw_ascii_image(car_x + 53, car_y + 7, car_wheel_image_2)
         else:
@@ -149,7 +149,7 @@ def draw_travelling_screen():
         if road > 1:
             road = 0
 
-        time.sleep(0.25)
+        time.sleep(0.15)
 
 
 def draw_win_screen():
