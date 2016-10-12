@@ -120,6 +120,20 @@ def draw_travelling_screen():
         time.sleep(0.25)
 
 
+def draw_win_screen():
+    # TODO: Code for the dead screen goes here
+    # TODO: This function should never return (use quit() ? unless that's a bad idea for some reason)
+
+    # TODO: Replace with something else
+
+    screen.clear()
+    set_current_screen(screen_list["win"])
+
+    print("You made it to New York! You win!")
+
+    quit()
+
+
 screen_list = {
     "starting": {
         "name": "starting",
@@ -143,5 +157,11 @@ screen_list = {
         "name": "travelling",
 
         "draw_function": draw_travelling_screen
+    },
+
+    "win": {
+        "name": "win",
+
+        "draw_function": draw_win_screen
     },
 }

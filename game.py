@@ -117,8 +117,14 @@ def game_tick():
 
     next_city = get_next_city(distance_travelled)
 
+    if next_city is None:
+        screens.screen_list["win"]["draw_function"]()
+
     if next_city["distance_from_start"] - distance_travelled <= survivors.car_speed:
         screen.print_notification("You arrived in " + next_city["name"] + "!")
+
+        if next_city["name"] == "New York":
+            screens.screen_list["win"]["draw_function"]()
 
         screens.screen_list["city"]["draw_function"](next_city)
     else:
