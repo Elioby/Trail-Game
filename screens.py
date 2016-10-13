@@ -56,8 +56,15 @@ def draw_dead_screen():
     screen.clear()
     set_current_screen(screen_list["dead"])
 
-    print("You died!")
-
+    game_over_image = ascii_helper.load_image("resources/dead_game_over.ascii")
+    tombstone_image = ascii_helper.load_image("resources/dead_tombstone.ascii")
+    game_over_x = int((screen.get_width() / 2) - (game_over_image["width"] / 2))
+    tombstone_x = int((screen.get_width() / 2) - (tombstone_image["width"] / 2))
+    screen.draw_ascii_image(game_over_x, 0, game_over_image)
+    screen.draw_ascii_image(tombstone_x, game_over_image["height"] + 2, tombstone_image)
+    screen.flush()
+    screen.wait_key()
+    screen.clear()
     quit()
 
 
@@ -107,6 +114,9 @@ def draw_city_screen(city):
         elif player_choice == "6":
             # Continue to travelling screen
             return
+        elif player_choice == "7":
+            # Debugging for dead screen
+            draw_dead_screen()
         else:
             # Invalid input
             print("Please enter a number between 1 and 6.")
