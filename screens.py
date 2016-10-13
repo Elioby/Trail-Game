@@ -58,15 +58,52 @@ def draw_dead_screen():
 
 
 def draw_city_screen(city):
-    # TODO: Code for the city screen goes here
-    # TODO: This function should not return until they leave the city
+    while True:
+        print("You are in " + city["name"])
+        #show options to player:
+        print("You can:")
+        print("1: Get information on " + city["name"] + ".")
+        print("2: Check survivors status.")
+        print("3: Visit Trader.")
+        print("4: Go to the bar.")
+        print("5: Rest.")
+        print("6: Move on to " + get_next_city(distance_travelled)["name"] + ".")
+        print("")
+        player_choice = input("What would you like to do?")
+
+        #Evaluate the players decision:
+        player_choice = normalise_input(player_choice)
+        if player_choice == "1":
+            #get information
+            print("You are in " + city["name"] +".")
+            print(city["description"])
+            #Maybe information on whats avaliable, like traders, inns to stay, etc...?
+            print("The next city is " + get_next_city(distance_travelled)["name"] + ".")
+            raw_input("Press enter to go back...") #Return to options
+        elif player_choice == "2":
+            #Check status
+            draw_put_down_screen()
+        elif player_choice == "3":
+            #Trade
+            draw_trading_screen()
+        elif player_choice == "4":
+            #Bar
+        elif player_choice == "5":
+            #Rest
+            draw_resting_screen()
+        elif player_choice == "6":
+            #Travel
+        else:
+            #invalid input
+            print("invalid input")
+
 
     # TODO: Replace with something else
 
     screen.clear()
     set_current_screen(screen_list["city"])
 
-    ignored_input = input("You are in " + city["name"] + ", what would you like to do? ")
+    #ignored_input = input("You are in " + city["name"] + ", what would you like to do? ")
 
 
 def draw_trading_screen():
