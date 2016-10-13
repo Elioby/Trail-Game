@@ -80,7 +80,7 @@ city_list = {
         "name": "Pittsburgh",
 
         # A brief (1 sentence?) description of the city
-        "description": "A city in Pennsylvania. Known as both "the Steel City" for its more than 300 steel-related businesses, and as the "City of Bridges" for its 446 bridges.",
+        "description": "A city in Pennsylvania. Known as both \"the Steel City\" for its more than 300 steel-related businesses, and as the \"City of Bridges\" for its 446 bridges.",
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 2600,
