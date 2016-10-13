@@ -83,13 +83,7 @@ def wait_key():
 
 def clear():
     if platform.system() == "Windows":
-        console_buffer_info = win32_structs.CONSOLE_SCREEN_BUFFER_INFO()
-        ctypes.windll.kernel32.GetConsoleScreenBufferInfo(stdout, ctypes.byref(console_buffer_info))
-
-        cells_in_screen = console_buffer_info.dwSize.x * console_buffer_info.dwSize.y
-
-        ctypes.windll.kernel32.FillConsoleOutputCharacterA(stdout, ctypes.c_char(b" "), cells_in_screen, win32_structs.COORD(0, 0), 0)
-        set_cursor_position(0, 0)
+        os.system("cls")
     else:
         os.system("clear")
 
