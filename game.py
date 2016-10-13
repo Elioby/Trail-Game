@@ -154,8 +154,12 @@ def main():
     screen.init()
     screen.clear()
 
-    while True:
-        screen.draw_bordered_rect(0, 0, 20, 10)
+    # while True:
+    #     screen.draw_bordered_rect(0, 0, 20, 10, None)
+    #
+    #     screen.flush()
+    #
+    #     time.sleep(1)
 
     # TODO: display a title screen?
 

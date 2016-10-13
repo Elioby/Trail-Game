@@ -62,52 +62,52 @@ def draw_dead_screen():
 
 
 def draw_city_screen(city):
-    while True:
-        print("You are in " + city["name"])
-        #show options to player:
-        print("You can:")
-        print("1: Get information on " + city["name"] + ".")
-        print("2: Check survivors status.")
-        print("3: Visit Trader.")
-        print("4: Go to the bar.")
-        print("5: Rest.")
-        print("6: Move on to " + get_next_city(distance_travelled)["name"] + ".")
-        print("")
-        player_choice = input("What would you like to do?")
-
-        #Evaluate the players decision:
-        player_choice = normalise_input(player_choice)
-        if player_choice == "1":
-            #get information
-            print("You are in " + city["name"] +".")
-            print(city["description"])
-            #Maybe information on whats avaliable, like traders, inns to stay, etc...?
-            print("The next city is " + get_next_city(distance_travelled)["name"] + ".")
-            raw_input("Press enter to go back...") #Return to options
-        elif player_choice == "2":
-            #Check status
-            draw_put_down_screen()
-        elif player_choice == "3":
-            #Trade
-            draw_trading_screen()
-        elif player_choice == "4":
-            #Bar
-        elif player_choice == "5":
-            #Rest
-            draw_resting_screen()
-        elif player_choice == "6":
-            #Travel
-        else:
-            #invalid input
-            print("invalid input")
-
-
-    # TODO: Replace with something else
-
     screen.clear()
     set_current_screen(screen_list["city"])
 
-    #ignored_input = input("You are in " + city["name"] + ", what would you like to do? ")
+    while True:
+        print("You enter the city of " + city["name"])
+
+        # Show options to player:
+        print("You can:")
+        print("1: Get information on " + city["name"] + ".")
+        print("2: Check survivors status.")
+        print("3: Trade with other survivors.")
+        print("4: Go to the bar.")
+        print("5: Rest.")
+        print("6: Move on to " + get_next_city(survivors.distance_travelled)["name"] + ".")
+        print("")
+        player_choice = input("What would you like to do? ")
+
+        # Evaluate the players decision:
+        player_choice = normalise_input(player_choice)
+        if player_choice == "1":
+            # Get information
+            print("You are in " + city["name"] + ".")
+            print(city["description"])
+            # TODO: Maybe information on whats available, like traders, inns to stay, etc...?
+            print("The next city is " + get_next_city(survivors.distance_travelled)["name"] + ".")
+
+            # Return to options
+            input("Press enter to go back...")
+        elif player_choice == "2":
+            # Check status
+            draw_put_down_screen()
+        elif player_choice == "3":
+            # Trade
+            draw_trading_screen()
+        elif player_choice == "4":
+            # Bar
+            pass
+        elif player_choice == "5":
+            # Rest
+            draw_resting_screen()
+        elif player_choice == "6":
+            # Continue to travelling screen
+            return
+        else:
+            # Invalid input
+            print("Please enter a number between 1 and 6.")
 
 
 def draw_trading_screen():
@@ -188,7 +188,8 @@ def draw_travelling_screen():
             if survivor["alive"]:
                 remaining_bars = int(max((survivor["health"] / survivor["max_health"]) * total_bars, 1))
 
-                screen.draw_text(survivor_x_start + health_x + 3, survivor_y + 1, "[" + ("█" * remaining_bars) + (" " * (total_bars - remaining_bars)) + "]")
+                screen.draw_text(survivor_x_start + health_x + 3, survivor_y + 1,
+                                 "[" + ("█" * remaining_bars) + (" " * (total_bars - remaining_bars)) + "]")
 
                 if survivor["zombified"]:
                     screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y + 1, "(ZOMBIE)")
@@ -196,7 +197,8 @@ def draw_travelling_screen():
                     screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y + 1, "(BITTEN)")
             else:
                 padding = int((total_bars - 4) / 2)
-                screen.draw_text(survivor_x_start + health_x + 3, survivor_y + 1, "[" + (padding * " ") + "DEAD" + (padding * " ") + "]")
+                screen.draw_text(survivor_x_start + health_x + 3, survivor_y + 1,
+                                 "[" + (padding * " ") + "DEAD" + (padding * " ") + "]")
 
             survivor_y += 2
 
@@ -204,8 +206,10 @@ def draw_travelling_screen():
 
         next_city = get_next_city(survivors.distance_travelled)
 
-        stat_lines = ["Time: " + format_time(survivors.current_datetime), "Date: " + format_date(survivors.current_datetime),
-                      "Next City: " + next_city["name"], "Distance: " + str(int(next_city["distance_from_start"] - survivors.distance_travelled)) + " miles"]
+        stat_lines = ["Time: " + format_time(survivors.current_datetime),
+                      "Date: " + format_date(survivors.current_datetime),
+                      "Next City: " + next_city["name"], "Distance: " + str(
+                int(next_city["distance_from_start"] - survivors.distance_travelled)) + " miles"]
 
         longest_line = 0
 
@@ -248,7 +252,8 @@ def draw_travelling_screen():
 
         if show_next_city_notification:
             next_city = get_next_city(survivors.distance_travelled)
-            screen.print_notification(next_city["name"] + " is " + str(int(next_city["distance_from_start"] - survivors.distance_travelled)) + " miles away.")
+            screen.print_notification(next_city["name"] + " is " + str(
+                int(next_city["distance_from_start"] - survivors.distance_travelled)) + " miles away.")
             show_next_city_notification = False
 
         wheel += 0.25

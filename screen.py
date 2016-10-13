@@ -106,7 +106,27 @@ def draw_rect(rect_x, rect_y, rect_width, rect_height):
 
 
 def draw_bordered_rect(rect_x, rect_y, rect_width, rect_height, fill_char=" "):
-    pass
+    for x in range(rect_x + 1, rect_x + rect_width - 1):
+        draw_pixel(x, rect_y, "═")
+
+    for x in range(rect_x + 1, rect_x + rect_width - 1):
+        draw_pixel(x, rect_y + rect_height - 1, "═")
+
+    for y in range(rect_y + 1, rect_y + rect_height - 1):
+        draw_pixel(rect_x, y, "║")
+
+    for y in range(rect_y + 1, rect_y + rect_height - 1):
+        draw_pixel(rect_x + rect_width - 1, y, "║")
+
+        draw_pixel(rect_x + rect_width - 1, y, "║")
+        draw_pixel(rect_x + rect_width - 1, y, "║")
+        draw_pixel(rect_x + rect_width - 1, y, "║")
+        draw_pixel(rect_x + rect_width - 1, y, "║")
+
+    if fill_char is not None:
+        for x in range(rect_x + 1, rect_x + rect_width - 1):
+            for y in range(rect_y + 1, rect_y + rect_height - 1):
+                draw_pixel(x, y, fill_char)
 
 
 def draw_ascii_image(image_x, image_y, ascii_image):
