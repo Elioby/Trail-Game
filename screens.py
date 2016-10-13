@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# coding=utf-8
 
 # This file contains data on the screens in the game
 

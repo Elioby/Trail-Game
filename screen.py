@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# coding=utf-8
 
 # This file contains functions to help you operate the screen, such as clearing, drawing and flushing
 # 	This is only for complex screens like the traveling screen, for other screens, use the print and input functions 

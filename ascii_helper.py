@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# coding=utf-8
 
 # This file contains functions for reading, processing and altering ascii art
 
