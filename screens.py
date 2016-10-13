@@ -66,6 +66,7 @@ def draw_city_screen(city):
     set_current_screen(screen_list["city"])
 
     while True:
+        screen.clear()
         print("You enter the city of " + city["name"])
 
         # Show options to player:
@@ -78,6 +79,7 @@ def draw_city_screen(city):
         print("6: Move on to " + get_next_city(survivors.distance_travelled)["name"] + ".")
         print("")
         player_choice = input("What would you like to do? ")
+        screen.clear()
 
         # Evaluate the players decision:
         player_choice = normalise_input(player_choice)
