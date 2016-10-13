@@ -105,6 +105,10 @@ def draw_rect(rect_x, rect_y, rect_width, rect_height):
             back_buffer[x][y] = "#"
 
 
+def draw_bordered_rect(rect_x, rect_y, rect_width, rect_height, fill_char=" "):
+    pass
+
+
 def draw_ascii_image(image_x, image_y, ascii_image):
     image_buffer = ascii_image["image_buffer"]
     image_width = ascii_image["width"]

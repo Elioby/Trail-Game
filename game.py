@@ -43,7 +43,7 @@ def pass_time(hours):
 
             food["amount"] -= required_food
 
-        screen.print_notification("You have " + str(food["amount"]) + " food.")
+        screen.print_notification("You have " + str(food["amount"]) + " food remaining.")
 
     survivors.ticks_elapsed += 1
     survivors.current_datetime += timedelta(hours=hours)
@@ -61,21 +61,22 @@ def game_tick():
     dprint("Current date: " + format_date(survivors.current_datetime))
     dprint("Current time: " + format_time(survivors.current_datetime))
 
-    for event in events:
-        event_random = random.uniform(0.0, 100.0)
-        if event["occurrence_chance"] > event_random:
-            event_function = None
+    if survivors.ticks_elapsed > 3:
+        for event in events:
+            event_random = random.uniform(0.0, 100.0)
+            if event["occurrence_chance"] > event_random:
+                event_function = None
 
-            if event["notification_handler_function"] is not None:
-                event_function = event["notification_handler_function"]
+                if event["notification_handler_function"] is not None:
+                    event_function = event["notification_handler_function"]
 
-            # TODO: Add support for other handler functions that are more complex than a notification
+                # TODO: Add support for other handler functions that are more complex than a notification
 
-            if event_function is not None:
-                event_function()
+                if event_function is not None:
+                    event_function()
 
-                # NOTE: we don't want more than one event per tick
-                break
+                    # NOTE: we don't want more than one event per tick
+                    break
 
     for survivor in survivors.survivor_list:
         if survivor["alive"] and survivor["zombified"]:
@@ -130,7 +131,7 @@ def game_tick():
         screens.screen_list["win"]["draw_function"]()
 
     if next_city["distance_from_start"] - survivors.distance_travelled <= survivors.car_speed:
-        screen.print_notification("You arrived in " + next_city["name"] + "!")
+        screen.print_notification("You arrived in " + next_city["name"] + ".")
 
         if next_city["name"] == "New York":
             screens.screen_list["win"]["draw_function"]()
@@ -152,6 +153,9 @@ def game_tick():
 def main():
     screen.init()
     screen.clear()
+
+    while True:
+        screen.draw_bordered_rect(0, 0, 20, 10)
 
     # TODO: display a title screen?
 

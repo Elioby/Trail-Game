@@ -34,6 +34,10 @@ def draw_starting_screen():
 
     # TODO: update the names in survivors.py by using the survivors list eg: survivors[0] = player_name
 
+    # TODO: enforce names so that they are not longer than 16 characters
+
+    # TODO: the player should be informed about what they start with, how much food, how many medkits, how much money
+
     screen.clear()
 
     set_current_screen(screen_list["starting"])
@@ -103,14 +107,19 @@ def draw_put_down_screen():
 
 
 def draw_travelling_screen():
+    show_next_city_notification = current_screen["name"] == "city"
+
     set_current_screen(screen_list["travelling"])
 
     car_body_image = ascii_helper.load_image("resources/car_body.ascii")
     car_wheel_image_1 = ascii_helper.load_image("resources/car_wheel_1.ascii")
     car_wheel_image_2 = ascii_helper.load_image("resources/car_wheel_2.ascii")
 
+    survivor_x_start = int(screen.get_width() / 10)
+    survivor_y_start = screen.get_height() - (len(survivors.survivor_list) * 2) - 1
+
     car_x = int((screen.get_width() / 2) - (car_body_image["width"] / 2))
-    car_y = int((screen.get_height() / 2) - car_body_image["height"])
+    car_y = survivor_y_start - car_body_image["height"] - 5
 
     # TODO: this is kinda messy
     iterations = 0
@@ -119,7 +128,7 @@ def draw_travelling_screen():
 
     while True:
         # Draw survivors stats
-        survivor_y = 0
+        survivor_y = survivor_y_start
 
         health_x = 0
 
@@ -130,11 +139,11 @@ def draw_travelling_screen():
             if survivor_name_length > health_x:
                 health_x = survivor_name_length
 
-            screen.draw_text(1, survivor_y + 1, survivor_name)
+            screen.draw_text(survivor_x_start, survivor_y + 1, survivor_name)
 
             survivor_y += 2
 
-        survivor_y = 0
+        survivor_y = survivor_y_start
 
         total_bars = 14
 
@@ -142,22 +151,39 @@ def draw_travelling_screen():
             if survivor["alive"]:
                 remaining_bars = int(max((survivor["health"] / survivor["max_health"]) * total_bars, 1))
 
-                screen.draw_text(health_x + 3, survivor_y + 1, "[" + ("█" * remaining_bars) + (" " * (total_bars - remaining_bars)) + "]")
+                screen.draw_text(survivor_x_start + health_x + 3, survivor_y + 1, "[" + ("█" * remaining_bars) + (" " * (total_bars - remaining_bars)) + "]")
 
                 if survivor["zombified"]:
-                    screen.draw_text(health_x + total_bars + 6, survivor_y + 1, "(ZOMBIE)")
+                    screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y + 1, "(ZOMBIE)")
                 elif survivor["bitten"]:
-                    screen.draw_text(health_x + total_bars + 6, survivor_y + 1, "(BITTEN)")
+                    screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y + 1, "(BITTEN)")
             else:
                 padding = int((total_bars - 4) / 2)
-                screen.draw_text(health_x + 3, survivor_y + 1, "[" + (padding * " ") + "DEAD" + (padding * " ") + "]")
+                screen.draw_text(survivor_x_start + health_x + 3, survivor_y + 1, "[" + (padding * " ") + "DEAD" + (padding * " ") + "]")
 
             survivor_y += 2
 
         # Draw datetime
 
-        screen.draw_text(health_x + 30, 1, format_time(survivors.current_datetime))
-        screen.draw_text(health_x + 30, 3, format_date(survivors.current_datetime))
+        next_city = get_next_city(survivors.distance_travelled)
+
+        stat_lines = ["Time: " + format_time(survivors.current_datetime), "Date: " + format_date(survivors.current_datetime),
+                      "Next City: " + next_city["name"], "Distance: " + str(int(next_city["distance_from_start"] - survivors.distance_travelled)) + " miles"]
+
+        longest_line = 0
+
+        for stat_line in stat_lines:
+            stat_line_length = len(stat_line)
+            if stat_line_length > longest_line:
+                longest_line = stat_line_length
+
+        stat_x = int(screen.get_width() - longest_line - (screen.get_width() / 10) + 2)
+        stat_y = survivor_y_start + 1
+
+        for stat_line in stat_lines:
+            screen.draw_text(stat_x, stat_y, stat_line)
+
+            stat_y += 2
 
         # Draw the car
         screen.draw_ascii_image(car_x, car_y, car_body_image)
@@ -182,6 +208,11 @@ def draw_travelling_screen():
             screen.draw_pixel(x, car_y + car_body_image["height"] + 2, pixel_char)
 
         screen.flush()
+
+        if show_next_city_notification:
+            next_city = get_next_city(survivors.distance_travelled)
+            screen.print_notification(next_city["name"] + " is " + str(int(next_city["distance_from_start"] - survivors.distance_travelled)) + " miles away.")
+            show_next_city_notification = False
 
         wheel += 0.25
         road += 1
