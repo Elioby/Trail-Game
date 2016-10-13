@@ -3,7 +3,22 @@
 
 import items
 
+from datetime import datetime
+
 # This file contains data about the survivors in the game
+
+
+# The date and time when the trail started
+start_datetime = datetime.strptime('02/07/2009 08:00:00', '%d/%m/%Y %H:%M:%S')
+
+# The current date and time (in game), use pass_time(hours) to change, never change directly
+current_datetime = start_datetime
+
+# Total distance travelled so far, in miles
+distance_travelled = 0
+
+# The amount of ticks gone by since the start of the game (1 tick = 1 hour)
+ticks_elapsed = 0
 
 # You start with 100 HP (hit points / health points)
 default_health = 100.0

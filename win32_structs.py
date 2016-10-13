@@ -22,7 +22,6 @@ class CHAR_INFO(ctypes.Structure):
 
 
 class CONSOLE_SCREEN_BUFFER_INFO(ctypes.Structure):
-    """struct in wincon.h."""
     _fields_ = [
         ("dwSize", COORD),
         ("dwCursorPosition", COORD),

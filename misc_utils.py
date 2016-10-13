@@ -8,14 +8,54 @@ import survivors
 
 # This file contains misc utility functions that have no other place
 
+def get_month_name(month_number):
+    return ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][month_number - 1]
+
+
 # TODO: This should return a nicely formatted date string from a datetime object ("2nd July 2009")
 def format_date(datetime_object):
-    return str(datetime_object.date())
+    date = ""
+
+    date += str(datetime_object.day)
+
+    if datetime_object.day < 11 or datetime_object.day > 19:
+        if datetime_object.day % 10 == 1:
+            date += "st "
+        elif datetime_object.day % 10 == 2:
+            date += "nd "
+        elif datetime_object.day % 10 == 3:
+            date += "rd "
+        else:
+            date += "th "
+    else:
+        date += "th "
+
+    date += get_month_name(datetime_object.month) + " "
+
+    date += str(datetime_object.year)
+
+    return date
 
 
-# TODO: This should return a nicely formatted time string from a datetime object ("8:56 am")
 def format_time(datetime_object):
-    return str(datetime_object.time())
+    time = ""
+
+    if datetime_object.hour > 12:
+        time += str(datetime_object.hour - 12)
+    else:
+        time += str(datetime_object.hour)
+
+    if datetime_object.minute < 10:
+        time += ":0" + str(datetime_object.minute)
+    else:
+        time += ":" + str(datetime_object.minute)
+
+    if datetime_object.hour < 12:
+        time += " am"
+    else:
+        time += " pm"
+
+    return time
 
 
 def get_next_city(distance):

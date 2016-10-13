@@ -9,36 +9,21 @@ from misc_utils import *
 
 from events import events
 import survivors
-from datetime import datetime, timedelta
+
+from datetime import timedelta
 
 # This is the main file for the trail game.
-
-# The date and time when the trail started 
-start_datetime = datetime.strptime('02/07/2009 08:00:00', '%d/%m/%Y %H:%M:%S')
-
-# The current date and time (in game), use pass_time(hours) to change, never change directly
-current_datetime = start_datetime
-
-# Total distance travelled so far, in miles 
-distance_travelled = 0
-
-# The amount of ticks gone by since the start of the game (1 tick = 1 hour)
-ticks_elapsed = 0
 
 
 # You must use this method when changing the time
 def pass_time(hours):
-    global ticks_elapsed
-    global current_datetime
-    global distance_travelled
-
     # TODO: If the current time is 8pm, do food consumption
-    if current_datetime.hour == 20 or (int(current_datetime.hour) < 20 < int(current_datetime.hour + hours)):
+    if survivors.current_datetime.hour == 20 or (int(survivors.current_datetime.hour) < 20 < int(survivors.current_datetime.hour + hours)):
         screen.print_notification("Food consumption should happen now.")
 
-    ticks_elapsed += 1
-    current_datetime += timedelta(hours=hours)
-    distance_travelled += survivors.car_speed
+    survivors.ticks_elapsed += 1
+    survivors.current_datetime += timedelta(hours=hours)
+    survivors.distance_travelled += survivors.car_speed
 
 
 # This is called every tick of the game
@@ -48,9 +33,9 @@ def game_tick():
 
     screens.screen_list["travelling"]["draw_function"]()
 
-    dprint("Start of game tick: " + str(ticks_elapsed))
-    dprint("Current date: " + format_date(current_datetime))
-    dprint("Current time: " + format_time(current_datetime))
+    dprint("Start of game tick: " + str(survivors.ticks_elapsed))
+    dprint("Current date: " + format_date(survivors.current_datetime))
+    dprint("Current time: " + format_time(survivors.current_datetime))
 
     for event in events:
         event_random = random.uniform(0.0, 100.0)
@@ -115,12 +100,12 @@ def game_tick():
 
             survivor["ticks_since_bitten"] = ticks_since_bitten + 1
 
-    next_city = get_next_city(distance_travelled)
+    next_city = get_next_city(survivors.distance_travelled)
 
     if next_city is None:
         screens.screen_list["win"]["draw_function"]()
 
-    if next_city["distance_from_start"] - distance_travelled <= survivors.car_speed:
+    if next_city["distance_from_start"] - survivors.distance_travelled <= survivors.car_speed:
         screen.print_notification("You arrived in " + next_city["name"] + "!")
 
         if next_city["name"] == "New York":

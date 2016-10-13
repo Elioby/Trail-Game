@@ -3,10 +3,14 @@
 
 # This file contains data on the screens in the game
 
+import game
 import time
 import screen
 import survivors
 import ascii_helper
+
+from misc_utils import *
+from datetime import timedelta
 
 # TODO: These are currently useless because of the front buffer, maybe they won't be in future though?
 previous_screen = None
@@ -114,6 +118,7 @@ def draw_travelling_screen():
     road = 0
 
     while True:
+        # Draw survivors stats
         survivor_y = 0
 
         health_x = 0
@@ -131,7 +136,6 @@ def draw_travelling_screen():
 
         survivor_y = 0
 
-        # Must be even
         total_bars = 14
 
         for survivor in survivors.survivor_list:
@@ -149,6 +153,11 @@ def draw_travelling_screen():
                 screen.draw_text(health_x + 3, survivor_y + 1, "[" + (padding * " ") + "DEAD" + (padding * " ") + "]")
 
             survivor_y += 2
+
+        # Draw datetime
+
+        screen.draw_text(health_x + 30, 1, format_time(survivors.current_datetime))
+        screen.draw_text(health_x + 30, 3, format_date(survivors.current_datetime))
 
         # Draw the car
         screen.draw_ascii_image(car_x, car_y, car_body_image)
