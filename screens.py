@@ -4,6 +4,7 @@
 
 import time
 import screen
+import survivors
 import ascii_helper
 
 # TODO: These are currently useless because of the front buffer, maybe they won't be in future though?
@@ -111,9 +112,43 @@ def draw_travelling_screen():
     wheel = 0
     road = 0
 
-    screen.set_cursor(0, 0)
-
     while True:
+        survivor_y = 0
+
+        health_x = 0
+
+        for survivor in survivors.survivor_list:
+            survivor_name = survivor["name"]
+            survivor_name_length = len(survivor_name)
+
+            if survivor_name_length > health_x:
+                health_x = survivor_name_length
+
+            screen.draw_text(1, survivor_y + 1, survivor_name)
+
+            survivor_y += 2
+
+        survivor_y = 0
+
+        # Must be even
+        total_bars = 14
+
+        for survivor in survivors.survivor_list:
+            if survivor["alive"]:
+                remaining_bars = int(max((survivor["health"] / survivor["max_health"]) * total_bars, 1))
+
+                screen.draw_text(health_x + 3, survivor_y + 1, "[" + ("█" * remaining_bars) + (" " * (total_bars - remaining_bars)) + "]")
+
+                if survivor["zombified"]:
+                    screen.draw_text(health_x + total_bars + 6, survivor_y + 1, "(ZOMBIE)")
+                elif survivor["bitten"]:
+                    screen.draw_text(health_x + total_bars + 6, survivor_y + 1, "(BITTEN)")
+            else:
+                padding = int((total_bars - 4) / 2)
+                screen.draw_text(health_x + 3, survivor_y + 1, "[" + (padding * " ") + "DEAD" + (padding * " ") + "]")
+
+            survivor_y += 2
+
         # Draw the car
         screen.draw_ascii_image(car_x, car_y, car_body_image)
 

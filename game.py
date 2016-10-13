@@ -77,6 +77,9 @@ def game_tick():
 
                 # TODO: subtract a bullet from ammo?
                 screen.print_notification(random_survivor["name"] + " managed to shoot a zombified " + survivor["name"] + " dead.")
+
+                # NOTE: We don't want another zombie event this tick, as one has just been shot
+                break
             elif random_number <= 90:
                 random_survivor = get_random_survivor(True, True, False, False)
                 random_damage = random.randrange(1, 20)

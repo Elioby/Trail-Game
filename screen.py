@@ -88,7 +88,7 @@ def clear():
         cells_in_screen = console_buffer_info.dwSize.x * console_buffer_info.dwSize.y
 
         ctypes.windll.kernel32.FillConsoleOutputCharacterA(stdout, ctypes.c_char(b" "), cells_in_screen, win32_structs.COORD(0, 0), 0)
-        set_cursor(0, 0)
+        set_cursor_position(0, 0)
     else:
         os.system("clear")
 
@@ -148,10 +148,14 @@ def draw_pixel(pixel_x, pixel_y, pixel_char):
     if pixel_x >= width or pixel_y >= height:
         return
 
-    back_buffer[pixel_x][pixel_y] = pixel_char
+    try:
+        back_buffer[pixel_x][pixel_y] = pixel_char
+    except UnicodeEncodeError:
+        back_buffer[pixel_x][pixel_y] = str(pixel_char).encode(sys.stdout.encoding)
 
 
 def draw_text(text_x, text_y, text):
+    text = text
     text_length = len(text)
 
     for x in range(text_length):
@@ -165,41 +169,41 @@ def print_notification(message):
     x_start = (width / 2) - (message_length / 2)
     y_start = (height / 2)
 
-    set_cursor(x_start - 3, y_start - 2)
+    set_cursor_position(x_start - 3, y_start - 2)
 
     stdout_write_flush("╔" + "═" * (message_length + 4) + "╗")
 
-    set_cursor(x_start - 2, y_start - 1)
+    set_cursor_position(x_start - 2, y_start - 1)
 
     stdout_write_flush(" " * (message_length + 4))
 
-    set_cursor(x_start, y_start)
+    set_cursor_position(x_start, y_start)
 
     stdout_write_flush(message)
 
-    set_cursor(x_start - 2, y_start + 1)
+    set_cursor_position(x_start - 2, y_start + 1)
 
     stdout_write_flush(" " * (message_length + 4))
 
     for j in range(-1, 2):
-        set_cursor(x_start - 3, y_start + j)
+        set_cursor_position(x_start - 3, y_start + j)
         stdout_write_flush("║")
 
     for j in range(-1, 2):
-        set_cursor(x_start + message_length + 2, y_start + j)
+        set_cursor_position(x_start + message_length + 2, y_start + j)
         stdout_write_flush("║")
 
-    set_cursor(x_start - 2, y_start)
+    set_cursor_position(x_start - 2, y_start)
     stdout_write_flush(" " * 2)
 
-    set_cursor(x_start + message_length, y_start)
+    set_cursor_position(x_start + message_length, y_start)
     stdout_write_flush(" " * 2)
 
-    set_cursor(x_start - 3, y_start + 2)
+    set_cursor_position(x_start - 3, y_start + 2)
 
     stdout_write_flush("╚" + "═" * (message_length + 4) + "╝")
 
-    set_cursor(0, 0)
+    set_cursor_position(0, 0)
 
     wait_key()
 
@@ -211,7 +215,7 @@ def stdout_write_flush(message):
     sys.stdout.flush()
 
 
-def set_cursor(cursor_x, cursor_y):
+def set_cursor_position(cursor_x, cursor_y):
     if platform.system() == "Windows":
         adjusted_position = win32_structs.COORD(int(cursor_x), int(cursor_y))
 
@@ -288,7 +292,7 @@ def render_buffer(buffer_to_render):
         if end_y is None:
             end_y = 1
 
-        set_cursor(start_x, start_y)
+        set_cursor_position(start_x, start_y)
 
         y = 0
         for col in buffer_to_render.T:

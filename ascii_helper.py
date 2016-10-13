@@ -3,6 +3,8 @@
 # This file contains functions for reading, processing and altering ascii art
 
 import pip
+import sys
+import codecs
 import subprocess
 
 try:
@@ -20,7 +22,7 @@ def load_image(filename):
     if filename in image_cache:
         return image_cache[filename]
 
-    file = open(filename, 'r')
+    file = codecs.open(filename, "r", "utf-8")
 
     lines = file.readlines()
     final_lines = []
@@ -54,7 +56,10 @@ def load_image(filename):
 
     for line in final_lines:
         for char in line[left_stripped:right_strip_max]:
-            image_buffer[image_x][image_y] = char
+            try:
+                image_buffer[image_x][image_y] = char
+            except UnicodeEncodeError:
+                image_buffer[image_x][image_y] = str(char).encode(sys.stdout.encoding)
 
             image_x += 1
 
