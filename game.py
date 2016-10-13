@@ -17,9 +17,33 @@ from datetime import timedelta
 
 # You must use this method when changing the time
 def pass_time(hours):
-    # TODO: If the current time is 8pm, do food consumption
     if survivors.current_datetime.hour == 20 or (int(survivors.current_datetime.hour) < 20 < int(survivors.current_datetime.hour + hours)):
-        screen.print_notification("Food consumption should happen now.")
+        amount_of_food = 0
+        food = survivors.group_inventory["Food"]
+
+        if food is not None:
+            amount_of_food = food["amount"]
+
+        remaining_survivors = count_survivors(True, True, False, False)
+        required_food = remaining_survivors * 10
+
+        if amount_of_food < required_food:
+            screen.print_notification("You did not have enough food to feed the party fully, they go hungry.")
+
+            amount_not_fed = required_food - amount_of_food
+
+            for survivor in survivors.survivor_list:
+                if survivor["alive"] and not survivor["zombified"]:
+                    survivor["health"] -= int(amount_not_fed * 1.5)
+
+            food["amount"] = 0
+        else:
+            # TODO: what if you're alone, or in a 2, or a 3?
+            screen.print_notification("The party enjoys a full meal together.")
+
+            food["amount"] -= required_food
+
+        screen.print_notification("You have " + str(food["amount"]) + " food.")
 
     survivors.ticks_elapsed += 1
     survivors.current_datetime += timedelta(hours=hours)

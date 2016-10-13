@@ -29,21 +29,21 @@ group_money = 40.0
 # The MPH (miles per tick in this case) the car is curently moving at
 car_speed = 20.0
 
-group_inventory = [
+group_inventory = {
 
-    {
+    "Medkit": {
         "item": items.item_list["Medkit"],
 
         "amount": 1
     },
 
-    {
+    "Food": {
         "item": items.item_list["Food"],
 
         "amount": 100
     },
 
-]
+}
 
 # A list of "survivors", where the first element is the player, and the following 3 are the players friends.
 # 	The names of the survivors will be added in code after the user has entered this information.

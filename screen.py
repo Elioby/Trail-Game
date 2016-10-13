@@ -82,10 +82,7 @@ def wait_key():
 
 
 def clear():
-    if platform.system() == "Windows":
-        os.system("cls")
-    else:
-        os.system("clear")
+    os.system("cls")
 
 
 def get_width():
