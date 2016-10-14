@@ -146,14 +146,51 @@ def draw_resting_screen():
 
 
 def draw_put_down_screen():
-    # TODO: Code for the put down screen goes here
-
-    # TODO: Replace with something else
+    set_current_screen(screen_list["put_down"])
     screen.clear()
+    # Display the survivors status
+    # Players infromation:
+    if survivors.survivor_list[0]["bitten"] == False:
+        print("Your health is " + survivors.survivor_list[0]["health"] + ".")
+    elif survivor_list[0]["bitten"] == True:
+        print("Your health is " + survivors.survivor_list[0]["health"] + ", and you have been bitten.")
+    # Other survivors infromation:
+    for i in range (1,len(survivors.survivor_list)):
+        if survivors.survivor_list[i]["alive"] == True and survivors.survivor_list[i]["bitten"] == False:
+            print(survivors.survivor_list[i]["name"] + " has " + survivors.survivor_list[i]["health"] + " health.")
+        elif survivors.survivor_list[i]["alive"] == True and survivors.survivor_list[i]["bitten"] == True and survivors.survivor_list[i]["zombified"] == False:
+            print(survivors.survivor_list[i]["name"] + " has " + survivors.survivor_list[i]["health"] + " health, and has been bitten")
+        elif survivors.survivor_list[i]["alive"] == False:
+            print(survivors.survivor_list[i]["name"] + " is dead.")
+    print("")
 
-    print("This is the put down screen")
+#Display options
+while True:
+    option_count = 1
+    options_avaliable = {}
+    print("1: Go back")
+    for i in range (1,len(survivors.survivor_list)):
+        if survivors.survivor_list[i]["bitten"] == True and survivors.survivor_list[i]["alive"] == True:
+            option_count = option_count + 1
+            options_avaliable.update({str(option_count): i})
+            print(str(option_count) + ": Put down " + str(survivors.survivor_list[i]["name"]) + ".")
+    #Evaluate users input:
+    user_choice = raw_input("What would you like to do?")
+    if user_choice == "1":
+        #Return to city menu screen:c
+        draw_city_screen(get_next_city(survivors.distance_travelled))
+    elif user_choice <= option_count:
+        #search through opitons avalible to find who to kill:
+        survivors.survivor_list[options_avaliable[user_choice]]["alive"] = False
+        print("You have killed " + survivors.survivor_list[options_avaliable[user_choice]]["name"])
+    else:
+        #Invalid Input
+        print("Please enter a number between 1 and " + str(option_count) + ".")
 
-    screen.wait_key()
+
+
+
+
 
 
 def draw_travelling_screen():
@@ -177,8 +214,7 @@ def draw_travelling_screen():
     road = 0
 
     while True:
-        # Draw progress bar
-
+        # Draw travelling progress bar
         progress_bar_box_width = int(screen.get_width() / 1.5)
         progress_bar_box_x = int((screen.get_width() / 2) - (progress_bar_box_width / 2))
 
@@ -212,16 +248,13 @@ def draw_travelling_screen():
 
             survivor_y += 2
 
-        survivor_y = survivor_y_start
+        survivor_y = survivor_y_start + 1
 
         total_bars = 14
 
         for survivor in survivors.survivor_list:
             if survivor["alive"]:
-                remaining_bars = int(max((survivor["health"] / survivor["max_health"]) * total_bars, 1))
-
-                screen.draw_text(survivor_x_start + health_x + 3, survivor_y + 1,
-                                 "[" + ("█" * remaining_bars) + (" " * (total_bars - remaining_bars)) + "]")
+                screen.draw_progress_bar(survivor_x_start + health_x + 2, survivor_y, total_bars, survivor["health"] / survivor["max_health"])
 
                 if survivor["zombified"]:
                     screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y + 1, "(ZOMBIE)")
@@ -234,8 +267,7 @@ def draw_travelling_screen():
 
             survivor_y += 2
 
-        # Draw datetime
-
+        # Draw stats
         next_city = get_next_city(survivors.distance_travelled)
 
         stat_lines = ["Time: " + format_time(survivors.current_datetime),
