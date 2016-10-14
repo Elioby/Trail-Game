@@ -9,7 +9,9 @@ import survivors
 # This file contains misc utility functions that have no other place
 
 def get_month_name(month_number):
-    return ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][month_number - 1]
+    return \
+    ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",
+     "December"][month_number - 1]
 
 
 # TODO: This should return a nicely formatted date string from a datetime object ("2nd July 2009")
@@ -65,7 +67,7 @@ def get_end_distance():
         distance_from_start = city["distance_from_start"]
 
         if distance_from_start > biggest_distance:
-                biggest_distance = distance_from_start
+            biggest_distance = distance_from_start
 
     return biggest_distance
 
@@ -118,30 +120,34 @@ def count_survivors(if_player=True, if_bitten=True, if_zombified=False, if_dead=
         if not if_player and survivor_index == 0:
             continue
 
-        random_survivor = survivors.survivor_list[survivor_index]
+        survivor = survivors.survivor_list[survivor_index]
 
-        if not if_bitten and random_survivor["bitten"]:
+        if not if_bitten and survivor["bitten"]:
             continue
 
-        if not if_dead and not random_survivor["alive"]:
+        if not if_dead and not survivor["alive"]:
             continue
 
-        if not if_zombified and random_survivor["zombified"]:
+        if not if_zombified and survivor["zombified"]:
             continue
 
         remaining_survivor_count += 1
 
     return remaining_survivor_count
 
+
 # Dealing with the player input:
-def normalise_input(input):
-    usrInput = str(input)
+def normalise_input(user_input):
+    user_input = str(user_input)
+
     # Convert to lower case:
-    usrInput = usrInput.lower()
+    user_input = user_input.lower()
+
     # Remove any symbols:
     newStr = ""
-    for chr in usrInput:
-        if chr.isalpha() == True or chr.isdigit() == True or chr == " ":
-            newStr = newStr + chr
+    for char in user_input:
+        if char.isalpha() or char.isdigit() or char == " ":
+            newStr += char
+
     # Players input to be used:
     return newStr

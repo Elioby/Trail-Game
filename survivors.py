@@ -29,6 +29,17 @@ group_money = 40.0
 # The MPH (miles per tick in this case) the car is curently moving at
 car_speed = 20.0
 
+
+# TODO: This should add x items to the group inventory
+def inventory_add_item(item, amount):
+    pass
+
+
+# TODO: This should remove x items to the group inventory, and remove it from the list if amount = 0
+def inventory_remove_item(item, amount):
+    pass
+
+
 group_inventory = {
 
     "Medkit": {
@@ -89,7 +100,7 @@ survivor_list = [
 
         "max_health": default_health,
 
-        "bitten": True,
+        "bitten": False,
 
         "ticks_since_bitten": 0,
 

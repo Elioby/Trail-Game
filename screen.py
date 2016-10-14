@@ -268,7 +268,7 @@ def draw_text(text_x, text_y, text):
 
 
 # NOTE: this function does not use the front or back buffer as we want the front buffer to stay intact, this is why it's called print instead of draw
-def print_notification(message):
+def print_notification(message, redraw_on_exit=True):
     message_length = len(message)
 
     x_start = (width / 2) - (message_length / 2)
@@ -312,7 +312,8 @@ def print_notification(message):
 
     wait_key()
 
-    refresh()
+    if redraw_on_exit:
+        refresh()
 
 
 def stdout_write_flush(message):
