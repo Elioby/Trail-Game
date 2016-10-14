@@ -69,7 +69,7 @@ def draw_dead_screen():
 
 
 def draw_city_screen(city):
-    screen.clear()
+    #screen.clear()
     set_current_screen(screen_list["city"])
 
     while True:
@@ -83,10 +83,9 @@ def draw_city_screen(city):
         print("3: Trade with other survivors.")
         print("4: Go to the bar.")
         print("5: Rest.")
-        print("6: Move on to " + get_next_city(survivors.distance_travelled)["name"] + ".")
+        print("6: Move on to " + get_next_city(survivors.distance_travelled + survivors.car_speed)["name"] + ".")
         print("")
-        player_choice = input("What would you like to do? ")
-        screen.clear()
+        player_choice = "6"  # input("What would you like to do? ")
 
         # Evaluate the players decision:
         player_choice = normalise_input(player_choice)
@@ -95,7 +94,7 @@ def draw_city_screen(city):
             print("You are in " + city["name"] + ".")
             print(city["description"])
             # TODO: Maybe information on whats available, like traders, inns to stay, etc...?
-            print("The next city is " + get_next_city(survivors.distance_travelled)["name"] + ".")
+            print("The next city is " + get_next_city(survivors.distance_travelled + survivors.car_speed)["name"] + ".")
 
             # Return to options
             input("Press enter to go back...")
@@ -114,6 +113,7 @@ def draw_city_screen(city):
         elif player_choice == "6":
             # Continue to travelling screen
             return
+        # TODO: remove after debugged
         elif player_choice == "7":
             # Debugging for dead screen
             draw_dead_screen()
@@ -176,6 +176,24 @@ def draw_travelling_screen():
     road = 0
 
     while True:
+        # Draw progress bar
+
+        progress_bar_box_width = int(screen.get_width() / 1.5)
+        progress_bar_box_x = int((screen.get_width() / 2) - (progress_bar_box_width / 2))
+
+        progress_bar_width = progress_bar_box_width - 6
+
+        screen.draw_bordered_rect(progress_bar_box_x, -1, progress_bar_box_width, 5)
+
+        screen.draw_pixel(int(progress_bar_box_x + 2), 1, "|")
+
+        for x in range(progress_bar_box_x + 3, progress_bar_box_x + progress_bar_box_width - 3):
+            screen.draw_pixel(x, 1, "-")
+
+        progress_bar_current_x = progress_bar_box_x + 3 + ((survivors.distance_travelled / get_end_distance()) * progress_bar_width)
+
+        screen.draw_pixel(int(progress_bar_current_x), 2, "^")
+
         # Draw survivors stats
         survivor_y = survivor_y_start
 
@@ -280,7 +298,7 @@ def draw_travelling_screen():
         if road > 1:
             road = 0
 
-        time.sleep(0.15)
+        time.sleep(0.0015)
 
 
 def draw_win_screen():

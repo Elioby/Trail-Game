@@ -11,6 +11,9 @@ import ctypes
 import shutil
 import platform
 import subprocess
+
+import time
+
 import win32_structs
 
 try:
@@ -82,7 +85,7 @@ def wait_key():
 
 
 def clear():
-    os.system("cls")
+    subprocess.call(["cls"], shell=True)
 
 
 def get_width():
@@ -118,10 +121,10 @@ def draw_bordered_rect(rect_x, rect_y, rect_width, rect_height, fill_char=" "):
     for y in range(rect_y + 1, rect_y + rect_height - 1):
         draw_pixel(rect_x + rect_width - 1, y, "║")
 
-        draw_pixel(rect_x + rect_width - 1, y, "║")
-        draw_pixel(rect_x + rect_width - 1, y, "║")
-        draw_pixel(rect_x + rect_width - 1, y, "║")
-        draw_pixel(rect_x + rect_width - 1, y, "║")
+    draw_pixel(rect_x, rect_y, "╔")
+    draw_pixel(rect_x + rect_width - 1, rect_y, "╗")
+    draw_pixel(rect_x, rect_y + rect_height - 1, "╚")
+    draw_pixel(rect_x + rect_width - 1, rect_y + rect_height - 1, "╝")
 
     if fill_char is not None:
         for x in range(rect_x + 1, rect_x + rect_width - 1):
@@ -161,7 +164,7 @@ def draw_pixel(pixel_x, pixel_y, pixel_char):
         if buffer_end["y"] is None or pixel_y > buffer_end["y"]:
             buffer_end["y"] = pixel_y
 
-    if pixel_x >= width or pixel_y >= height:
+    if pixel_x >= width or pixel_x < 0 or pixel_y >= height or pixel_y < 0:
         return
 
     try:
@@ -221,7 +224,9 @@ def print_notification(message):
 
     set_cursor_position(0, 0)
 
-    wait_key()
+    # TODO: wait_key()
+
+    time.sleep(0.5)
 
     refresh()
 
@@ -280,7 +285,7 @@ def render_buffer(buffer_to_render):
             0x40000000 | 0x80000000,  # Generic read and write permissions
             1 | 2,  # We want read and write permissions
             0,
-            3,  # Open the file only if it exists
+            3,  # Open the "file" only if it exists
             0,
             0)
 
@@ -289,8 +294,11 @@ def render_buffer(buffer_to_render):
 
         if ctypes.windll.kernel32.WriteConsoleOutputA(console_handle, ctypes.byref(buf), win32_structs.COORD(width, height),
                                                       win32_structs.COORD(0, 0),
-                                                      ctypes.byref(win32_structs.SMALL_RECT(0, 0, width - 1, height - 1))) == 0:
+                                                      ctypes.byref(win32_structs.SMALL_RECT(0, 0, width, height))) == 0:
             raise ctypes.WinError()
+
+        # NOTE: Always remember to close your handles!
+        ctypes.windll.kernel32.CloseHandle(console_handle)
     else:
         clear()
 
@@ -329,3 +337,4 @@ def render_buffer(buffer_to_render):
 
             if y > end_y:
                 break
+        pass

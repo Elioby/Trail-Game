@@ -58,6 +58,18 @@ def format_time(datetime_object):
     return time
 
 
+def get_end_distance():
+    biggest_distance = 0
+
+    for city in cities.city_list.values():
+        distance_from_start = city["distance_from_start"]
+
+        if distance_from_start > biggest_distance:
+                biggest_distance = distance_from_start
+
+    return biggest_distance
+
+
 def get_next_city(distance):
     chosen_city = None
 
