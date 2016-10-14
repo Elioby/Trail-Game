@@ -14,7 +14,8 @@ import subprocess
 
 import time
 
-import win32_structs
+if platform.system() == "Windows":
+    import win32_structs
 
 try:
     import numpy
