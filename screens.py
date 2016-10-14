@@ -175,7 +175,7 @@ while True:
             options_avaliable.update({str(option_count): i})
             print(str(option_count) + ": Put down " + str(survivors.survivor_list[i]["name"]) + ".")
     #Evaluate users input:
-    user_choice = raw_input("What would you like to do?")
+    user_choice = input("What would you like to do? ")
     if user_choice == "1":
         #Return to city menu screen:c
         draw_city_screen(get_next_city(survivors.distance_travelled))
