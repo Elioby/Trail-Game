@@ -47,6 +47,16 @@ def draw_starting_screen():
     screen.wait_key()
 
 
+def draw_points_screen():
+    screen.clear()
+
+    set_current_screen(screen_list["points"])
+
+    print("This is the points screen")
+
+    screen.wait_key()
+
+
 def draw_dead_screen():
     # TODO: Code for the dead screen goes here
     # TODO: This function should never return (use quit() ? unless that's a bad idea for some reason)
@@ -354,6 +364,12 @@ screen_list = {
         "name": "starting",
 
         "draw_function": draw_starting_screen
+    },
+
+    "points": {
+        "name": "points",
+
+        "draw_function": draw_points_screen
     },
 
     "dead": {
