@@ -164,6 +164,32 @@ def draw_ascii_image(image_x, image_y, ascii_image):
         image_x += 1
 
 
+# TODO: draw a box of wrapped text, like notifcations but multi-line
+def draw_text_box():
+    pass
+
+
+def draw_decision(body_text, decisions, decision_x=None, decision_y=None, max_width=None, max_height=None):
+    box_width = int(get_width() - get_width() / 6)
+    box_height = int(get_height() - get_height() / 6)
+
+    if max_width is not None:
+        box_width = min(box_width, max_width)
+
+    if max_height is not None:
+        box_height = min(box_height, max_height)
+
+    if decision_x is None:
+        decision_x = int((get_width() / 2) - (box_width / 2))
+
+    if decision_y is None:
+        decision_y = int((get_height() / 2) - (box_height / 2))
+
+    draw_bordered_rect(decision_x, decision_y, box_width, box_height, " ")
+
+    draw_text_wrapped(decision_x + 6, decision_y + 3, body_text, box_width - 1, False)
+
+
 def draw_pixel(pixel_x, pixel_y, pixel_char):
     if pixel_char != "" and pixel_char != " ":
         if buffer_start["y"] is None or pixel_y < buffer_start["y"]:
@@ -179,6 +205,56 @@ def draw_pixel(pixel_x, pixel_y, pixel_char):
         back_buffer[pixel_x][pixel_y] = pixel_char
     except UnicodeEncodeError:
         back_buffer[pixel_x][pixel_y] = str(pixel_char).encode(sys.stdout.encoding)
+
+
+# TODO: (Add docs) returns the amount of vertical lines it used
+def draw_text_wrapped(text_x, text_y, text, max_length, indent = False):
+    text_length = len(text)
+
+    words = text.split(" ")
+
+    x = text_x
+    y = text_y
+
+    for word in words:
+        word_length = len(word)
+
+        if x + word_length > max_length:
+            x = text_x
+
+            if indent:
+                x += 2
+
+            y += 1
+
+        for i in range(word_length):
+            char = word[i]
+
+            if char is "\n":
+                y += 1
+                x = text_x
+
+                if indent:
+                    x += 2
+
+                continue
+            else:
+                draw_pixel(x, y, char)
+
+            if x > max_length:
+                x = text_x
+
+                if indent:
+                    x += 2
+
+                y += 1
+
+            x += 1
+
+        if x != text_length:
+            x += 1
+
+    return 1
 
 
 def draw_text(text_x, text_y, text):
