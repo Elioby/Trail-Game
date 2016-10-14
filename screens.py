@@ -150,18 +150,18 @@ def draw_put_down_screen():
     screen.clear()
     # Display the survivors status
     # Players infromation:
-    if survivor_list[0]["bitten"] == False:
-        print("Your health is " + survivor_list[0]["health"] + ".")
+    if survivors.survivor_list[0]["bitten"] == False:
+        print("Your health is " + survivors.survivor_list[0]["health"] + ".")
     elif survivor_list[0]["bitten"] == True:
-        print("Your health is " + survivor_list[0]["health"] + ", and you have been bitten.")
+        print("Your health is " + survivors.survivor_list[0]["health"] + ", and you have been bitten.")
     # Other survivors infromation:
-    for i in range (1,len(survivor_list)):
-        if survivor_list[i]["alive"] == True and survivor_list[i]["bitten"] == False:
-            print(survivor_list[i]["name"] + " has " + survivor_list[i]["health"] + " health.")
-        elif survivor_list[i]["alive"] == True and survivor_list[i]["bitten"] == True and survivor_list[i]["zombified"] == False:
-            print(survivor_list[i]["name"] + " has " + survivor_list[i]["health"] + " health, and has been bitten")
-        elif survivor_list[i]["alive"] == False:
-            print(survivor_list[i]["name"] + " is dead.")
+    for i in range (1,len(survivors.survivor_list)):
+        if survivors.survivor_list[i]["alive"] == True and survivors.survivor_list[i]["bitten"] == False:
+            print(survivors.survivor_list[i]["name"] + " has " + survivors.survivor_list[i]["health"] + " health.")
+        elif survivors.survivor_list[i]["alive"] == True and survivors.survivor_list[i]["bitten"] == True and survivors.survivor_list[i]["zombified"] == False:
+            print(survivors.survivor_list[i]["name"] + " has " + survivors.survivor_list[i]["health"] + " health, and has been bitten")
+        elif survivors.survivor_list[i]["alive"] == False:
+            print(survivors.survivor_list[i]["name"] + " is dead.")
     print("")
 
 #Display options
@@ -169,11 +169,11 @@ while True:
     option_count = 1
     options_avaliable = {}
     print("1: Go back")
-    for i in range (1,len(survivor_list)):
-        if survivor_list[i]["bitten"] == True and survivor_list[i]["alive"] == True:
+    for i in range (1,len(survivors.survivor_list)):
+        if survivors.survivor_list[i]["bitten"] == True and survivors.survivor_list[i]["alive"] == True:
             option_count = option_count + 1
             options_avaliable.update({str(option_count): i})
-            print(str(option_count) + ": Put down " + survivor_list[i]["name"] + ".")
+            print(str(option_count) + ": Put down " + str(survivors.survivor_list[i]["name"]) + ".")
     #Evaluate users input:
     user_choice = raw_input("What would you like to do?")
     if user_choice == "1":
@@ -181,8 +181,8 @@ while True:
         draw_city_screen(get_next_city(survivors.distance_travelled))
     elif user_choice <= option_count:
         #search through opitons avalible to find who to kill:
-        survivor_list[options_avaliable[user_choice]]["alive"] = False
-        print("You have killed " + survivor_list[options_avaliable[user_choice]]["name"])
+        survivors.survivor_list[options_avaliable[user_choice]]["alive"] = False
+        print("You have killed " + survivors.survivor_list[options_avaliable[user_choice]]["name"])
     else:
         #Invalid Input
         print("Please enter a number between 1 and " + option_count + ".")
