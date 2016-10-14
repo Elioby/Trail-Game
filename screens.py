@@ -146,21 +146,23 @@ def draw_resting_screen():
 
 
 def draw_put_down_screen():
-#Display the survivors status
-#Players infromation:
-if survivor_list[0]["bitten"] == False:
-    print("Your health is " + survivor_list[0]["health"] + ".")
-elif survivor_list[0]["bitten"] == True:
-    print("Your health is " + survivor_list[0]["health"] + ", and you have been bitten.")
-#Other survivors infromation:
-for i in range (1,len(survivor_list)):
-    if survivor_list[i]["alive"] == True and survivor_list[i]["bitten"] == False:
-        print(survivor_list[i]["name"] + " has " + survivor_list[i]["health"] + " health.")
-    elif survivor_list[i]["alive"] == True and survivor_list[i]["bitten"] == True and survivor_list[i]["zombified"] == False:
-        print(survivor_list[i]["name"] + " has " + survivor_list[i]["health"] + " health, and has been bitten")
-    elif survivor_list[i]["alive"] == False:
-        print(survivor_list[i]["name"] + " is dead.")
-print("")
+    set_current_screen(screen_list["put_down"])
+    screen.clear()
+    # Display the survivors status
+    # Players infromation:
+    if survivor_list[0]["bitten"] == False:
+        print("Your health is " + survivor_list[0]["health"] + ".")
+    elif survivor_list[0]["bitten"] == True:
+        print("Your health is " + survivor_list[0]["health"] + ", and you have been bitten.")
+    # Other survivors infromation:
+    for i in range (1,len(survivor_list)):
+        if survivor_list[i]["alive"] == True and survivor_list[i]["bitten"] == False:
+            print(survivor_list[i]["name"] + " has " + survivor_list[i]["health"] + " health.")
+        elif survivor_list[i]["alive"] == True and survivor_list[i]["bitten"] == True and survivor_list[i]["zombified"] == False:
+            print(survivor_list[i]["name"] + " has " + survivor_list[i]["health"] + " health, and has been bitten")
+        elif survivor_list[i]["alive"] == False:
+            print(survivor_list[i]["name"] + " is dead.")
+    print("")
 
 #Display options
 while True:
