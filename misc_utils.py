@@ -133,15 +133,15 @@ def count_survivors(if_player=True, if_bitten=True, if_zombified=False, if_dead=
 
     return remaining_survivor_count
 
-#Dealing with the player input:
+# Dealing with the player input:
 def normalise_input(input):
     usrInput = str(input)
-    #convert to lower case:
+    # Convert to lower case:
     usrInput = usrInput.lower()
-    #Remove any symbols:
+    # Remove any symbols:
     newStr = ""
     for chr in usrInput:
         if chr.isalpha() == True or chr.isdigit() == True or chr == " ":
             newStr = newStr + chr
-    #players input to be used:
+    # Players input to be used:
     return newStr
