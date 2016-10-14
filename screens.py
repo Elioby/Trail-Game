@@ -58,12 +58,13 @@ def draw_dead_screen():
 
     game_over_image = ascii_helper.load_image("resources/dead_game_over.ascii")
     tombstone_image = ascii_helper.load_image("resources/dead_tombstone.ascii")
-    game_over_x = int((screen.get_width() / 2) - (game_over_image["width"] / 2))
-    tombstone_x = int((screen.get_width() / 2) - (tombstone_image["width"] / 2))
+    game_over_x = int((screen.get_width() / 2) - (game_over_image["width"] / 2)) - 3
+    tombstone_x = int((screen.get_width() / 2) - (tombstone_image["width"] / 2)) - 1
     screen.draw_ascii_image(game_over_x, 0, game_over_image)
     screen.draw_ascii_image(tombstone_x, game_over_image["height"] + 2, tombstone_image)
     screen.flush()
-    screen.wait_key()
+    time.sleep(2)
+    screen.print_notification("Press any key to exit!")
     screen.clear()
     quit()
 
