@@ -85,7 +85,10 @@ def wait_key():
 
 
 def clear():
-    subprocess.call(["cls"], shell=True)
+    if platform.system() == "Windows":
+        os.system("cls")
+    else:
+        os.system("clear")
 
 
 def get_width():
@@ -224,9 +227,7 @@ def print_notification(message):
 
     set_cursor_position(0, 0)
 
-    # TODO: wait_key()
-
-    time.sleep(0.5)
+    wait_key()
 
     refresh()
 

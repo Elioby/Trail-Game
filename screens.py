@@ -69,7 +69,6 @@ def draw_dead_screen():
 
 
 def draw_city_screen(city):
-    #screen.clear()
     set_current_screen(screen_list["city"])
 
     while True:
@@ -85,11 +84,12 @@ def draw_city_screen(city):
         print("5: Rest.")
         print("6: Move on to " + get_next_city(survivors.distance_travelled + survivors.car_speed)["name"] + ".")
         print("")
-        player_choice = "6"  # input("What would you like to do? ")
+        player_choice = input("What would you like to do? ")
 
         # Evaluate the players decision:
         player_choice = normalise_input(player_choice)
         if player_choice == "1":
+            screen.clear()
             # Get information
             print("You are in " + city["name"] + ".")
             print(city["description"])
@@ -186,6 +186,7 @@ def draw_travelling_screen():
         screen.draw_bordered_rect(progress_bar_box_x, -1, progress_bar_box_width, 5)
 
         screen.draw_pixel(int(progress_bar_box_x + 2), 1, "|")
+        screen.draw_pixel(int(progress_bar_box_x + progress_bar_width + 3), 1, "|")
 
         for x in range(progress_bar_box_x + 3, progress_bar_box_x + progress_bar_box_width - 3):
             screen.draw_pixel(x, 1, "-")
@@ -298,7 +299,7 @@ def draw_travelling_screen():
         if road > 1:
             road = 0
 
-        time.sleep(0.0015)
+        time.sleep(0.15)
 
 
 def draw_win_screen():
