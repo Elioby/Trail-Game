@@ -164,28 +164,28 @@ def draw_put_down_screen():
             print(survivors.survivor_list[i]["name"] + " is dead.")
     print("")
 
-#Display options
-while True:
-    option_count = 1
-    options_avaliable = {}
-    print("1: Go back")
-    for i in range (1,len(survivors.survivor_list)):
-        if survivors.survivor_list[i]["bitten"] == True and survivors.survivor_list[i]["alive"] == True:
-            option_count = option_count + 1
-            options_avaliable.update({str(option_count): i})
-            print(str(option_count) + ": Put down " + str(survivors.survivor_list[i]["name"]) + ".")
-    #Evaluate users input:
-    user_choice = input("What would you like to do? ")
-    if user_choice == "1":
-        #Return to city menu screen:c
-        draw_city_screen(get_next_city(survivors.distance_travelled))
-    elif user_choice <= option_count:
-        #search through opitons avalible to find who to kill:
-        survivors.survivor_list[options_avaliable[user_choice]]["alive"] = False
-        print("You have killed " + survivors.survivor_list[options_avaliable[user_choice]]["name"])
-    else:
-        #Invalid Input
-        print("Please enter a number between 1 and " + str(option_count) + ".")
+    # Display options
+    while True:
+        option_count = 1
+        options_avaliable = {}
+        print("1: Go back")
+        for i in range (1,len(survivors.survivor_list)):
+            if survivors.survivor_list[i]["bitten"] == True and survivors.survivor_list[i]["alive"] == True:
+                option_count = option_count + 1
+                options_avaliable.update({str(option_count): i})
+                print(str(option_count) + ": Put down " + str(survivors.survivor_list[i]["name"]) + ".")
+        # Evaluate users input:
+        user_choice = input("What would you like to do? ")
+        if user_choice == "1":
+            # Return to city menu screen:c
+            draw_city_screen(get_next_city(survivors.distance_travelled))
+        elif user_choice <= option_count:
+            # search through opitons avalible to find who to kill:
+            survivors.survivor_list[options_avaliable[user_choice]]["alive"] = False
+            print("You have killed " + survivors.survivor_list[options_avaliable[user_choice]]["name"])
+        else:
+            # Invalid Input
+            print("Please enter a number between 1 and " + str(option_count) + ".")
 
 
 
