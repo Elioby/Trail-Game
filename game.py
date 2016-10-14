@@ -75,7 +75,7 @@ def game_tick():
                 if event_function is not None:
                     event_function()
 
-                    # NOTE: we don't want more than one event per tick
+                    # NOTE: We don't want more than one event per tick
                     break
 
     for survivor in survivors.survivor_list:
@@ -86,7 +86,7 @@ def game_tick():
                 random_survivor = get_random_survivor(True, True, False, False)
                 survivor["alive"] = False
 
-                # TODO: subtract a bullet from ammo?
+                # TODO: Subtract a bullet from ammo?
                 screen.print_notification(random_survivor["name"] + " managed to shoot a zombified " + survivor["name"] + " dead.")
 
                 # NOTE: We don't want another zombie event this tick, as one has just been shot
@@ -177,7 +177,7 @@ def main():
         # Simulate one game tick
         game_tick()
 
-        # NOTE: this may cause weird drawing bugs
+        # NOTE: This may cause weird drawing bugs
         if screens.current_screen is not None and screens.current_screen["name"] != "travelling":
             screens.screen_list["travelling"]["draw_function"]()
 

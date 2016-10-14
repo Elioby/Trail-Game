@@ -114,7 +114,7 @@ def draw_city_screen(city):
         elif player_choice == "6":
             # Continue to travelling screen
             return
-        # TODO: remove after debugged
+        # TODO: Remove after debugged
         elif player_choice == "7":
             # Debugging for dead screen
             draw_dead_screen()
@@ -208,7 +208,7 @@ def draw_travelling_screen():
     car_x = int((screen.get_width() / 2) - (car_body_image["width"] / 2))
     car_y = survivor_y_start - car_body_image["height"] - 5
 
-    # TODO: this is kinda messy
+    # TODO: This is kinda messy
     iterations = 0
     wheel = 0
     road = 0
