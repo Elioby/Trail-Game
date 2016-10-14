@@ -89,7 +89,7 @@ survivor_list = [
 
         "max_health": default_health,
 
-        "bitten": False,
+        "bitten": True,
 
         "ticks_since_bitten": 0,
 
