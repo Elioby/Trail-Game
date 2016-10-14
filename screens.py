@@ -52,7 +52,13 @@ def draw_points_screen():
 
     set_current_screen(screen_list["points"])
 
-    print("This is the points screen")
+    points = 0
+
+    points += survivors.distance_travelled
+
+    points += count_survivors(True, False, False, False)
+
+    print("You have " + str(points) + ".")
 
     screen.wait_key()
 
