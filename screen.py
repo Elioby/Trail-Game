@@ -135,6 +135,11 @@ def draw_bordered_rect(rect_x, rect_y, rect_width, rect_height, fill_char=" "):
                 draw_pixel(x, y, fill_char)
 
 
+def draw_progress_bar(bar_x, bar_y, length, progress):
+    remaining_bars = int(max(progress * length, 1))
+
+    draw_text(bar_x, bar_y, "[" + ("█" * remaining_bars) + (" " * (length - remaining_bars)) + "]")
+
 def draw_ascii_image(image_x, image_y, ascii_image):
     image_buffer = ascii_image["image_buffer"]
     image_width = ascii_image["width"]
