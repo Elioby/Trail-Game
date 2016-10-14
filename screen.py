@@ -48,7 +48,8 @@ def init():
     global height
 
     # Get the handle of the console's standard output (stdout)
-    stdout = ctypes.windll.kernel32.GetStdHandle(-11)
+    if platform.system() == "Windows":
+        stdout = ctypes.windll.kernel32.GetStdHandle(-11)
 
     width = shutil.get_terminal_size()[0] - 1
     height = shutil.get_terminal_size()[1] - 1
