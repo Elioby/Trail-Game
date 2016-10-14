@@ -173,17 +173,24 @@ def draw_put_down_screen():
         for i in range (1,len(survivors.survivor_list)):
             if survivors.survivor_list[i]["alive"] == True:
                 option_count = option_count + 1
-                options_avaliable.update({str(option_count): i})
+                options_avaliable.update({option_count: i})
                 print(str(option_count) + ": Put down " + str(survivors.survivor_list[i]["name"]) + ".")
         # Evaluate users input:
         user_choice = input("What would you like to do? ")
-        if user_choice == "1":
+
+        try:
+            user_choice = int(user_choice)
+        except ValueError:
+            print("Please enter a number.")
+            continue
+
+        if user_choice == 1:
             # Return to city menu screen:c
             draw_city_screen(get_next_city(survivors.distance_travelled))
-        elif user_choice == "2":
+        elif user_choice == 2:
             # Suicide
             draw_dead_screen()
-        elif int(user_choice) <= option_count:
+        elif user_choice <= option_count:
             # search through opitons avalible to find who to kill:
             survivors.survivor_list[options_avaliable[user_choice]]["alive"] = False
             print("You have killed " + survivors.survivor_list[options_avaliable[user_choice]]["name"])
