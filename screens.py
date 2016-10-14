@@ -185,13 +185,12 @@ while True:
         print("You have killed " + survivors.survivor_list[options_avaliable[user_choice]]["name"])
     else:
         #Invalid Input
-        print("Please enter a number between 1 and " + option_count + ".")
+        print("Please enter a number between 1 and " + str(option_count) + ".")
 
-    screen.clear()
 
-    print("This is the put down screen")
 
-    screen.wait_key()
+
+
 
 
 def draw_travelling_screen():
