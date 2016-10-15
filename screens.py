@@ -43,29 +43,6 @@ def draw_starting_screen():
     screen.wait_key()
 
 
-# TODO: this needs some prettifying
-def draw_points_screen():
-    screen.clear()
-
-    set_current_screen(screen_list["points"])
-
-    points = 0
-
-    points += survivors.distance_travelled
-
-    points += count_survivors(True, False, False, False) * 250
-
-    print("Total score: " + str(points) + ".")
-
-    time.sleep(2)
-
-    screen.print_notification("Press any key to exit.", False)
-
-    screen.clear()
-
-    quit()
-
-
 def draw_dead_screen():
     screen.clear()
     set_current_screen(screen_list["dead"])
@@ -100,6 +77,29 @@ def draw_win_screen():
     print("You made it to New York! You win!")
 
     draw_points_screen()
+
+
+# TODO: this needs some prettifying
+def draw_points_screen():
+    screen.clear()
+
+    set_current_screen(screen_list["points"])
+
+    points = 0
+
+    points += survivors.distance_travelled
+
+    points += count_survivors(True, False, False, False) * 250
+
+    print("Total score: " + str(points) + ".")
+
+    time.sleep(2)
+
+    screen.print_notification("Press any key to exit.", False)
+
+    screen.clear()
+
+    quit()
 
 
 def draw_city_screen(city):
@@ -151,10 +151,6 @@ def draw_city_screen(city):
         elif player_choice == "7":
             # Debugging for dead screen
             draw_dead_screen()
-        # TODO: Remove after debugged
-        elif player_choice == "8":
-            # Debugging for dead screen
-            draw_points_screen()
         else:
             # Invalid input
             print("Please enter a number between 1 and 6.")
@@ -166,7 +162,33 @@ def draw_trading_screen():
     # TODO: Replace with something else
     screen.clear()
 
-    print("This is the trading screen")
+    survivors_items_count = len(survivors.group_inventory)
+
+    if survivors_items_count <= 0 and survivors.group_money <= 0:
+        print("You have nothing to trade.")
+        time.sleep(2)
+        return
+
+    trades = {}
+
+    for i in range(3):
+        # None means use money
+        survivors_item = None
+
+        # If they have more than 0 items, and they either don't have money or a 60% chance, use random item - otherwise use money for this trade
+        if survivors_items_count > 0 and (survivors.group_money <= 0 or random.randrange(1, 100) <= 60):
+            # Get a random item from the group inventory
+            survivors_item = get_random_dict_value(survivors.group_inventory)
+
+        if survivors_item is not None:
+            print("Use item " + str(survivors_item))
+        else:
+            print("Use money")
+
+    if len(trades) == 0:
+        print("You have nothing to trade.")
+        time.sleep(2)
+        return
 
     screen.wait_key()
 
@@ -392,12 +414,6 @@ screen_list = {
         "draw_function": draw_starting_screen
     },
 
-    "points": {
-        "name": "points",
-
-        "draw_function": draw_points_screen
-    },
-
     "dead": {
         "name": "dead",
 
@@ -408,6 +424,12 @@ screen_list = {
         "name": "win",
 
         "draw_function": draw_win_screen
+    },
+
+    "points": {
+        "name": "points",
+
+        "draw_function": draw_points_screen
     },
 
     "city": {
