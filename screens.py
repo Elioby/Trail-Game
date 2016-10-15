@@ -59,12 +59,40 @@ def draw_starting_screen():
         user_input = input()
 
         if user_input == "1":
-            draw_city_screen(get_next_city(0))
+            draw_survivor_name_screen()
             # TODO: survivor naming screen
-        # elif user_input == "2":
-            # TODO:  draw info screen
+        elif user_input == "2":
+            draw_info_screen()
         elif user_input == "3":
+            screen.clear()
             quit()
+
+
+def draw_info_screen():
+    pass
+
+
+def get_max_user_input(print_text, alt_text, max_length):
+    user_input = input(print_text)
+
+    while len(user_input) > max_length:
+        user_input = input(alt_text)
+    return user_input
+
+
+def draw_survivor_name_screen():
+    screen.clear()
+    name = get_max_user_input("Enter your name: ", "Enter a valid name: ",  16)
+    # Leave the name as default when player enters nothing
+    if len(name) > 0:
+        survivors.survivor_list[0]["name"] = name
+
+    for i in range(0, 3):
+        name = get_max_user_input("Enter your friend's name: ", "Enter a valid friend's name: ", 16)
+        if len(name) > 0:
+            survivors.survivor_list[i + 1]["name"] = name
+
+    draw_city_screen(get_next_city(0))
 
 
 def draw_dead_screen():
@@ -190,6 +218,7 @@ def draw_city_screen(city):
             draw_resting_screen()
         elif player_choice == "6":
             # Continue to travelling screen
+            draw_travelling_screen()
             return
         # TODO: Remove after debugged
         elif player_choice == "7":
@@ -294,10 +323,10 @@ def draw_put_down_screen():
         print("2: Commit suicide")
 
         for i in range(1, len(survivors.survivor_list)):
-            if survivor["alive"]:
+            if survivors.survivor_list[i]["alive"]:
                 option_count += 1
                 options_available.update({option_count: i})
-                print(str(option_count) + ": Put down " + str(survivor["name"]) + ".")
+                print(str(option_count) + ": Put down " + str(survivors.survivor_list[i]["name"]) + ".")
 
         # Evaluate users input:
         user_choice = input("What would you like to do? ")
@@ -519,5 +548,17 @@ screen_list = {
         "name": "travelling",
 
         "draw_function": draw_travelling_screen
+    },
+
+    "info": {
+        "name": "info",
+
+        "draw_function": draw_info_screen
+    },
+
+    "survivor_name": {
+        "name": "survivor_name",
+
+        "draw_function": draw_survivor_name_screen
     },
 }
