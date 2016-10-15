@@ -74,7 +74,20 @@ def draw_win_screen():
 
     # TODO: Replace with something else
 
-    print("You made it to New York! You win!")
+    win_title_image = ascii_helper.load_image("resources/win_title.ascii")
+    win_text_image = ascii_helper.load_image("resources/win_text.ascii")
+
+    win_title_x = int((screen.get_width() / 2) - (win_title_image["width"] / 2))
+    win_text_x = int((screen.get_width() / 2) - (win_text_image["width"] / 2))
+
+    screen.draw_ascii_image(win_title_x, 0, win_title_image)
+    screen.draw_ascii_image(win_text_x, win_title_image["height"], win_text_image)
+
+    screen.flush()
+
+    time.sleep(6)
+
+    screen.print_notification("Press any key to continue.", False)
 
     draw_points_screen()
 
@@ -151,6 +164,14 @@ def draw_city_screen(city):
         elif player_choice == "7":
             # Debugging for dead screen
             draw_dead_screen()
+        # TODO: Remove after debugged
+        elif player_choice == "8":
+            # Debugging for dead screen
+            draw_points_screen()
+        elif player_choice == "9":
+            # Debugging for win screen
+            draw_win_screen()
+        # TODO: Remove after debugged
         else:
             # Invalid input
             print("Please enter a number between 1 and 6.")
