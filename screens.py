@@ -51,12 +51,20 @@ def draw_starting_screen():
         user_input = input()
 
         if user_input == "1":
-            draw_city_screen(get_next_city(0))
+            draw_survivor_name_screen()
             # TODO: survivor naming screen
-        # elif user_input == "2":
-            # TODO:  draw info screen
+        elif user_input == "2":
+            draw_info_screen()
         elif user_input == "3":
+            screen.clear()
             quit()
+
+
+def draw_info_screen():
+    pass
+
+def draw_survivor_name_screen():
+    draw_city_screen(get_next_city(0))
 
 
 def draw_dead_screen():
@@ -498,5 +506,17 @@ screen_list = {
         "name": "travelling",
 
         "draw_function": draw_travelling_screen
+    },
+
+    "info": {
+        "name": "info",
+
+        "draw_function": draw_info_screen
+    },
+
+    "survivor_name": {
+        "name": "survivor_name",
+
+        "draw_function": draw_survivor_name_screen
     },
 }
