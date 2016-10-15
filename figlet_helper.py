@@ -29,7 +29,7 @@ def load_font(filename):
 
     height, base_line, max_length, old_layout, comment_lines = map(int, header_numbers[:5])
 
-    font = {"hardblank_character": hardblank_character, "height": height, "font_data": sections[height + 2:]}
+    font = {"hardblank_character": hardblank_character, "height": height, "font_data": sections[comment_lines:]}
 
     font_cache[filename] = font
 

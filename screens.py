@@ -4,6 +4,7 @@
 # This file contains data on the screens in the game
 
 import time
+import items
 
 import ascii_helper
 import figlet_helper
@@ -36,9 +37,9 @@ def draw_starting_screen():
 
     set_current_screen(screen_list["starting"])
 
-    title_text = "Survival Trail"
-
     big_font = figlet_helper.load_font("resources/fonts/big.flf")
+
+    title_text = "Survival Trail"
 
     title_width = figlet_helper.get_text_width(title_text, big_font)
 
@@ -92,14 +93,20 @@ def draw_win_screen():
     screen.clear()
     set_current_screen(screen_list["win"])
 
-    win_title_image = ascii_helper.load_image("resources/win_title.ascii")
-    win_text_image = ascii_helper.load_image("resources/win_text.ascii")
+    big_font = figlet_helper.load_font("resources/fonts/big.flf")
+    contessa_font = figlet_helper.load_font("resources/fonts/contessa.flf")
 
-    win_title_x = int((screen.get_width() / 2) - (win_title_image["width"] / 2))
-    win_text_x = int((screen.get_width() / 2) - (win_text_image["width"] / 2))
+    win_title_text = "You Win!"
+    win_body_text = "You reached New York in time"
 
-    screen.draw_ascii_image(win_title_x, 0, win_title_image)
-    screen.draw_ascii_image(win_text_x, win_title_image["height"], win_text_image)
+    win_title_width = figlet_helper.get_text_width(win_title_text, big_font)
+    win_body_width = figlet_helper.get_text_width(win_body_text, contessa_font)
+
+    win_title_x = int((screen.get_width() / 2) - (win_title_width / 2))
+    win_body_x = int((screen.get_width() / 2) - (win_body_width / 2))
+
+    screen.draw_ascii_font_text(win_title_x, 0, win_title_text, big_font)
+    screen.draw_ascii_font_text(win_body_x, big_font["height"], win_body_text, contessa_font)
 
     screen.flush()
 
@@ -214,7 +221,7 @@ def draw_trading_screen():
         time.sleep(2)
         return
 
-    trades = {}
+    previous_trades = []
 
     for i in range(3):
         # None means use money
@@ -225,15 +232,22 @@ def draw_trading_screen():
             # Get a random item from the group inventory
             survivors_item = get_random_dict_value(survivors.group_inventory)
 
-        if survivors_item is not None:
-            print("Use item " + str(survivors_item))
-        else:
-            print("Use money")
+        trader_item = None
 
-    if len(trades) == 0:
-        print("You have nothing to trade.")
-        time.sleep(2)
-        return
+        while True:
+            # TODO: let the trader offer money for items if the survivor item is not money
+            trader_item = get_random_dict_value(items.item_list)
+
+            if survivors_item is None or trader_item != survivors_item["item"]:
+                survivors_item_name = "Money"
+
+                if survivors_item is not None:
+                    # TODO: it seems weird that it's called survivors_item but I have to get the "item" from it
+                    survivors_item_name = survivors_item["item"]["name"]
+
+
+                print("Trade " + survivors_item_name + " for " + trader_item["name"])
+                break
 
     screen.wait_key()
 

@@ -374,7 +374,7 @@ def set_cursor_position(cursor_x, cursor_y):
 
         ctypes.windll.kernel32.SetConsoleCursorPosition(stdout, adjusted_position)
     else:
-        stdout_write_flush("\033[" + str(int(cursor_y) + 1) + ";" + str(int(cursor_x) + 1) + "H")
+        stdout_write_flush("\033[" + str(int(cursor_x) + 1) + ";" + str(int(cursor_y) + 1) + "H")
 
 
 # Re-renders the front buffer to the screen
