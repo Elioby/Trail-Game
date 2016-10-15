@@ -22,7 +22,6 @@ def set_current_screen(new_screen):
 
 
 def draw_starting_screen():
-    # TODO: Code for the starting screen goes here
     # TODO: This function should not return until they have picked all 4 characters' names
     # TODO: These names should be updated in the survivors list in survivors.py, where survivors[0] is the main player
 
@@ -34,13 +33,30 @@ def draw_starting_screen():
 
     # TODO: the player should be informed about what they start with, how much food, how many medkits, how much money
 
-    screen.clear()
-
     set_current_screen(screen_list["starting"])
+    start_title_image = ascii_helper.load_image("resources/start_title.ascii")
+    start_title_x = int((screen.get_width() / 2) - (start_title_image["width"] / 2))
 
-    print("This is the starting screen")
+    while True:
+        screen.clear()
+        screen.draw_ascii_image(start_title_x, 0, start_title_image)
 
-    screen.wait_key()
+        screen.draw_text(45, 11, "1. Travel to the trail")
+        screen.draw_text(45, 13, "2. Learn about the trail")
+        screen.draw_text(45, 15, "3. Exit the trail")
+        screen.draw_text(42, 17, "Enter your option: ")
+        screen.set_cursor_position(42 + 19, 17)
+        screen.flush()
+
+        user_input = input()
+
+        if user_input == "1":
+            draw_city_screen(get_next_city(0))
+            # TODO: survivor naming screen
+        # elif user_input == "2":
+            # TODO:  draw info screen
+        elif user_input == "3":
+            quit()
 
 
 def draw_dead_screen():
@@ -103,7 +119,7 @@ def draw_points_screen():
     score_title_x = int((screen.get_width() / 2) - (score_title_image["width"] / 2))
 
     screen.draw_ascii_image(score_title_x, 0, score_title_image)
-    screen.draw_ascii_numbers(0, score_title_image["height"] + 1, points)
+    screen.draw_ascii_numbers(0, score_title_image["height"] + 5, points)
 
     screen.flush()
 
