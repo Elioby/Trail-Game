@@ -34,3 +34,24 @@ def load_font(filename):
     font_cache[filename] = font
 
     return font
+
+
+def get_text_width(text, font):
+    width = 0
+
+    for char in text:
+        char_code = ord(char)
+        char_start = ((char_code - 32) * font["height"])
+
+        last_width = 0
+
+        for i in range(font["height"]):
+            line = font["font_data"][char_start + i + 1]
+            line_length = len(line)
+
+            if line_length > last_width:
+                last_width = line_length - 2
+
+        width += last_width
+
+    return width - 1

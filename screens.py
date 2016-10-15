@@ -6,6 +6,7 @@
 import time
 
 import ascii_helper
+import figlet_helper
 import screen
 from misc_utils import *
 
@@ -34,12 +35,18 @@ def draw_starting_screen():
     # TODO: the player should be informed about what they start with, how much food, how many medkits, how much money
 
     set_current_screen(screen_list["starting"])
-    start_title_image = ascii_helper.load_image("resources/start_title.ascii")
-    start_title_x = int((screen.get_width() / 2) - (start_title_image["width"] / 2))
+
+    title_text = "Survival Trail"
+
+    big_font = figlet_helper.load_font("resources/fonts/big.flf")
+
+    title_width = figlet_helper.get_text_width(title_text, big_font)
+
+    start_title_x = int((screen.get_width() / 2) - (title_width / 2))
 
     while True:
         screen.clear()
-        screen.draw_ascii_image(start_title_x, 0, start_title_image)
+        screen.draw_ascii_font_text(start_title_x, 0, title_text, big_font)
 
         screen.draw_text(45, 11, "1. Travel to the trail")
         screen.draw_text(45, 13, "2. Learn about the trail")

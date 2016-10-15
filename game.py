@@ -173,9 +173,6 @@ def main():
     #     screen.flush()
     
     #     time.sleep(1)
-
-    # TODO: display a title screen?
-
     screens.screen_list["starting"]["draw_function"]()
 
     screens.screen_list["city"]["draw_function"](cities.city_list["Los Angeles"])
