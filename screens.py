@@ -66,13 +66,8 @@ def draw_dead_screen():
 
 
 def draw_win_screen():
-    # TODO: Code for the dead screen goes here
-    # TODO: This function should never return (use quit() ? unless that's a bad idea for some reason)
-
     screen.clear()
     set_current_screen(screen_list["win"])
-
-    # TODO: Replace with something else
 
     win_title_image = ascii_helper.load_image("resources/win_title.ascii")
     win_text_image = ascii_helper.load_image("resources/win_text.ascii")
@@ -104,7 +99,13 @@ def draw_points_screen():
 
     points += count_survivors(True, False, False, False) * 250
 
-    print("Total score: " + str(points) + ".")
+    score_title_image = ascii_helper.load_image("resources/numbers/score_title.ascii")
+    score_title_x = int((screen.get_width() / 2) - (score_title_image["width"] / 2))
+
+    screen.draw_ascii_image(score_title_x, 0, score_title_image)
+    screen.draw_ascii_numbers(0, score_title_image["height"] + 1, points)
+
+    screen.flush()
 
     time.sleep(2)
 

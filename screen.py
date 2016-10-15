@@ -11,7 +11,7 @@ import ctypes
 import shutil
 import platform
 import subprocess
-
+import ascii_helper
 import time
 
 if platform.system() == "Windows":
@@ -141,6 +141,7 @@ def draw_progress_bar(bar_x, bar_y, length, progress):
     remaining_bars = int(max(progress * length, 1))
 
     draw_text(bar_x, bar_y, "[" + ("█" * remaining_bars) + (" " * (length - remaining_bars)) + "]")
+
 
 def draw_ascii_image(image_x, image_y, ascii_image):
     image_buffer = ascii_image["image_buffer"]
@@ -423,3 +424,20 @@ def render_buffer(buffer_to_render):
             if y > end_y:
                 break
         pass
+
+
+def draw_ascii_numbers(x, y, input_number):
+    ascii_numbers = []
+    x_spacing = 2
+    x_offset = 0
+    input_number = str(input_number)
+
+    for i in range(0, 9):
+        ascii_numbers.append(ascii_helper.load_image("resources/numbers/{0}.ascii".format(str(i))))
+
+    for i in range(0, len(input_number)):
+        num = int(input_number[i])
+        draw_ascii_image(x + x_offset, y, ascii_numbers[num])
+        x_offset += ascii_numbers[num]["width"] + x_spacing
+
+
