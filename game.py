@@ -53,13 +53,9 @@ def pass_time(hours):
 # This is called every tick of the game
 def game_tick():
     if not survivors.survivor_list[0]["alive"]:
-        screens.screen_list["dead"]["draw_function"]()
+        screens.open_screen(screens.screen_list["dead"])
 
-    screens.screen_list["travelling"]["draw_function"]()
-
-    dprint("Start of game tick: " + str(survivors.ticks_elapsed))
-    dprint("Current date: " + format_date(survivors.current_datetime))
-    dprint("Current time: " + format_time(survivors.current_datetime))
+    screens.open_screen(screens.screen_list["travelling"])
 
     if survivors.ticks_elapsed > 3:
         for event in events:
@@ -136,9 +132,7 @@ def game_tick():
         if next_city["name"] == "New York":
             screens.screen_list["win"]["draw_function"]()
 
-        screens.screen_list["city"]["draw_function"](next_city)
-    else:
-        dprint("The next city is: " + next_city["name"])
+        screens.open_screen(screens.screen_list["city"])
 
     for survivor in survivors.survivor_list:
         if survivor["alive"] and survivor["health"] <= 0:
@@ -173,7 +167,7 @@ def main():
     #     screen.flush()
     
     #     time.sleep(1)
-    screens.screen_list["starting"]["draw_function"]()
+    screens.open_screen(screens.screen_list["travelling"])
 
     # The main game loop
     while True:
@@ -182,6 +176,7 @@ def main():
 
         # NOTE: This may cause weird drawing bugs
         if screens.current_screen is not None and screens.current_screen["name"] != "travelling":
+            # NOTE: I think this is okay to do because the current screen is technically the travelling screen
             screens.screen_list["travelling"]["draw_function"]()
 
 

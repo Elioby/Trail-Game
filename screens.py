@@ -9,6 +9,7 @@ import items
 import ascii_helper
 import figlet_helper
 import screen
+from debug import dprint
 from misc_utils import *
 
 screen_stack = []
@@ -21,14 +22,42 @@ def open_screen(new_screen):
     global previous_screen
     global current_screen
 
+    was_same_screen = new_screen is current_screen
+
     previous_screen = current_screen
     current_screen = new_screen
 
-    screen_stack.append(new_screen)
+    previous_screen_name = "console"
+
+    if previous_screen is not None:
+        previous_screen_name = previous_screen["name"]
+
+    if not was_same_screen and not new_screen["one_time"]:
+        screen_stack.append(new_screen)
+        dprint("Moving from the " + previous_screen_name + " screen to the " + current_screen["name"] + " screen.")
+        dprint("Stack size: " + str(len(screen_stack)))
 
     new_screen["draw_function"]()
 
-    previous_screen = screen_stack.pop()
+    if not was_same_screen and previous_screen is not None:
+        if len(screen_stack) > 1:
+            previous_screen = screen_stack.pop()
+            current_screen = screen_stack.pop()
+            screen_stack.append(current_screen)
+            dprint("Moving from the " + previous_screen["name"] + " screen to the " + current_screen["name"] + " screen.")
+            dprint("Stack size: " + str(len(screen_stack)))
+        elif len(screen_stack) > 0:
+            current_screen = screen_stack.pop()
+            screen_stack.append(current_screen)
+
+            previous_screen_name = "console"
+
+            if previous_screen is not None:
+                previous_screen_name = previous_screen["name"]
+
+            dprint("Moving from the " + previous_screen_name + " screen to the " + current_screen["name"] + " screen.")
+            dprint("Stack size: " + str(len(screen_stack)))
+
 
 
 def draw_starting_screen():
@@ -46,8 +75,6 @@ def draw_starting_screen():
     title_text = "Survival Trail"
 
     big_font = figlet_helper.load_font("resources/fonts/big.flf")
-
-    title_text = "Survival Trail"
 
     title_width = figlet_helper.get_text_width(title_text, big_font)
 
@@ -67,7 +94,7 @@ def draw_starting_screen():
         user_input = input()
 
         if user_input == "1":
-            open_screen(screen_list["starting"])
+            open_screen(screen_list["survivor_name"])
         elif user_input == "2":
             open_screen(screen_list["info"])
         elif user_input == "3":
@@ -93,7 +120,7 @@ def get_max_user_input(print_text, alt_text, max_length):
 
 def draw_survivor_name_screen():
     screen.clear()
-    name = get_max_user_input("Enter your name: ", "Enter a valid name: ",  16)
+    name = get_max_user_input("Enter your name: ", "Enter a valid name: ", 16)
     # Leave the name as default when player enters nothing
     if len(name) > 0:
         survivors.survivor_list[0]["name"] = name
@@ -168,7 +195,7 @@ def draw_points_screen():
     score_title_x = int((screen.get_width() / 2) - (score_title_image["width"] / 2))
 
     screen.draw_ascii_image(score_title_x, 0, score_title_image)
-    screen.draw_ascii_numbers(0, score_title_image["height"] + 5, points)
+    screen.draw_ascii_numbers(0, score_title_image["height"] + 5, int(points))
 
     screen.flush()
 
@@ -278,7 +305,6 @@ def draw_trading_screen():
                     # TODO: it seems weird that it's called survivors_item but I have to get the "item" from it
                     survivors_item_name = survivors_item["item"]["name"]
 
-
                 print("Trade " + survivors_item_name + " for " + trader_item["name"])
                 break
 
@@ -359,7 +385,7 @@ def draw_put_down_screen():
 
 
 def draw_travelling_screen():
-    show_next_city_notification = previous_screen["name"] == "city"
+    show_next_city_notification = previous_screen is not None and previous_screen["name"] == "city"
 
     car_body_image = ascii_helper.load_image("resources/car_body.ascii")
     car_wheel_image_1 = ascii_helper.load_image("resources/car_wheel_1.ascii")
@@ -392,7 +418,7 @@ def draw_travelling_screen():
             screen.draw_pixel(x, 1, "-")
 
         progress_bar_current_x = progress_bar_box_x + 3 + (
-        (survivors.distance_travelled / get_end_distance()) * progress_bar_width)
+            (survivors.distance_travelled / get_end_distance()) * progress_bar_width)
 
         screen.draw_pixel(int(progress_bar_current_x), 2, "^")
 
@@ -504,66 +530,88 @@ screen_list = {
     "starting": {
         "name": "starting",
 
-        "draw_function": draw_starting_screen
+        "draw_function": draw_starting_screen,
+
+        "one_time": True
     },
 
     "dead": {
         "name": "dead",
 
-        "draw_function": draw_dead_screen
+        "draw_function": draw_dead_screen,
+
+        "one_time": True
     },
 
     "win": {
         "name": "win",
 
-        "draw_function": draw_win_screen
+        "draw_function": draw_win_screen,
+
+        "one_time": True
     },
 
     "points": {
         "name": "points",
 
-        "draw_function": draw_points_screen
+        "draw_function": draw_points_screen,
+
+        "one_time": True
     },
 
     "city": {
         "name": "city",
 
-        "draw_function": draw_city_screen
+        "draw_function": draw_city_screen,
+
+        "one_time": False
     },
 
     "trading": {
         "name": "trading",
 
-        "draw_function": draw_trading_screen
+        "draw_function": draw_trading_screen,
+
+        "one_time": False
     },
 
     "resting": {
         "name": "resting",
 
-        "draw_function": draw_resting_screen
+        "draw_function": draw_resting_screen,
+
+        "one_time": False
     },
 
     "put_down": {
         "name": "put_down",
 
-        "draw_function": draw_put_down_screen
+        "draw_function": draw_put_down_screen,
+
+        "one_time": False
     },
 
     "travelling": {
         "name": "travelling",
 
-        "draw_function": draw_travelling_screen
+        "draw_function": draw_travelling_screen,
+
+        "one_time": False
     },
 
     "info": {
         "name": "info",
 
-        "draw_function": draw_info_screen
+        "draw_function": draw_info_screen,
+
+        "one_time": False
     },
 
     "survivor_name": {
         "name": "survivor_name",
 
-        "draw_function": draw_survivor_name_screen
+        "draw_function": draw_survivor_name_screen,
+
+        "one_time": True
     },
 }
