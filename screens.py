@@ -136,11 +136,73 @@ def draw_trading_screen():
 
 def draw_resting_screen():
     # TODO: Code for the resting screen goes here
-
     # TODO: Replace with something else
     screen.clear()
 
     print("This is the resting screen")
+       
+    for i in range (0,len(survivors.survivor_list)):
+        if survivors.survivor_list[i]["health"] == survivors.survivor_list[i]["max_health"]:
+            print(survivors.survivor_list[i]["name"] + ":" + "You don't need to rest")
+    # Show options to player:
+        elif survivors.survivor_list[i]["health"] <= survivors.survivor_list[i]["max_health"]: 
+            print(survivors.survivor_list[i]["name"] + ":") 
+            print("1: one hour = 10 health")
+            print("2: two hours = 20 health")
+            print("3: three hours = 30 health")
+            print("4: four hours = 40 health")
+            print("5: five hours = 50 health")
+            print("6: six hours = 60 health")
+            print("7: seven hours = 70 health")
+            print("8: eight hours = 80 health")
+            print("9: nine hours = 90 health")
+            print("")        
+            sleep_choice = input("How many hours would you like to sleep?")
+            sleep_choice = normalise_input(sleep_choice)
+
+            if sleep_choice == "1":
+                screen.clear()
+            
+                print(int(survivors.survivor_list[i]["health"]) + 10 + ".")
+
+            elif sleep_choice == "2":
+                print(int(survivors.survivor_list[i]["health"]) + 20 + ".")
+            
+            elif sleep_choice == "3":
+                print(int(survivors.survivor_list[i]["health"]) + 30 + ".")
+              
+            elif sleep_choice == "4":
+                print(int(survivors.survivor_list[i]["health"]) + 40 + ".")
+           
+            elif sleep_choice == "5":
+                print(int(survivors.survivor_list[i]["health"]) + 50 + ".")
+            
+            elif sleep_choice == "6":
+                print(int(survivors.survivor_list[i]["health"]) + 60 + ".")
+        
+            elif sleep_choice == "7":
+                print(int(survivors.survivor_list[i]["health"]) + 70 + ".")
+         
+            elif sleep_choice == "8":
+                print(int(survivors.survivor_list[i]["health"]) + 80 + ".")
+
+            elif sleep_choice == "9":
+                print(int(survivors.survivor_list[i]["health"]) + 90 + ".")
+
+            else:
+                print("Please enter a number between 1 and 9.")
+
+        else:
+            print("This is not possible")    
+        # Evaluate the players decision:
+            
+
+
+
+
+
+                   
+    
 
     screen.wait_key()
 
