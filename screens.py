@@ -10,16 +10,24 @@ import figlet_helper
 import screen
 from misc_utils import *
 
+screen_stack = []
+
 previous_screen = None
 current_screen = None
 
 
-def set_current_screen(new_screen):
+def open_screen(new_screen):
     global previous_screen
     global current_screen
 
     previous_screen = current_screen
     current_screen = new_screen
+
+    screen_stack.append(new_screen)
+
+    new_screen["draw_function"]()
+
+    previous_screen = screen_stack.pop()
 
 
 def draw_starting_screen():
@@ -33,8 +41,6 @@ def draw_starting_screen():
     # TODO: enforce names so that they are not longer than 16 characters
 
     # TODO: the player should be informed about what they start with, how much food, how many medkits, how much money
-
-    set_current_screen(screen_list["starting"])
 
     title_text = "Survival Trail"
 
@@ -58,7 +64,7 @@ def draw_starting_screen():
         user_input = input()
 
         if user_input == "1":
-            draw_city_screen(get_next_city(0))
+            open_screen(screen_list["city"])
             # TODO: survivor naming screen
         # elif user_input == "2":
             # TODO:  draw info screen
@@ -68,7 +74,6 @@ def draw_starting_screen():
 
 def draw_dead_screen():
     screen.clear()
-    set_current_screen(screen_list["dead"])
 
     game_over_image = ascii_helper.load_image("resources/dead_game_over.ascii")
     tombstone_image = ascii_helper.load_image("resources/dead_tombstone.ascii")
@@ -85,12 +90,11 @@ def draw_dead_screen():
 
     screen.print_notification("Press any key to continue.", False)
 
-    draw_points_screen()
+    open_screen(screen_list["points"])
 
 
 def draw_win_screen():
     screen.clear()
-    set_current_screen(screen_list["win"])
 
     win_title_image = ascii_helper.load_image("resources/win_title.ascii")
     win_text_image = ascii_helper.load_image("resources/win_text.ascii")
@@ -107,14 +111,12 @@ def draw_win_screen():
 
     screen.print_notification("Press any key to continue.", False)
 
-    draw_points_screen()
+    open_screen(screen_list["points"])
 
 
 # TODO: this needs some prettifying
 def draw_points_screen():
     screen.clear()
-
-    set_current_screen(screen_list["points"])
 
     points = 0
 
@@ -139,8 +141,9 @@ def draw_points_screen():
     quit()
 
 
-def draw_city_screen(city):
-    set_current_screen(screen_list["city"])
+def draw_city_screen():
+    # TODO: think of some way to reliably get the city here
+    city = cities.city_list["Los Angeles"]
 
     while True:
         screen.clear()
@@ -171,30 +174,30 @@ def draw_city_screen(city):
             input("Press enter to go back...")
         elif player_choice == "2":
             # Check status
-            draw_put_down_screen()
+            open_screen(screen_list["put_down"])
         elif player_choice == "3":
             # Trade
-            draw_trading_screen()
+            open_screen(screen_list["trading"])
         elif player_choice == "4":
             # Bar
             pass
         elif player_choice == "5":
             # Rest
-            draw_resting_screen()
+            open_screen(screen_list["resting"])
         elif player_choice == "6":
-            # Continue to travelling screen
+            # Continue to previous screen
             return
         # TODO: Remove after debugged
         elif player_choice == "7":
             # Debugging for dead screen
-            draw_dead_screen()
+            open_screen(screen_list["dead"])
         # TODO: Remove after debugged
         elif player_choice == "8":
             # Debugging for dead screen
-            draw_points_screen()
+            open_screen(screen_list["points"])
         elif player_choice == "9":
             # Debugging for win screen
-            draw_win_screen()
+            open_screen(screen_list["win"])
         # TODO: Remove after debugged
         else:
             # Invalid input
@@ -250,7 +253,6 @@ def draw_resting_screen():
 
 
 def draw_put_down_screen():
-    set_current_screen(screen_list["put_down"])
     screen.clear()
     # Display the survivors status
 
@@ -296,10 +298,10 @@ def draw_put_down_screen():
 
         if user_choice == 1:
             # Return to city menu screen
-            draw_city_screen(get_next_city(survivors.distance_travelled))
+            return
         elif user_choice == 2:
             # Suicide
-            draw_dead_screen()
+            open_screen(screen_list["dead"])
         elif user_choice <= option_count:
             # Search through options available to find who to kill
             survivors.survivor_list[options_available[user_choice]]["alive"] = False
@@ -309,9 +311,7 @@ def draw_put_down_screen():
 
 
 def draw_travelling_screen():
-    show_next_city_notification = current_screen["name"] == "city"
-
-    set_current_screen(screen_list["travelling"])
+    show_next_city_notification = previous_screen["name"] == "city"
 
     car_body_image = ascii_helper.load_image("resources/car_body.ascii")
     car_wheel_image_1 = ascii_helper.load_image("resources/car_wheel_1.ascii")
