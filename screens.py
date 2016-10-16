@@ -4,6 +4,7 @@
 # This file contains data on the screens in the game
 
 import time
+import items
 
 import ascii_helper
 import figlet_helper
@@ -46,6 +47,8 @@ def draw_starting_screen():
 
     big_font = figlet_helper.load_font("resources/fonts/big.flf")
 
+    title_text = "Survival Trail"
+
     title_width = figlet_helper.get_text_width(title_text, big_font)
 
     start_title_x = int((screen.get_width() / 2) - (title_width / 2))
@@ -64,12 +67,43 @@ def draw_starting_screen():
         user_input = input()
 
         if user_input == "1":
-            open_screen(screen_list["city"])
-            # TODO: survivor naming screen
-        # elif user_input == "2":
-            # TODO:  draw info screen
+            open_screen(screen_list["starting"])
+        elif user_input == "2":
+            open_screen(screen_list["info"])
         elif user_input == "3":
+            screen.clear()
             quit()
+        else:
+            continue
+
+        return
+
+
+def draw_info_screen():
+    pass
+
+
+def get_max_user_input(print_text, alt_text, max_length):
+    user_input = input(print_text)
+
+    while len(user_input) > max_length:
+        user_input = input(alt_text)
+    return user_input
+
+
+def draw_survivor_name_screen():
+    screen.clear()
+    name = get_max_user_input("Enter your name: ", "Enter a valid name: ",  16)
+    # Leave the name as default when player enters nothing
+    if len(name) > 0:
+        survivors.survivor_list[0]["name"] = name
+
+    for i in range(0, 3):
+        name = get_max_user_input("Enter your friend's name: ", "Enter a valid friend's name: ", 16)
+        if len(name) > 0:
+            survivors.survivor_list[i + 1]["name"] = name
+
+    open_screen(screen_list["city"])
 
 
 def draw_dead_screen():
@@ -96,14 +130,20 @@ def draw_dead_screen():
 def draw_win_screen():
     screen.clear()
 
-    win_title_image = ascii_helper.load_image("resources/win_title.ascii")
-    win_text_image = ascii_helper.load_image("resources/win_text.ascii")
+    big_font = figlet_helper.load_font("resources/fonts/big.flf")
+    contessa_font = figlet_helper.load_font("resources/fonts/contessa.flf")
 
-    win_title_x = int((screen.get_width() / 2) - (win_title_image["width"] / 2))
-    win_text_x = int((screen.get_width() / 2) - (win_text_image["width"] / 2))
+    win_title_text = "You Win!"
+    win_body_text = "You reached New York in time"
 
-    screen.draw_ascii_image(win_title_x, 0, win_title_image)
-    screen.draw_ascii_image(win_text_x, win_title_image["height"], win_text_image)
+    win_title_width = figlet_helper.get_text_width(win_title_text, big_font)
+    win_body_width = figlet_helper.get_text_width(win_body_text, contessa_font)
+
+    win_title_x = int((screen.get_width() / 2) - (win_title_width / 2))
+    win_body_x = int((screen.get_width() / 2) - (win_body_width / 2))
+
+    screen.draw_ascii_font_text(win_title_x, 0, win_title_text, big_font)
+    screen.draw_ascii_font_text(win_body_x, big_font["height"], win_body_text, contessa_font)
 
     screen.flush()
 
@@ -205,9 +245,6 @@ def draw_city_screen():
 
 
 def draw_trading_screen():
-    # TODO: Code for the trading screen goes here
-
-    # TODO: Replace with something else
     screen.clear()
 
     survivors_items_count = len(survivors.group_inventory)
@@ -217,7 +254,7 @@ def draw_trading_screen():
         time.sleep(2)
         return
 
-    trades = {}
+    previous_trades = []
 
     for i in range(3):
         # None means use money
@@ -228,15 +265,22 @@ def draw_trading_screen():
             # Get a random item from the group inventory
             survivors_item = get_random_dict_value(survivors.group_inventory)
 
-        if survivors_item is not None:
-            print("Use item " + str(survivors_item))
-        else:
-            print("Use money")
+        trader_item = None
 
-    if len(trades) == 0:
-        print("You have nothing to trade.")
-        time.sleep(2)
-        return
+        while True:
+            # TODO: let the trader offer money for items if the survivor item is not money
+            trader_item = get_random_dict_value(items.item_list)
+
+            if survivors_item is None or trader_item != survivors_item["item"]:
+                survivors_item_name = "Money"
+
+                if survivors_item is not None:
+                    # TODO: it seems weird that it's called survivors_item but I have to get the "item" from it
+                    survivors_item_name = survivors_item["item"]["name"]
+
+
+                print("Trade " + survivors_item_name + " for " + trader_item["name"])
+                break
 
     screen.wait_key()
 
@@ -282,10 +326,10 @@ def draw_put_down_screen():
         print("2: Commit suicide")
 
         for i in range(1, len(survivors.survivor_list)):
-            if survivor["alive"]:
+            if survivors.survivor_list[i]["alive"]:
                 option_count += 1
                 options_available.update({option_count: i})
-                print(str(option_count) + ": Put down " + str(survivor["name"]) + ".")
+                print(str(option_count) + ": Put down " + str(survivors.survivor_list[i]["name"]) + ".")
 
         # Evaluate users input:
         user_choice = input("What would you like to do? ")
@@ -306,8 +350,12 @@ def draw_put_down_screen():
             # Search through options available to find who to kill
             survivors.survivor_list[options_available[user_choice]]["alive"] = False
             print("You killed " + survivors.survivor_list[options_available[user_choice]]["name"])
+            continue
         else:
             print("Please enter a number between 1 and " + str(option_count) + ".")
+            continue
+
+        return
 
 
 def draw_travelling_screen():
@@ -376,10 +424,10 @@ def draw_travelling_screen():
                 if survivor["zombified"]:
                     screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y + 1, "(ZOMBIE)")
                 elif survivor["bitten"]:
-                    screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y + 1, "(BITTEN)")
+                    screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y, "(BITTEN)")
             else:
                 padding = int((total_bars - 4) / 2)
-                screen.draw_text(survivor_x_start + health_x + 3, survivor_y + 1,
+                screen.draw_text(survivor_x_start + health_x + 2, survivor_y,
                                  "[" + (padding * " ") + "DEAD" + (padding * " ") + "]")
 
             survivor_y += 2
@@ -505,5 +553,17 @@ screen_list = {
         "name": "travelling",
 
         "draw_function": draw_travelling_screen
+    },
+
+    "info": {
+        "name": "info",
+
+        "draw_function": draw_info_screen
+    },
+
+    "survivor_name": {
+        "name": "survivor_name",
+
+        "draw_function": draw_survivor_name_screen
     },
 }
