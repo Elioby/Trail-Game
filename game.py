@@ -175,8 +175,6 @@ def main():
     #     time.sleep(1)
     screens.screen_list["starting"]["draw_function"]()
 
-    screens.screen_list["city"]["draw_function"](cities.city_list["Los Angeles"])
-
     # The main game loop
     while True:
         # Simulate one game tick

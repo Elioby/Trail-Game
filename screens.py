@@ -60,12 +60,15 @@ def draw_starting_screen():
 
         if user_input == "1":
             draw_survivor_name_screen()
-            # TODO: survivor naming screen
         elif user_input == "2":
             draw_info_screen()
         elif user_input == "3":
             screen.clear()
             quit()
+        else:
+            continue
+
+        return
 
 
 def draw_info_screen():
@@ -92,7 +95,7 @@ def draw_survivor_name_screen():
         if len(name) > 0:
             survivors.survivor_list[i + 1]["name"] = name
 
-    draw_city_screen(get_next_city(0))
+    draw_city_screen(cities.city_list["Los Angeles"])
 
 
 def draw_dead_screen():
@@ -218,7 +221,6 @@ def draw_city_screen(city):
             draw_resting_screen()
         elif player_choice == "6":
             # Continue to travelling screen
-            draw_travelling_screen()
             return
         # TODO: Remove after debugged
         elif player_choice == "7":
@@ -238,9 +240,7 @@ def draw_city_screen(city):
 
 
 def draw_trading_screen():
-    # TODO: Code for the trading screen goes here
-
-    # TODO: Replace with something else
+    set_current_screen(screen_list["trading"])
     screen.clear()
 
     survivors_items_count = len(survivors.group_inventory)
@@ -285,6 +285,7 @@ def draw_resting_screen():
     # TODO: Code for the resting screen goes here
 
     # TODO: Replace with something else
+    set_current_screen(screen_list["resting"])
     screen.clear()
 
     print("This is the resting screen")
@@ -339,7 +340,7 @@ def draw_put_down_screen():
 
         if user_choice == 1:
             # Return to city menu screen
-            draw_city_screen(get_next_city(survivors.distance_travelled))
+            return
         elif user_choice == 2:
             # Suicide
             draw_dead_screen()
@@ -347,8 +348,12 @@ def draw_put_down_screen():
             # Search through options available to find who to kill
             survivors.survivor_list[options_available[user_choice]]["alive"] = False
             print("You killed " + survivors.survivor_list[options_available[user_choice]]["name"])
+            continue
         else:
             print("Please enter a number between 1 and " + str(option_count) + ".")
+            continue
+
+        return
 
 
 def draw_travelling_screen():
@@ -419,10 +424,10 @@ def draw_travelling_screen():
                 if survivor["zombified"]:
                     screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y + 1, "(ZOMBIE)")
                 elif survivor["bitten"]:
-                    screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y + 1, "(BITTEN)")
+                    screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y, "(BITTEN)")
             else:
                 padding = int((total_bars - 4) / 2)
-                screen.draw_text(survivor_x_start + health_x + 3, survivor_y + 1,
+                screen.draw_text(survivor_x_start + health_x + 2, survivor_y,
                                  "[" + (padding * " ") + "DEAD" + (padding * " ") + "]")
 
             survivor_y += 2
