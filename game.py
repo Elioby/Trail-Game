@@ -69,10 +69,11 @@ def game_tick():
                 # TODO: Add support for other handler functions that are more complex than a notification
 
                 if event_function is not None:
-                    event_function()
+                    did_execute = event_function()
 
-                    # NOTE: We don't want more than one event per tick
-                    break
+                    if did_execute:
+                        # NOTE: We don't want more than one event per tick if the event worked
+                        break
 
     for survivor in survivors.survivor_list:
         if survivor["alive"] and survivor["zombified"]:

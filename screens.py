@@ -39,7 +39,7 @@ def open_screen(new_screen):
 
     new_screen["draw_function"]()
 
-    if not was_same_screen and previous_screen is not None:
+    if not was_same_screen and not new_screen["one_time"] and previous_screen is not None:
         if len(screen_stack) > 1:
             previous_screen = screen_stack.pop()
             current_screen = screen_stack.pop()
@@ -57,7 +57,6 @@ def open_screen(new_screen):
 
             dprint("Moving from the " + previous_screen_name + " screen to the " + current_screen["name"] + " screen.")
             dprint("Stack size: " + str(len(screen_stack)))
-
 
 
 def draw_starting_screen():
@@ -95,6 +94,8 @@ def draw_starting_screen():
 
         if user_input == "1":
             open_screen(screen_list["survivor_name"])
+
+            return
         elif user_input == "2":
             open_screen(screen_list["info"])
         elif user_input == "3":
@@ -292,8 +293,6 @@ def draw_trading_screen():
             # Get a random item from the group inventory
             survivors_item = get_random_dict_value(survivors.group_inventory)
 
-        trader_item = None
-
         while True:
             # TODO: let the trader offer money for items if the survivor item is not money
             trader_item = get_random_dict_value(items.item_list)
@@ -385,6 +384,9 @@ def draw_put_down_screen():
 
 
 def draw_travelling_screen():
+    if previous_screen is None:
+        open_screen(screen_list["starting"])
+
     show_next_city_notification = previous_screen is not None and previous_screen["name"] == "city"
 
     car_body_image = ascii_helper.load_image("resources/car_body.ascii")
@@ -448,9 +450,9 @@ def draw_travelling_screen():
                                          survivor["health"] / survivor["max_health"])
 
                 if survivor["zombified"]:
-                    screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y + 1, "(ZOMBIE)")
+                    screen.draw_text(survivor_x_start + health_x + total_bars + 5, survivor_y, "(ZOMBIE)")
                 elif survivor["bitten"]:
-                    screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y, "(BITTEN)")
+                    screen.draw_text(survivor_x_start + health_x + total_bars + 5, survivor_y, "(BITTEN)")
             else:
                 padding = int((total_bars - 4) / 2)
                 screen.draw_text(survivor_x_start + health_x + 2, survivor_y,
