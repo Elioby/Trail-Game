@@ -275,114 +275,137 @@ def draw_city_screen():
 def draw_trading_screen():
     screen.clear()
 
-    previous_trades = []
+    city = get_next_city(survivors.distance_travelled)
 
-    # TODO: offer 10 trades only
-    for i in range(10):
-        # None means use money
-        survivors_item = None
+    trades = []
 
-        random_survivors_item_unit_value = 1
+    if "saved_trades" in city:
+        trades = city["saved_trades"]
+    else:
+        previous_trades = []
 
-        # 60% chance, use random item - otherwise use money for this trade
-        if random.randrange(1, 100) <= 60:
-            # Get a random item from the group inventory
-            survivors_item = get_random_dict_value(items.item_list)
+        for i in range(5):
+            # None means use money
+            survivors_item = None
 
-        if survivors_item is not None:
-            random_survivors_item_unit_value = random.randrange(survivors_item["min_value"], survivors_item["max_value"])
+            random_survivors_item_unit_value = 1
 
-        for j in range(10):
-            # TODO: let the trader offer money for items if the survivor item is not money
-            trader_item = None
+            # 60% chance, use random item - otherwise use money for this trade
+            if random.randrange(1, 100) <= 60:
+                # Get a random item from the group inventory
+                survivors_item = get_random_dict_value(items.item_list)
 
-            if survivors_item is None or random.randrange(1, 100) <= 60:
-                trader_item = get_random_dict_value(items.item_list)
+            if survivors_item is not None:
+                random_survivors_item_unit_value = random.randrange(survivors_item["min_value"], survivors_item["max_value"])
 
-            random_trader_item_unit_value = 1
+            for j in range(10):
+                # TODO: let the trader offer money for items if the survivor item is not money
+                trader_item = None
 
-            if trader_item is not None:
-                random_trader_item_unit_value = random.randrange(trader_item["min_value"], trader_item["max_value"])
+                if survivors_item is None or random.randrange(1, 100) <= 60:
+                    trader_item = get_random_dict_value(items.item_list)
 
-            # TODO: what if this doesn't convert to int exactly?
-            survivors_item_amount = random_trader_item_unit_value / random_survivors_item_unit_value
+                for previous_trade in previous_trades:
+                    if previous_trade[0] == survivors_item and previous_trade[1] == trader_item:
+                        break
 
-            if survivors_item_amount < 1:
-                survivors_item_amount = 1
-
-            trader_item_amount = random_survivors_item_unit_value / random_trader_item_unit_value
-
-            if trader_item_amount < 1:
-                trader_item_amount = 1
-
-            if survivors_item is None or trader_item != survivors_item:
-                if random_survivors_item_unit_value <= 10 and survivors_item_amount <= 10:
-                    random_increase = random.randrange(11 - random_survivors_item_unit_value, 15 - random_survivors_item_unit_value)
-
-                    survivors_item_amount *= random_increase
-                    trader_item_amount *= random_increase
-
-                survivors_item_name = "Money"
-
-                if survivors_item is not None:
-                    survivors_item_name = survivors_item["plural_name"]
-
-                trader_item_name = "Money"
+                random_trader_item_unit_value = 1
 
                 if trader_item is not None:
-                    trader_item_name = trader_item["plural_name"]
+                    random_trader_item_unit_value = random.randrange(trader_item["min_value"], trader_item["max_value"])
 
-                print("1: Continue to next trade")
-                print("2: Trade " + str(int(survivors_item_amount)) + " of your " + survivors_item_name + " for " + str(int(trader_item_amount)) + " of their " + trader_item_name)
-                print("3: Skip all further trades")
-                print("")
+                # TODO: what if this doesn't convert to int exactly?
+                survivors_item_amount = random_trader_item_unit_value / random_survivors_item_unit_value
 
-                previous_trades.append([survivors_item, trader_item])
+                if survivors_item_amount < 1:
+                    survivors_item_amount = 1
 
-                while True:
-                    user_input = input("What would you like to do? ")
+                trader_item_amount = random_survivors_item_unit_value / random_trader_item_unit_value
 
-                    if user_input == "1":
-                        screen.clear()
-                        break
-                    elif user_input == "2":
-                        if survivors_item is None:
-                            if survivors.group_money >= survivors_item_amount:
-                                survivors.group_money -= survivors_item_amount
-                                screen.print_notification("Trade completed successfully.", False)
+                if trader_item_amount < 1:
+                    trader_item_amount = 1
 
-                                if trader_item is None:
-                                    survivors.group_money += trader_item_amount
-                                else:
-                                    survivors.inventory_add_item(trader_item, trader_item_amount)
-                            else:
-                                screen.print_notification("Trade failed, you do not have enough " + survivors_item_name + " for this trade.", False)
+                if survivors_item is None or trader_item != survivors_item:
+                    if random_survivors_item_unit_value <= 10 and survivors_item_amount <= 10:
+                        random_increase = random.randrange(11 - random_survivors_item_unit_value, 15 - random_survivors_item_unit_value)
+
+                        survivors_item_amount *= random_increase
+                        trader_item_amount *= random_increase
+
+                    previous_trades.append([survivors_item, trader_item])
+
+                    trades.append({"survivors_item": survivors_item, "trader_item": trader_item,
+                                   "survivors_item_amount": survivors_item_amount, "trader_item_amount": trader_item_amount})
+
+                    break
+
+    city["saved_trades"] = trades
+
+    for trade in trades:
+        survivors_item = trade["survivors_item"]
+        trader_item = trade["trader_item"]
+        survivors_item_amount = trade["survivors_item_amount"]
+        trader_item_amount = trade["trader_item_amount"]
+
+        survivors_item_name = "Money"
+
+        if survivors_item is not None:
+            survivors_item_name = survivors_item["plural_name"]
+
+        trader_item_name = "Money"
+
+        if trader_item is not None:
+            trader_item_name = trader_item["plural_name"]
+
+        print("1: Continue to next trade")
+        print("2: Trade " + str(int(survivors_item_amount)) + " of your " + survivors_item_name + " for " + str(
+            int(trader_item_amount)) + " of their " + trader_item_name)
+        print("3: Skip all further trades")
+        print("")
+
+        while True:
+            user_input = input("What would you like to do? ")
+
+            if user_input == "1":
+                screen.clear()
+                break
+            elif user_input == "2":
+                if survivors_item is None:
+                    if survivors.group_money >= survivors_item_amount:
+                        survivors.group_money -= survivors_item_amount
+                        screen.print_notification("Trade completed successfully.", False)
+
+                        if trader_item is None:
+                            survivors.group_money += trader_item_amount
                         else:
-                            if survivors.inventory_remove_item(survivors_item, survivors_item_amount):
-                                screen.print_notification("Trade completed successfully.", False)
+                            survivors.inventory_add_item(trader_item, trader_item_amount)
 
-                                if trader_item is None:
-                                    survivors.group_money += trader_item_amount
-                                else:
-                                    survivors.inventory_add_item(trader_item, trader_item_amount)
-                            else:
-                                screen.print_notification("Trade failed, you do not have enough " + survivors_item_name + " for this trade.", False)
-
-                        print(survivors.group_inventory)
-                        print(survivors.group_money)
-
-                        screen.print_notification("Read them.", False)
-
-                        screen.clear()
-
-                        break
-                    if user_input == "3":
-                        screen.print_notification("Skipped all further trades.", False)
-                        return
+                        city["saved_trades"].remove(trade)
                     else:
-                        continue
+                        screen.print_notification(
+                            "Trade failed, you do not have enough " + survivors_item_name + " for this trade.", False)
+                else:
+                    if survivors.inventory_remove_item(survivors_item, survivors_item_amount):
+                        screen.print_notification("Trade completed successfully.", False)
+
+                        if trader_item is None:
+                            survivors.group_money += trader_item_amount
+                        else:
+                            survivors.inventory_add_item(trader_item, trader_item_amount)
+
+                        city["saved_trades"].remove(trade)
+                    else:
+                        screen.print_notification(
+                            "Trade failed, you do not have enough " + survivors_item_name + " for this trade.", False)
+
+                screen.clear()
 
                 break
+            if user_input == "3":
+                screen.print_notification("Skipped all further trades.", False)
+                return
+            else:
+                continue
 
     screen.print_notification("There are no more trades to show.", False)
 

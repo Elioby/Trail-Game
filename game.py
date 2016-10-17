@@ -45,7 +45,7 @@ def pass_time(hours):
 
         screen.print_notification("You have " + str(food["amount"]) + " food remaining.")
 
-    survivors.ticks_elapsed += 1
+    survivors.ticks_elapsed += hours
     survivors.current_datetime += timedelta(hours=hours)
     survivors.distance_travelled += survivors.car_speed
 

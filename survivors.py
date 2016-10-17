@@ -21,13 +21,13 @@ distance_travelled = 0
 ticks_elapsed = 0
 
 # You start with 100 HP (hit points / health points)
-default_health = 100.0
+default_health = 100
 
 # You start with $40.0
-group_money = 40.0
+group_money = 40
 
 # The MPH (miles per tick in this case) the car is currently moving at
-car_speed = 20.0
+car_speed = 20
 
 
 # TODO: This should add x items to the group inventory
