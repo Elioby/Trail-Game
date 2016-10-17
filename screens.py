@@ -411,6 +411,7 @@ def draw_trading_screen():
 
 # TODO: finish this off
 def draw_medkit_screen():
+    invalid_input = False
     while True:
         screen.clear()
         medkit_count = 0
@@ -441,8 +442,10 @@ def draw_medkit_screen():
         print("5: Return to city screen")
         print()
 
-        player_choice = input("What would you like to do? ")
+        if invalid_input:
+            print("Please enter a number between 1 and 5.")
 
+        player_choice = input("What would you like to do? ")
         player_choice = normalise_input(player_choice)
 
         if player_choice == "1":
@@ -469,8 +472,10 @@ def draw_medkit_screen():
                 survivors.inventory_remove_item(survivors.group_inventory["Medkit"]["item"], 1)
             else:
                 print("Player is already dead.")
+        elif player_choice == "5":
+            open_screen(screen_list["city"])
         else:
-            print("Please enter a number between 1 and 4.")
+            invalid_input = True
 
 
 def draw_resting_screen():
