@@ -278,12 +278,11 @@ def draw_trading_screen():
     def draw_inventory(): # Lists the group's items in inventory
         print("Your group has:")
         print(str(survivors.group_money) + " Money")
-        if survivors.group_inventory["Medkit"]["amount"] == 1:
-            print("1 Medtkit")
-        else:
-            print(str(survivors.group_inventory["Medkit"]["amount"]) + " Medkits")
-            print(str(survivors.group_inventory["Food"]["amount"]) + " Food")
-            print()
+
+        for group_item in survivors.group_inventory:
+            # TODO: finish
+            # if group_item["amount"] >
+            pass
 
     city = get_next_city(survivors.distance_travelled)
 
@@ -354,6 +353,9 @@ def draw_trading_screen():
     city["saved_trades"] = trades
 
     for trade in trades:
+        draw_inventory()
+        print()
+
         survivors_item = trade["survivors_item"]
         trader_item = trade["trader_item"]
         survivors_item_amount = trade["survivors_item_amount"]
