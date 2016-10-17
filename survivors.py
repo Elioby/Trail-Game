@@ -26,18 +26,36 @@ default_health = 100.0
 # You start with $40.0
 group_money = 40.0
 
-# The MPH (miles per tick in this case) the car is curently moving at
+# The MPH (miles per tick in this case) the car is currently moving at
 car_speed = 20.0
 
 
 # TODO: This should add x items to the group inventory
 def inventory_add_item(item, amount):
-    pass
+    item_name = item["name"]
+    if item_name in group_inventory:
+        group_inventory[item_name]["amount"] += amount
+    else:
+        group_inventory[item_name] = {"item": item, "amount": amount}
 
 
-# TODO: This should remove x items to the group inventory, and remove it from the list if amount = 0
+# TODO: write docs
+# Returns true if it worked, false if failed
 def inventory_remove_item(item, amount):
-    pass
+    item_name = item["name"]
+    if item_name in group_inventory:
+        group_item = group_inventory[item_name]
+        group_item_amount = group_item["amount"]
+
+        if group_item_amount >= amount:
+            if group_item_amount == amount:
+                del group_inventory[item_name]
+            else:
+                group_inventory[item_name]["amount"] -= amount
+
+            return True
+
+    return False
 
 
 group_inventory = {

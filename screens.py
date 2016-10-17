@@ -275,49 +275,124 @@ def draw_city_screen():
 def draw_trading_screen():
     screen.clear()
 
-    survivors_items_count = len(survivors.group_inventory)
-
-    if survivors_items_count <= 0 and survivors.group_money <= 0:
-        print("You have nothing to trade.")
-        time.sleep(2)
-        return
-
     previous_trades = []
 
-    for i in range(3):
+    # TODO: offer 10 trades only
+    for i in range(10):
         # None means use money
         survivors_item = None
 
-        # If they have more than 0 items, and they either don't have money or a 60% chance, use random item - otherwise use money for this trade
-        if survivors_items_count > 0 and (survivors.group_money <= 0 or random.randrange(1, 100) <= 60):
+        random_survivors_item_unit_value = 1
+
+        # 60% chance, use random item - otherwise use money for this trade
+        if random.randrange(1, 100) <= 60:
             # Get a random item from the group inventory
-            survivors_item = get_random_dict_value(survivors.group_inventory)
+            survivors_item = get_random_dict_value(items.item_list)
 
-        while True:
+        if survivors_item is not None:
+            random_survivors_item_unit_value = random.randrange(survivors_item["min_value"], survivors_item["max_value"])
+
+        for j in range(10):
             # TODO: let the trader offer money for items if the survivor item is not money
-            trader_item = get_random_dict_value(items.item_list)
+            trader_item = None
 
-            if survivors_item is None or trader_item != survivors_item["item"]:
+            if survivors_item is None or random.randrange(1, 100) <= 60:
+                trader_item = get_random_dict_value(items.item_list)
+
+            random_trader_item_unit_value = 1
+
+            if trader_item is not None:
+                random_trader_item_unit_value = random.randrange(trader_item["min_value"], trader_item["max_value"])
+
+            # TODO: what if this doesn't convert to int exactly?
+            survivors_item_amount = random_trader_item_unit_value / random_survivors_item_unit_value
+
+            if survivors_item_amount < 1:
+                survivors_item_amount = 1
+
+            trader_item_amount = random_survivors_item_unit_value / random_trader_item_unit_value
+
+            if trader_item_amount < 1:
+                trader_item_amount = 1
+
+            if survivors_item is None or trader_item != survivors_item:
+                if random_survivors_item_unit_value <= 10 and survivors_item_amount <= 10:
+                    random_increase = random.randrange(11 - random_survivors_item_unit_value, 15 - random_survivors_item_unit_value)
+
+                    survivors_item_amount *= random_increase
+                    trader_item_amount *= random_increase
+
                 survivors_item_name = "Money"
 
                 if survivors_item is not None:
-                    # TODO: it seems weird that it's called survivors_item but I have to get the "item" from it
-                    survivors_item_name = survivors_item["item"]["name"]
+                    survivors_item_name = survivors_item["plural_name"]
 
-                print("Trade " + survivors_item_name + " for " + trader_item["name"])
+                trader_item_name = "Money"
+
+                if trader_item is not None:
+                    trader_item_name = trader_item["plural_name"]
+
+                print("1: Continue to next trade")
+                print("2: Trade " + str(int(survivors_item_amount)) + " of your " + survivors_item_name + " for " + str(int(trader_item_amount)) + " of their " + trader_item_name)
+                print("3: Skip all further trades")
+                print("")
+
+                previous_trades.append([survivors_item, trader_item])
+
+                while True:
+                    user_input = input("What would you like to do? ")
+
+                    if user_input == "1":
+                        screen.clear()
+                        break
+                    elif user_input == "2":
+                        if survivors_item is None:
+                            if survivors.group_money >= survivors_item_amount:
+                                survivors.group_money -= survivors_item_amount
+                                screen.print_notification("Trade completed successfully.", False)
+
+                                if trader_item is None:
+                                    survivors.group_money += trader_item_amount
+                                else:
+                                    survivors.inventory_add_item(trader_item, trader_item_amount)
+                            else:
+                                screen.print_notification("Trade failed, you do not have enough " + survivors_item_name + " for this trade.", False)
+                        else:
+                            if survivors.inventory_remove_item(survivors_item, survivors_item_amount):
+                                screen.print_notification("Trade completed successfully.", False)
+
+                                if trader_item is None:
+                                    survivors.group_money += trader_item_amount
+                                else:
+                                    survivors.inventory_add_item(trader_item, trader_item_amount)
+                            else:
+                                screen.print_notification("Trade failed, you do not have enough " + survivors_item_name + " for this trade.", False)
+
+                        print(survivors.group_inventory)
+                        print(survivors.group_money)
+
+                        screen.print_notification("Read them.", False)
+
+                        screen.clear()
+
+                        break
+                    if user_input == "3":
+                        screen.print_notification("Skipped all further trades.", False)
+                        return
+                    else:
+                        continue
+
                 break
 
-    screen.wait_key()
+    screen.print_notification("There are no more trades to show.", False)
 
 
 def draw_resting_screen():
-    # TODO: Code for the resting screen goes here
-    # TODO: Replace with something else
     screen.clear()
 
     print("This is the resting screen")
        
-    for i in range (0,len(survivors.survivor_list)):
+    for i in range(0, len(survivors.survivor_list)):
         if survivors.survivor_list[i]["health"] == survivors.survivor_list[i]["max_health"]:
             print(survivors.survivor_list[i]["name"] + ":" + "You don't need to rest")
     # Show options to player:
@@ -333,52 +408,29 @@ def draw_resting_screen():
             print("8: eight hours = 80 health")
             print("9: nine hours = 90 health")
             print("")        
-            sleep_choice = input("How many hours would you like to sleep?")
+            sleep_choice = input("How many hours would you like to sleep? ")
             sleep_choice = normalise_input(sleep_choice)
 
             if sleep_choice == "1":
-                screen.clear()
-            
-                print(int(survivors.survivor_list[i]["health"]) + 10 + ".")
-
+                print(int(survivors.survivor_list[i]["health"]) + 10)
             elif sleep_choice == "2":
-                print(int(survivors.survivor_list[i]["health"]) + 20 + ".")
-            
+                print(int(survivors.survivor_list[i]["health"]) + 20)
             elif sleep_choice == "3":
-                print(int(survivors.survivor_list[i]["health"]) + 30 + ".")
-              
+                print(int(survivors.survivor_list[i]["health"]) + 30)
             elif sleep_choice == "4":
-                print(int(survivors.survivor_list[i]["health"]) + 40 + ".")
-           
+                print(int(survivors.survivor_list[i]["health"]) + 40)
             elif sleep_choice == "5":
-                print(int(survivors.survivor_list[i]["health"]) + 50 + ".")
-            
+                print(int(survivors.survivor_list[i]["health"]) + 50)
             elif sleep_choice == "6":
-                print(int(survivors.survivor_list[i]["health"]) + 60 + ".")
-        
+                print(int(survivors.survivor_list[i]["health"]) + 60)
             elif sleep_choice == "7":
-                print(int(survivors.survivor_list[i]["health"]) + 70 + ".")
-         
+                print(int(survivors.survivor_list[i]["health"]) + 70)
             elif sleep_choice == "8":
-                print(int(survivors.survivor_list[i]["health"]) + 80 + ".")
-
+                print(int(survivors.survivor_list[i]["health"]) + 80)
             elif sleep_choice == "9":
-                print(int(survivors.survivor_list[i]["health"]) + 90 + ".")
-
+                print(int(survivors.survivor_list[i]["health"]) + 90)
             else:
                 print("Please enter a number between 1 and 9.")
-
-        else:
-            print("This is not possible")    
-        # Evaluate the players decision:
-            
-
-
-
-
-
-                   
-    
 
     screen.wait_key()
 

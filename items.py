@@ -13,10 +13,10 @@ item_list = {
         "plural_name": "Medkits",
 
         # The minimum one of this item can be sold for in dollars.
-        "min_value": 15.0,
+        "min_value": 30,
 
         # The maximum one of this item can be sold for in dollars.
-        "max_value": 40.0
+        "max_value": 45
     },
 
     "Food": {
@@ -26,10 +26,10 @@ item_list = {
         "plural_name": "Food",
 
         # The minimum one of this item can be sold for in dollars.
-        "min_value": 1.0,
+        "min_value": 1,
 
         # The maximum one of this item can be sold for in dollars.
-        "max_value": 2.0
+        "max_value": 2
     },
 
 }
