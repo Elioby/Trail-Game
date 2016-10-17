@@ -161,9 +161,9 @@ def main():
 
     #     screen.draw_decision(decision_text,
     #         ["Decision 1", "Decision 2"])
-    
+
     #     screen.flush()
-    
+
     #     time.sleep(1)
 
     # TODO: display a title screen?
