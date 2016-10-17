@@ -54,7 +54,7 @@ events = [
 
     {
         # The percentage chance for this event to happen
-        "occurrence_chance": 1.0,
+        "occurrence_chance": 50.0,
 
         # A function to run when the event occurs
         "notification_handler_function": event_whiplash
