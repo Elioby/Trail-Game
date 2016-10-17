@@ -10,6 +10,9 @@ import survivors
 
 
 def get_random_dict_value(dictionary):
+    if len(dictionary) == 0:
+        return None
+
     return dictionary[random.choice(list(dictionary))]
 
 

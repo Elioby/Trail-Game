@@ -39,18 +39,30 @@ def event_whiplash():
 
     return True
 
+
 def event_sits_on():
     random_survivor = get_random_survivor(False, True, False, False)
 
     if random_survivor is not None:
         random_item = get_random_dict_value(survivors.group_inventory)
 
+        if random_item is not None:
+            random_item_amount = 1
+
+            if random_item["item"]["min_value"] <= 10:
+                random_item_amount = random.randrange(11 - random_item["item"]["min_value"], 15 - random_item["item"]["min_value"])
+
+            if random_item["amount"] < random_item_amount:
+                random_item_amount = random_item["amount"]
+
+            survivors.inventory_remove_item(random_item["item"], random_item_amount)
+
+            screen.print_notification(random_survivor["name"] + " sits on " + str(random_item_amount) + " " + random_item["item"]["name"] + " and ruins it.")
+            return True
+
+    return False
 
 
-
-
-# TODO: Should this be a dictionary itself, or just a list?
-# TODO: Events should start off simple: "<random survivor> got bitten by a zombie"
 events = [
 
     {
@@ -67,6 +79,14 @@ events = [
 
         # A function to run when the event occurs
         "notification_handler_function": event_whiplash
+    },
+
+    {
+        # The percentage chance for this event to happen
+        "occurrence_chance": 1.0,
+
+        # A function to run when the event occurs
+        "notification_handler_function": event_sits_on
     },
 
 ]

@@ -29,8 +29,7 @@ group_money = 40
 # The MPH (miles per tick in this case) the car is currently moving at
 car_speed = 20
 
-
-# TODO: This should add x items to the group inventory
+# TODO: write docs
 def inventory_add_item(item, amount):
     item_name = item["name"]
     if item_name in group_inventory:

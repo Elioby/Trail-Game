@@ -19,31 +19,36 @@ from datetime import timedelta
 def pass_time(hours):
     if survivors.current_datetime.hour == 20 or (int(survivors.current_datetime.hour) < 20 < int(survivors.current_datetime.hour + hours)):
         amount_of_food = 0
-        food = survivors.group_inventory["Food"]
+        food = None
 
-        if food is not None:
+        if "Food" in survivors.group_inventory:
+            food = survivors.group_inventory["Food"]
             amount_of_food = food["amount"]
 
         remaining_survivors = count_survivors(True, True, False, False)
         required_food = remaining_survivors * 10
 
+        if required_food > amount_of_food != 0:
+            survivors.inventory_remove_item(food["item"], amount_of_food)
+        else:
+            survivors.inventory_remove_item(food["item"], required_food)
+
         if amount_of_food < required_food:
-            screen.print_notification("You did not have enough food to feed the party fully, they go hungry.")
+            if remaining_survivors < 2:
+                screen.print_notification("You don't have enough food to fully feed yourself. This only amplifies your loneliness.")
+            else:
+                screen.print_notification("You did not have enough food to feed the party fully, they go hungry.")
 
             amount_not_fed = required_food - amount_of_food
 
             for survivor in survivors.survivor_list:
                 if survivor["alive"] and not survivor["zombified"]:
                     survivor["health"] -= int(amount_not_fed * 1.5)
-
-            food["amount"] = 0
         else:
-            # TODO: what if you're alone, or in a 2, or a 3?
-            screen.print_notification("The party enjoys a full meal together.")
-
-            food["amount"] -= required_food
-
-        screen.print_notification("You have " + str(food["amount"]) + " food remaining.")
+            if remaining_survivors < 2:
+                screen.print_notification("You eat your meal alone.")
+            else:
+                screen.print_notification("The party enjoys a full meal together.")
 
     survivors.ticks_elapsed += hours
     survivors.current_datetime += timedelta(hours=hours)
@@ -65,8 +70,6 @@ def game_tick():
 
                 if event["notification_handler_function"] is not None:
                     event_function = event["notification_handler_function"]
-
-                # TODO: Add support for other handler functions that are more complex than a notification
 
                 if event_function is not None:
                     did_execute = event_function()
@@ -125,13 +128,13 @@ def game_tick():
     next_city = get_next_city(survivors.distance_travelled)
 
     if next_city is None:
-        screens.screen_list["win"]["draw_function"]()
+        screens.open_screen(screens.screen_list["win"])
 
     if next_city["distance_from_start"] - survivors.distance_travelled <= survivors.car_speed:
         screen.print_notification("You arrived in " + next_city["name"] + ".")
 
         if next_city["name"] == "New York":
-            screens.screen_list["win"]["draw_function"]()
+            screens.open_screen(screens.screen_list["win"])
 
         screens.open_screen(screens.screen_list["city"])
 

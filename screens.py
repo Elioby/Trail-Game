@@ -60,17 +60,6 @@ def open_screen(new_screen):
 
 
 def draw_starting_screen():
-    # TODO: This function should not return until they have picked all 4 characters' names
-    # TODO: These names should be updated in the survivors list in survivors.py, where survivors[0] is the main player
-
-    # TODO: use the input function to ask for the players name, and for three other friends they can count on eg: input("What is your name? ")
-
-    # TODO: update the names in survivors.py by using the survivors list eg: survivors[0] = player_name
-
-    # TODO: enforce names so that they are not longer than 16 characters
-
-    # TODO: the player should be informed about what they start with, how much food, how many medkits, how much money
-
     title_text = "Survival Trail"
 
     big_font = figlet_helper.load_font("resources/fonts/big.flf")
@@ -224,7 +213,8 @@ def draw_city_screen():
         print("3: Trade with other survivors.")
         print("4: Go to the bar.")
         print("5: Rest.")
-        print("6: Move on to " + get_next_city(survivors.distance_travelled + survivors.car_speed)["name"] + ".")
+        print("6: Use medkits.")
+        print("7: Move on to " + get_next_city(survivors.distance_travelled + survivors.car_speed)["name"] + ".")
         print("")
         player_choice = input("What would you like to do? ")
 
@@ -253,20 +243,11 @@ def draw_city_screen():
             # Rest
             open_screen(screen_list["resting"])
         elif player_choice == "6":
+            # Use medkit
+            open_screen(screen_list["medkit"])
+        elif player_choice == "7":
             # Continue to previous screen
             return
-        # TODO: Remove after debugged
-        elif player_choice == "7":
-            # Debugging for dead screen
-            open_screen(screen_list["dead"])
-        # TODO: Remove after debugged
-        elif player_choice == "8":
-            # Debugging for dead screen
-            open_screen(screen_list["points"])
-        elif player_choice == "9":
-            # Debugging for win screen
-            open_screen(screen_list["win"])
-        # TODO: Remove after debugged
         else:
             # Invalid input
             print("Please enter a number between 1 and 6.")
@@ -275,18 +256,19 @@ def draw_city_screen():
 def draw_trading_screen():
     screen.clear()
 
-    def draw_inventory(): # Lists the group's items in inventory
+    def draw_inventory():
         print("Your group has:")
         print(str(survivors.group_money) + " Money")
 
-        for group_item in survivors.group_inventory:
-            # TODO: finish
-            # if group_item["amount"] >
-            pass
+        for group_item in survivors.group_inventory.values():
+            if group_item["amount"] < 2:
+                group_item_name = group_item["item"]["name"]
+            else:
+                group_item_name = group_item["item"]["plural_name"]
+
+            print(str(int(group_item["amount"])) + " " + group_item_name)
 
     city = get_next_city(survivors.distance_travelled)
-
-    previous_trades = []
 
     trades = []
 
@@ -318,6 +300,9 @@ def draw_trading_screen():
 
                 for previous_trade in previous_trades:
                     if previous_trade[0] == survivors_item and previous_trade[1] == trader_item:
+                        break
+
+                    if previous_trade[1] == survivors_item and previous_trade[0] == trader_item:
                         break
 
                 random_trader_item_unit_value = 1
@@ -422,6 +407,70 @@ def draw_trading_screen():
                 continue
 
     screen.print_notification("There are no more trades to show.", False)
+
+
+# TODO: finish this off
+def draw_medkit_screen():
+    while True:
+        screen.clear()
+        medkit_count = 0
+
+        if "Medkit" in survivors.group_inventory:
+            medkit_count = survivors.group_inventory["Medkit"]["amount"]
+
+        print("The group has " + str(medkit_count) + " medical kits.")
+        print()
+
+        if medkit_count == 0:
+            print("Press enter to continue.")
+            screen.wait_key()
+            return
+
+        print("Survivors health status:")
+
+        for survivor in survivors.survivor_list:
+            print(str(survivor["name"]) + ": " + str(survivor["health"]))
+
+        print()
+
+        print("You can heal:")
+        print("1: Heal " + survivors.survivor_list[0]["name"])
+        print("2: Heal " + survivors.survivor_list[1]["name"])
+        print("3: Heal " + survivors.survivor_list[2]["name"])
+        print("4: Heal " + survivors.survivor_list[3]["name"])
+        print("5: Return to city screen")
+        print()
+
+        player_choice = input("What would you like to do? ")
+
+        player_choice = normalise_input(player_choice)
+
+        if player_choice == "1":
+            if survivors.survivor_list[0]["alive"]:
+                survivors.survivor_list[0]["health"] = survivors.default_health
+                survivors.inventory_remove_item(survivors.group_inventory["Medkit"]["item"], 1)
+            else:
+                print("Player is already dead.")
+        elif player_choice == "2":
+            if survivors.survivor_list[1]["alive"]:
+                survivors.survivor_list[1]["health"] = survivors.default_health
+                survivors.inventory_remove_item(survivors.group_inventory["Medkit"]["item"], 1)
+            else:
+                print("Player is already dead.")
+        elif player_choice == "3":
+            if survivors.survivor_list[2]["alive"]:
+                survivors.survivor_list[2]["health"] = survivors.default_health
+                survivors.inventory_remove_item(survivors.group_inventory["Medkit"]["item"], 1)
+            else:
+                print("Player is already dead.")
+        elif player_choice == "4":
+            if survivors.survivor_list[3]["alive"]:
+                survivors.survivor_list[3]["health"] = survivors.default_health
+                survivors.inventory_remove_item(survivors.group_inventory["Medkit"]["item"], 1)
+            else:
+                print("Player is already dead.")
+        else:
+            print("Please enter a number between 1 and 4.")
 
 
 def draw_resting_screen():
@@ -550,7 +599,6 @@ def draw_travelling_screen():
     car_x = int((screen.get_width() / 2) - (car_body_image["width"] / 2))
     car_y = survivor_y_start - car_body_image["height"] - 5
 
-    # TODO: This is kinda messy
     iterations = 0
     wheel = 0
     road = 0
@@ -564,14 +612,16 @@ def draw_travelling_screen():
 
         screen.draw_bordered_rect(progress_bar_box_x, -1, progress_bar_box_width, 5)
 
-        screen.draw_pixel(int(progress_bar_box_x + 2), 1, "|")
-        screen.draw_pixel(int(progress_bar_box_x + progress_bar_width + 3), 1, "|")
-
         for x in range(progress_bar_box_x + 3, progress_bar_box_x + progress_bar_box_width - 3):
             screen.draw_pixel(x, 1, "-")
 
         progress_bar_current_x = progress_bar_box_x + 3 + (
             (survivors.distance_travelled / get_end_distance()) * progress_bar_width)
+
+        end_distance = get_end_distance()
+
+        for city in cities.city_list.values():
+            screen.draw_pixel(progress_bar_box_x + 3 + int((city["distance_from_start"] / end_distance) * (progress_bar_width - 1)), 1, "|")
 
         screen.draw_pixel(int(progress_bar_current_x), 2, "^")
 
@@ -614,10 +664,14 @@ def draw_travelling_screen():
         # Draw stats
         next_city = get_next_city(survivors.distance_travelled)
 
+        amount_of_food = 0
+
+        if "Food" in survivors.group_inventory:
+            amount_of_food = survivors.group_inventory["Food"]["amount"]
+
         stat_lines = ["Time: " + format_time(survivors.current_datetime),
                       "Date: " + format_date(survivors.current_datetime),
-                      "Next City: " + next_city["name"], "Distance: " + str(
-                int(next_city["distance_from_start"] - survivors.distance_travelled)) + " miles"]
+                      "Next City: " + next_city["name"], "Food: " + str(amount_of_food)]
 
         longest_line = 0
 
@@ -764,6 +818,14 @@ screen_list = {
         "name": "survivor_name",
 
         "draw_function": draw_survivor_name_screen,
+
+        "one_time": True
+    },
+
+    "medkit": {
+        "name": "medkit",
+
+        "draw_function": draw_medkit_screen,
 
         "one_time": True
     },
