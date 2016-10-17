@@ -28,10 +28,11 @@ def pass_time(hours):
         remaining_survivors = count_survivors(True, True, False, False)
         required_food = remaining_survivors * 10
 
-        if required_food > amount_of_food != 0:
-            survivors.inventory_remove_item(food["item"], amount_of_food)
-        else:
-            survivors.inventory_remove_item(food["item"], required_food)
+        if amount_of_food != 0:
+            if required_food > amount_of_food:
+                survivors.inventory_remove_item(food["item"], amount_of_food)
+            else:
+                survivors.inventory_remove_item(food["item"], required_food)
 
         if amount_of_food < required_food:
             if remaining_survivors < 2:
