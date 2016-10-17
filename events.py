@@ -39,6 +39,15 @@ def event_whiplash():
 
     return True
 
+def event_sits_on():
+    random_survivor = get_random_survivor(False, True, False, False)
+
+    if random_survivor is not None:
+        random_item = get_random_dict_value(survivors.group_inventory)
+
+
+
+
 
 # TODO: Should this be a dictionary itself, or just a list?
 # TODO: Events should start off simple: "<random survivor> got bitten by a zombie"
