@@ -4,6 +4,7 @@
 # This file contains data on the screens in the game
 
 import time
+from datetime import datetime, timedelta
 import items
 
 import ascii_helper
@@ -205,6 +206,7 @@ def draw_city_screen():
     while True:
         screen.clear()
         print("You enter the city of " + city["name"])
+        print()
 
         # Show options to player:
         print("You can:")
@@ -227,6 +229,7 @@ def draw_city_screen():
             print(city["description"])
             # TODO: Maybe information on whats available, like traders, inns to stay, etc...?
             print("The next city is " + get_next_city(survivors.distance_travelled + survivors.car_speed)["name"] + ".")
+            print()
 
             # Return to options
             input("Press enter to go back...")
@@ -480,49 +483,46 @@ def draw_medkit_screen():
 
 def draw_resting_screen():
     screen.clear()
-
-    print("This is the resting screen")
+    longest_sleep_time = 0
+    sleep_times = []
 
     for i in range(0, len(survivors.survivor_list)):
-        if survivors.survivor_list[i]["health"] == survivors.survivor_list[i]["max_health"]:
-            print(survivors.survivor_list[i]["name"] + ":" + "You don't need to rest")
-    # Show options to player:
-        elif survivors.survivor_list[i]["health"] < survivors.survivor_list[i]["max_health"]:
-            print(survivors.survivor_list[i]["name"] + ":")
-            print("1: one hour = 10 health")
-            print("2: two hours = 20 health")
-            print("3: three hours = 30 health")
-            print("4: four hours = 40 health")
-            print("5: five hours = 50 health")
-            print("6: six hours = 60 health")
-            print("7: seven hours = 70 health")
-            print("8: eight hours = 80 health")
-            print("9: nine hours = 90 health")
-            print("")
-            sleep_choice = input("How many hours would you like to sleep? ")
-            sleep_choice = normalise_input(sleep_choice)
+        print("This is the resting screen")
+        print()
+        survivor = survivors.survivor_list[i]
 
-            if sleep_choice == "1":
-                print(int(survivors.survivor_list[i]["health"]) + 10)
-            elif sleep_choice == "2":
-                print(int(survivors.survivor_list[i]["health"]) + 20)
-            elif sleep_choice == "3":
-                print(int(survivors.survivor_list[i]["health"]) + 30)
-            elif sleep_choice == "4":
-                print(int(survivors.survivor_list[i]["health"]) + 40)
-            elif sleep_choice == "5":
-                print(int(survivors.survivor_list[i]["health"]) + 50)
-            elif sleep_choice == "6":
-                print(int(survivors.survivor_list[i]["health"]) + 60)
-            elif sleep_choice == "7":
-                print(int(survivors.survivor_list[i]["health"]) + 70)
-            elif sleep_choice == "8":
-                print(int(survivors.survivor_list[i]["health"]) + 80)
-            elif sleep_choice == "9":
-                print(int(survivors.survivor_list[i]["health"]) + 90)
+        if survivor["health"] == survivor["max_health"]:
+            print(survivor["name"] + " doesn't need to rest")
+        elif survivor["health"] < survivor["max_health"]:
+            print("{0} ({1} / {2}): " .format(survivor["name"], survivor["health"], survivor["max_health"]))
+            print()
+            print("Gain 10 health per hour!")
+            print()
+            sleep_choice = input("How many hours would you like to sleep? ")
+            screen.clear()
+            sleep_choice = int(normalise_input(sleep_choice))
+
+            if sleep_choice < 10:
+                sleep_times.append(sleep_choice)
+                if sleep_choice > longest_sleep_time:
+                    longest_sleep_time = sleep_choice
             else:
                 print("Please enter a number between 1 and 9.")
 
+    survivors.current_datetime = survivors.current_datetime + timedelta(hours=longest_sleep_time)
+
+    print("This is the resting screen")
+    print()
+
+    for i in range(0, len(survivors.survivor_list)):
+        survivor = survivors.survivor_list[i]
+        old_health = survivor["health"]
+        survivor["health"] += sleep_times[i] * 10
+        if survivor["health"] > survivor["max_health"]:
+            survivor["health"] = survivor["max_health"]
+        print("{0} has slept for {1} hour(s) and gained {2} health.".format(survivor["name"], sleep_times[i],
+                                                                            survivor["health"] - old_health))
+        print()
     screen.wait_key()
 
 
@@ -537,7 +537,8 @@ def draw_put_down_screen():
         print("Your health is " + str(survivors.survivor_list[0]["health"]) + ", and you have been bitten.")
 
     # Other survivors information:
-    for survivor in survivors.survivor_list:
+    for i in range(1, 4):
+        survivor = survivors.survivor_list[i]
         if survivor["alive"] and not survivor["bitten"]:
             print(survivor["name"] + " has " + str(survivor["health"]) + " health.")
         elif survivor["alive"] and survivor["bitten"] and not survivor["zombified"]:
