@@ -4,25 +4,62 @@
 # This file contains data on the screens in the game
 
 import time
+import items
 
 import ascii_helper
+import figlet_helper
 import screen
+from debug import dprint
 from misc_utils import *
+
+screen_stack = []
 
 previous_screen = None
 current_screen = None
 
 
-def set_current_screen(new_screen):
+def open_screen(new_screen):
     global previous_screen
     global current_screen
+
+    was_same_screen = new_screen is current_screen
 
     previous_screen = current_screen
     current_screen = new_screen
 
+    previous_screen_name = "console"
+
+    if previous_screen is not None:
+        previous_screen_name = previous_screen["name"]
+
+    if not was_same_screen and not new_screen["one_time"]:
+        screen_stack.append(new_screen)
+        dprint("Moving from the " + previous_screen_name + " screen to the " + current_screen["name"] + " screen.")
+        dprint("Stack size: " + str(len(screen_stack)))
+
+    new_screen["draw_function"]()
+
+    if not was_same_screen and not new_screen["one_time"] and previous_screen is not None:
+        if len(screen_stack) > 1:
+            previous_screen = screen_stack.pop()
+            current_screen = screen_stack.pop()
+            screen_stack.append(current_screen)
+            dprint("Moving from the " + previous_screen["name"] + " screen to the " + current_screen["name"] + " screen.")
+            dprint("Stack size: " + str(len(screen_stack)))
+        elif len(screen_stack) > 0:
+            current_screen = screen_stack.pop()
+            screen_stack.append(current_screen)
+
+            previous_screen_name = "console"
+
+            if previous_screen is not None:
+                previous_screen_name = previous_screen["name"]
+
+            dprint("Moving from the " + previous_screen_name + " screen to the " + current_screen["name"] + " screen.")
+            dprint("Stack size: " + str(len(screen_stack)))
+
 
 def draw_starting_screen():
-    # TODO: Code for the starting screen goes here
     # TODO: This function should not return until they have picked all 4 characters' names
     # TODO: These names should be updated in the survivors list in survivors.py, where survivors[0] is the main player
 
@@ -34,41 +71,71 @@ def draw_starting_screen():
 
     # TODO: the player should be informed about what they start with, how much food, how many medkits, how much money
 
+    title_text = "Survival Trail"
+
+    big_font = figlet_helper.load_font("resources/fonts/big.flf")
+
+    title_width = figlet_helper.get_text_width(title_text, big_font)
+
+    start_title_x = int((screen.get_width() / 2) - (title_width / 2))
+
+    while True:
+        screen.clear()
+        screen.draw_ascii_font_text(start_title_x, 0, title_text, big_font)
+
+        screen.draw_text(45, 11, "1. Travel to the trail")
+        screen.draw_text(45, 13, "2. Learn about the trail")
+        screen.draw_text(45, 15, "3. Exit the trail")
+        screen.draw_text(42, 17, "Enter your option: ")
+        screen.set_cursor_position(42 + 19, 17)
+        screen.flush()
+
+        user_input = input()
+
+        if user_input == "1":
+            open_screen(screen_list["survivor_name"])
+
+            return
+        elif user_input == "2":
+            open_screen(screen_list["info"])
+        elif user_input == "3":
+            screen.clear()
+            quit()
+        else:
+            continue
+
+        return
+
+
+def draw_info_screen():
+    pass
+
+
+def get_max_user_input(print_text, alt_text, max_length):
+    user_input = input(print_text)
+
+    while len(user_input) > max_length:
+        user_input = input(alt_text)
+    return user_input
+
+
+def draw_survivor_name_screen():
     screen.clear()
+    name = get_max_user_input("Enter your name: ", "Enter a valid name: ", 16)
+    # Leave the name as default when player enters nothing
+    if len(name) > 0:
+        survivors.survivor_list[0]["name"] = name
 
-    set_current_screen(screen_list["starting"])
+    for i in range(0, 3):
+        name = get_max_user_input("Enter your friend's name: ", "Enter a valid friend's name: ", 16)
+        if len(name) > 0:
+            survivors.survivor_list[i + 1]["name"] = name
 
-    print("This is the starting screen")
-
-    screen.wait_key()
-
-
-# TODO: this needs some prettifying
-def draw_points_screen():
-    screen.clear()
-
-    set_current_screen(screen_list["points"])
-
-    points = 0
-
-    points += survivors.distance_travelled
-
-    points += count_survivors(True, False, False, False) * 250
-
-    print("Total score: " + str(points) + ".")
-
-    time.sleep(2)
-
-    screen.print_notification("Press any key to exit.", False)
-
-    screen.clear()
-
-    quit()
+    open_screen(screen_list["city"])
 
 
 def draw_dead_screen():
     screen.clear()
-    set_current_screen(screen_list["dead"])
 
     game_over_image = ascii_helper.load_image("resources/dead_game_over.ascii")
     tombstone_image = ascii_helper.load_image("resources/dead_tombstone.ascii")
@@ -85,25 +152,66 @@ def draw_dead_screen():
 
     screen.print_notification("Press any key to continue.", False)
 
-    draw_points_screen()
+    open_screen(screen_list["points"])
 
 
 def draw_win_screen():
-    # TODO: Code for the dead screen goes here
-    # TODO: This function should never return (use quit() ? unless that's a bad idea for some reason)
+    screen.clear()
+
+    big_font = figlet_helper.load_font("resources/fonts/big.flf")
+    contessa_font = figlet_helper.load_font("resources/fonts/contessa.flf")
+
+    win_title_text = "You Win!"
+    win_body_text = "You reached New York in time"
+
+    win_title_width = figlet_helper.get_text_width(win_title_text, big_font)
+    win_body_width = figlet_helper.get_text_width(win_body_text, contessa_font)
+
+    win_title_x = int((screen.get_width() / 2) - (win_title_width / 2))
+    win_body_x = int((screen.get_width() / 2) - (win_body_width / 2))
+
+    screen.draw_ascii_font_text(win_title_x, 0, win_title_text, big_font)
+    screen.draw_ascii_font_text(win_body_x, big_font["height"], win_body_text, contessa_font)
+
+    screen.flush()
+
+    time.sleep(6)
+
+    screen.print_notification("Press any key to continue.", False)
+
+    open_screen(screen_list["points"])
+
+
+# TODO: this needs some prettifying
+def draw_points_screen():
+    screen.clear()
+
+    points = 0
+
+    points += survivors.distance_travelled
+
+    points += count_survivors(True, False, False, False) * 250
+
+    score_title_image = ascii_helper.load_image("resources/numbers/score_title.ascii")
+    score_title_x = int((screen.get_width() / 2) - (score_title_image["width"] / 2))
+
+    screen.draw_ascii_image(score_title_x, 0, score_title_image)
+    screen.draw_ascii_numbers(0, score_title_image["height"] + 5, int(points))
+
+    screen.flush()
+
+    time.sleep(2)
+
+    screen.print_notification("Press any key to exit.", False)
 
     screen.clear()
-    set_current_screen(screen_list["win"])
 
-    # TODO: Replace with something else
-
-    print("You made it to New York! You win!")
-
-    draw_points_screen()
+    quit()
 
 
-def draw_city_screen(city):
-    set_current_screen(screen_list["city"])
+def draw_city_screen():
+    # TODO: think of some way to reliably get the city here
+    city = cities.city_list["Los Angeles"]
 
     while True:
         screen.clear()
@@ -134,56 +242,200 @@ def draw_city_screen(city):
             input("Press enter to go back...")
         elif player_choice == "2":
             # Check status
-            draw_put_down_screen()
+            open_screen(screen_list["put_down"])
         elif player_choice == "3":
             # Trade
-            draw_trading_screen()
+            open_screen(screen_list["trading"])
         elif player_choice == "4":
             # Bar
             pass
         elif player_choice == "5":
             # Rest
-            draw_resting_screen()
+            open_screen(screen_list["resting"])
         elif player_choice == "6":
-            # Continue to travelling screen
+            # Continue to previous screen
             return
         # TODO: Remove after debugged
         elif player_choice == "7":
             # Debugging for dead screen
-            draw_dead_screen()
+            open_screen(screen_list["dead"])
         # TODO: Remove after debugged
         elif player_choice == "8":
             # Debugging for dead screen
-            draw_points_screen()
+            open_screen(screen_list["points"])
+        elif player_choice == "9":
+            # Debugging for win screen
+            open_screen(screen_list["win"])
+        # TODO: Remove after debugged
         else:
             # Invalid input
             print("Please enter a number between 1 and 6.")
 
 
 def draw_trading_screen():
-    # TODO: Code for the trading screen goes here
-
-    # TODO: Replace with something else
     screen.clear()
 
-    print("This is the trading screen")
+    previous_trades = []
 
-    screen.wait_key()
+    # TODO: offer 10 trades only
+    for i in range(10):
+        # None means use money
+        survivors_item = None
+
+        random_survivors_item_unit_value = 1
+
+        # 60% chance, use random item - otherwise use money for this trade
+        if random.randrange(1, 100) <= 60:
+            # Get a random item from the group inventory
+            survivors_item = get_random_dict_value(items.item_list)
+
+        if survivors_item is not None:
+            random_survivors_item_unit_value = random.randrange(survivors_item["min_value"], survivors_item["max_value"])
+
+        for j in range(10):
+            # TODO: let the trader offer money for items if the survivor item is not money
+            trader_item = None
+
+            if survivors_item is None or random.randrange(1, 100) <= 60:
+                trader_item = get_random_dict_value(items.item_list)
+
+            random_trader_item_unit_value = 1
+
+            if trader_item is not None:
+                random_trader_item_unit_value = random.randrange(trader_item["min_value"], trader_item["max_value"])
+
+            # TODO: what if this doesn't convert to int exactly?
+            survivors_item_amount = random_trader_item_unit_value / random_survivors_item_unit_value
+
+            if survivors_item_amount < 1:
+                survivors_item_amount = 1
+
+            trader_item_amount = random_survivors_item_unit_value / random_trader_item_unit_value
+
+            if trader_item_amount < 1:
+                trader_item_amount = 1
+
+            if survivors_item is None or trader_item != survivors_item:
+                if random_survivors_item_unit_value <= 10 and survivors_item_amount <= 10:
+                    random_increase = random.randrange(11 - random_survivors_item_unit_value, 15 - random_survivors_item_unit_value)
+
+                    survivors_item_amount *= random_increase
+                    trader_item_amount *= random_increase
+
+                survivors_item_name = "Money"
+
+                if survivors_item is not None:
+                    survivors_item_name = survivors_item["plural_name"]
+
+                trader_item_name = "Money"
+
+                if trader_item is not None:
+                    trader_item_name = trader_item["plural_name"]
+
+                print("1: Continue to next trade")
+                print("2: Trade " + str(int(survivors_item_amount)) + " of your " + survivors_item_name + " for " + str(int(trader_item_amount)) + " of their " + trader_item_name)
+                print("3: Skip all further trades")
+                print("")
+
+                previous_trades.append([survivors_item, trader_item])
+
+                while True:
+                    user_input = input("What would you like to do? ")
+
+                    if user_input == "1":
+                        screen.clear()
+                        break
+                    elif user_input == "2":
+                        if survivors_item is None:
+                            if survivors.group_money >= survivors_item_amount:
+                                survivors.group_money -= survivors_item_amount
+                                screen.print_notification("Trade completed successfully.", False)
+
+                                if trader_item is None:
+                                    survivors.group_money += trader_item_amount
+                                else:
+                                    survivors.inventory_add_item(trader_item, trader_item_amount)
+                            else:
+                                screen.print_notification("Trade failed, you do not have enough " + survivors_item_name + " for this trade.", False)
+                        else:
+                            if survivors.inventory_remove_item(survivors_item, survivors_item_amount):
+                                screen.print_notification("Trade completed successfully.", False)
+
+                                if trader_item is None:
+                                    survivors.group_money += trader_item_amount
+                                else:
+                                    survivors.inventory_add_item(trader_item, trader_item_amount)
+                            else:
+                                screen.print_notification("Trade failed, you do not have enough " + survivors_item_name + " for this trade.", False)
+
+                        print(survivors.group_inventory)
+                        print(survivors.group_money)
+
+                        screen.print_notification("Read them.", False)
+
+                        screen.clear()
+
+                        break
+                    if user_input == "3":
+                        screen.print_notification("Skipped all further trades.", False)
+                        return
+                    else:
+                        continue
+
+                break
+
+    screen.print_notification("There are no more trades to show.", False)
 
 
 def draw_resting_screen():
-    # TODO: Code for the resting screen goes here
-
-    # TODO: Replace with something else
     screen.clear()
 
     print("This is the resting screen")
+       
+    for i in range(0, len(survivors.survivor_list)):
+        if survivors.survivor_list[i]["health"] == survivors.survivor_list[i]["max_health"]:
+            print(survivors.survivor_list[i]["name"] + ":" + "You don't need to rest")
+    # Show options to player:
+        elif survivors.survivor_list[i]["health"] < survivors.survivor_list[i]["max_health"]: 
+            print(survivors.survivor_list[i]["name"] + ":") 
+            print("1: one hour = 10 health")
+            print("2: two hours = 20 health")
+            print("3: three hours = 30 health")
+            print("4: four hours = 40 health")
+            print("5: five hours = 50 health")
+            print("6: six hours = 60 health")
+            print("7: seven hours = 70 health")
+            print("8: eight hours = 80 health")
+            print("9: nine hours = 90 health")
+            print("")        
+            sleep_choice = input("How many hours would you like to sleep? ")
+            sleep_choice = normalise_input(sleep_choice)
+
+            if sleep_choice == "1":
+                print(int(survivors.survivor_list[i]["health"]) + 10)
+            elif sleep_choice == "2":
+                print(int(survivors.survivor_list[i]["health"]) + 20)
+            elif sleep_choice == "3":
+                print(int(survivors.survivor_list[i]["health"]) + 30)
+            elif sleep_choice == "4":
+                print(int(survivors.survivor_list[i]["health"]) + 40)
+            elif sleep_choice == "5":
+                print(int(survivors.survivor_list[i]["health"]) + 50)
+            elif sleep_choice == "6":
+                print(int(survivors.survivor_list[i]["health"]) + 60)
+            elif sleep_choice == "7":
+                print(int(survivors.survivor_list[i]["health"]) + 70)
+            elif sleep_choice == "8":
+                print(int(survivors.survivor_list[i]["health"]) + 80)
+            elif sleep_choice == "9":
+                print(int(survivors.survivor_list[i]["health"]) + 90)
+            else:
+                print("Please enter a number between 1 and 9.")
 
     screen.wait_key()
 
 
 def draw_put_down_screen():
-    set_current_screen(screen_list["put_down"])
     screen.clear()
     # Display the survivors status
 
@@ -213,10 +465,10 @@ def draw_put_down_screen():
         print("2: Commit suicide")
 
         for i in range(1, len(survivors.survivor_list)):
-            if survivor["alive"]:
+            if survivors.survivor_list[i]["alive"]:
                 option_count += 1
                 options_available.update({option_count: i})
-                print(str(option_count) + ": Put down " + str(survivor["name"]) + ".")
+                print(str(option_count) + ": Put down " + str(survivors.survivor_list[i]["name"]) + ".")
 
         # Evaluate users input:
         user_choice = input("What would you like to do? ")
@@ -229,22 +481,27 @@ def draw_put_down_screen():
 
         if user_choice == 1:
             # Return to city menu screen
-            draw_city_screen(get_next_city(survivors.distance_travelled))
+            return
         elif user_choice == 2:
             # Suicide
-            draw_dead_screen()
+            open_screen(screen_list["dead"])
         elif user_choice <= option_count:
             # Search through options available to find who to kill
             survivors.survivor_list[options_available[user_choice]]["alive"] = False
             print("You killed " + survivors.survivor_list[options_available[user_choice]]["name"])
+            continue
         else:
             print("Please enter a number between 1 and " + str(option_count) + ".")
+            continue
+
+        return
 
 
 def draw_travelling_screen():
-    show_next_city_notification = current_screen["name"] == "city"
+    if previous_screen is None:
+        open_screen(screen_list["starting"])
 
-    set_current_screen(screen_list["travelling"])
+    show_next_city_notification = previous_screen is not None and previous_screen["name"] == "city"
 
     car_body_image = ascii_helper.load_image("resources/car_body.ascii")
     car_wheel_image_1 = ascii_helper.load_image("resources/car_wheel_1.ascii")
@@ -277,7 +534,7 @@ def draw_travelling_screen():
             screen.draw_pixel(x, 1, "-")
 
         progress_bar_current_x = progress_bar_box_x + 3 + (
-        (survivors.distance_travelled / get_end_distance()) * progress_bar_width)
+            (survivors.distance_travelled / get_end_distance()) * progress_bar_width)
 
         screen.draw_pixel(int(progress_bar_current_x), 2, "^")
 
@@ -307,12 +564,12 @@ def draw_travelling_screen():
                                          survivor["health"] / survivor["max_health"])
 
                 if survivor["zombified"]:
-                    screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y + 1, "(ZOMBIE)")
+                    screen.draw_text(survivor_x_start + health_x + total_bars + 5, survivor_y, "(ZOMBIE)")
                 elif survivor["bitten"]:
-                    screen.draw_text(survivor_x_start + health_x + total_bars + 6, survivor_y + 1, "(BITTEN)")
+                    screen.draw_text(survivor_x_start + health_x + total_bars + 5, survivor_y, "(BITTEN)")
             else:
                 padding = int((total_bars - 4) / 2)
-                screen.draw_text(survivor_x_start + health_x + 3, survivor_y + 1,
+                screen.draw_text(survivor_x_start + health_x + 2, survivor_y,
                                  "[" + (padding * " ") + "DEAD" + (padding * " ") + "]")
 
             survivor_y += 2
@@ -389,54 +646,88 @@ screen_list = {
     "starting": {
         "name": "starting",
 
-        "draw_function": draw_starting_screen
-    },
+        "draw_function": draw_starting_screen,
 
-    "points": {
-        "name": "points",
-
-        "draw_function": draw_points_screen
+        "one_time": True
     },
 
     "dead": {
         "name": "dead",
 
-        "draw_function": draw_dead_screen
+        "draw_function": draw_dead_screen,
+
+        "one_time": True
     },
 
     "win": {
         "name": "win",
 
-        "draw_function": draw_win_screen
+        "draw_function": draw_win_screen,
+
+        "one_time": True
+    },
+
+    "points": {
+        "name": "points",
+
+        "draw_function": draw_points_screen,
+
+        "one_time": True
     },
 
     "city": {
         "name": "city",
 
-        "draw_function": draw_city_screen
+        "draw_function": draw_city_screen,
+
+        "one_time": False
     },
 
     "trading": {
         "name": "trading",
 
-        "draw_function": draw_trading_screen
+        "draw_function": draw_trading_screen,
+
+        "one_time": False
     },
 
     "resting": {
         "name": "resting",
 
-        "draw_function": draw_resting_screen
+        "draw_function": draw_resting_screen,
+
+        "one_time": False
     },
 
     "put_down": {
         "name": "put_down",
 
-        "draw_function": draw_put_down_screen
+        "draw_function": draw_put_down_screen,
+
+        "one_time": False
     },
 
     "travelling": {
         "name": "travelling",
 
-        "draw_function": draw_travelling_screen
+        "draw_function": draw_travelling_screen,
+
+        "one_time": False
+    },
+
+    "info": {
+        "name": "info",
+
+        "draw_function": draw_info_screen,
+
+        "one_time": False
+    },
+
+    "survivor_name": {
+        "name": "survivor_name",
+
+        "draw_function": draw_survivor_name_screen,
+
+        "one_time": True
     },
 }

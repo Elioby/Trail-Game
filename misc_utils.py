@@ -8,17 +8,19 @@ import survivors
 
 # This file contains misc utility functions that have no other place
 
+
+def get_random_dict_value(dictionary):
+    return dictionary[random.choice(list(dictionary))]
+
+
 def get_month_name(month_number):
     return \
-    ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",
-     "December"][month_number - 1]
+        ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",
+         "December"][month_number - 1]
 
 
-# TODO: This should return a nicely formatted date string from a datetime object ("2nd July 2009")
 def format_date(datetime_object):
-    date = ""
-
-    date += str(datetime_object.day)
+    date = str(datetime_object.day)
 
     if datetime_object.day < 11 or datetime_object.day > 19:
         if datetime_object.day % 10 == 1:

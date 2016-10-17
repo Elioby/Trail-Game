@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # coding=utf-8
-
+import figlet_helper
 import screen
 import screens
 
@@ -53,13 +53,9 @@ def pass_time(hours):
 # This is called every tick of the game
 def game_tick():
     if not survivors.survivor_list[0]["alive"]:
-        screens.screen_list["dead"]["draw_function"]()
+        screens.open_screen(screens.screen_list["dead"])
 
-    screens.screen_list["travelling"]["draw_function"]()
-
-    dprint("Start of game tick: " + str(survivors.ticks_elapsed))
-    dprint("Current date: " + format_date(survivors.current_datetime))
-    dprint("Current time: " + format_time(survivors.current_datetime))
+    screens.open_screen(screens.screen_list["travelling"])
 
     if survivors.ticks_elapsed > 3:
         for event in events:
@@ -73,10 +69,11 @@ def game_tick():
                 # TODO: Add support for other handler functions that are more complex than a notification
 
                 if event_function is not None:
-                    event_function()
+                    did_execute = event_function()
 
-                    # NOTE: We don't want more than one event per tick
-                    break
+                    if did_execute:
+                        # NOTE: We don't want more than one event per tick if the event worked
+                        break
 
     for survivor in survivors.survivor_list:
         if survivor["alive"] and survivor["zombified"]:
@@ -136,9 +133,7 @@ def game_tick():
         if next_city["name"] == "New York":
             screens.screen_list["win"]["draw_function"]()
 
-        screens.screen_list["city"]["draw_function"](next_city)
-    else:
-        dprint("The next city is: " + next_city["name"])
+        screens.open_screen(screens.screen_list["city"])
 
     for survivor in survivors.survivor_list:
         if survivor["alive"] and survivor["health"] <= 0:
@@ -155,6 +150,14 @@ def main():
     screen.clear()
 
     # while True:
+    #     big_font = figlet_helper.load_font("resources/fonts/big.flf")
+    #     screen.draw_ascii_font_text(0, 0, "Dad is that you?", big_font)
+    #
+    #     screen.flush()
+    #
+    #     time.sleep(1)
+
+    # while True:
     #     decision_text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
 
     #     #decision_text = "This is some text that should wrap to the next line because it is so long. If it doesn't, it probably needs fixing."
@@ -165,12 +168,7 @@ def main():
     #     screen.flush()
 
     #     time.sleep(1)
-
-    # TODO: display a title screen?
-
-    screens.screen_list["starting"]["draw_function"]()
-
-    screens.screen_list["city"]["draw_function"](cities.city_list["Los Angeles"])
+    screens.open_screen(screens.screen_list["travelling"])
 
     # The main game loop
     while True:
@@ -179,6 +177,7 @@ def main():
 
         # NOTE: This may cause weird drawing bugs
         if screens.current_screen is not None and screens.current_screen["name"] != "travelling":
+            # NOTE: I think this is okay to do because the current screen is technically the travelling screen
             screens.screen_list["travelling"]["draw_function"]()
 
 

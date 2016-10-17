@@ -23,7 +23,7 @@ def load_image(filename):
     if filename in image_cache:
         return image_cache[filename]
 
-    file = codecs.open(filename, "r", "utf-8")
+    file = codecs.open(filename, "r", "ascii")
 
     lines = file.readlines()
     final_lines = []
@@ -72,7 +72,3 @@ def load_image(filename):
     image_cache[filename] = image
 
     return image
-
-
-def flip_image_x():
-    pass

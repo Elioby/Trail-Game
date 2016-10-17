@@ -11,7 +11,7 @@ import ctypes
 import shutil
 import platform
 import subprocess
-
+import ascii_helper
 import time
 
 if platform.system() == "Windows":
@@ -142,6 +142,7 @@ def draw_progress_bar(bar_x, bar_y, length, progress):
 
     draw_text(bar_x, bar_y, "[" + ("█" * remaining_bars) + (" " * (length - remaining_bars)) + "]")
 
+
 def draw_ascii_image(image_x, image_y, ascii_image):
     image_buffer = ascii_image["image_buffer"]
     image_width = ascii_image["width"]
@@ -210,7 +211,7 @@ def draw_pixel(pixel_x, pixel_y, pixel_char):
 
 
 # TODO: (Add docs) returns the amount of vertical lines it used
-def draw_text_wrapped(text_x, text_y, text, max_length, indent = False):
+def draw_text_wrapped(text_x, text_y, text, max_length, indent=False):
     text_length = len(text)
 
     words = text.split(" ")
@@ -265,6 +266,52 @@ def draw_text(text_x, text_y, text):
 
     for x in range(text_length):
         draw_pixel(x + text_x, text_y, text[x])
+
+
+def draw_ascii_numbers(x, y, input_number):
+    ascii_numbers = []
+    x_spacing = 2
+    x_offset = 0
+    input_number = str(input_number)
+
+    for i in range(0, 9):
+        ascii_numbers.append(ascii_helper.load_image("resources/numbers/" + str(i) + ".ascii"))
+
+    for i in range(0, len(input_number)):
+        num = int(input_number[i])
+        draw_ascii_image(x + x_offset, y, ascii_numbers[num])
+        x_offset += ascii_numbers[num]["width"] + x_spacing
+
+
+def draw_ascii_font_text(text_x, text_y, text, font):
+    last_width = 0
+
+    for char in text:
+        text_x += last_width
+        char_code = ord(char)
+        char_start = ((char_code - 32) * font["height"])
+
+        last_width = 0
+
+        for i in range(font["height"]):
+            line = font["font_data"][char_start + i + 1]
+            line_length = len(line)
+
+            if line_length > last_width:
+                last_width = line_length - 2
+
+            char_x = text_x
+
+            for x in line:
+                if x != "@":
+                    if x == font["hardblank_character"]:
+                        draw_pixel(char_x, text_y + i, " ")
+                    else:
+                        draw_pixel(char_x, text_y + i, x)
+                else:
+                    if i + 1 >= font["height"]:
+                        break
+                char_x += 1
 
 
 # NOTE: this function does not use the front or back buffer as we want the front buffer to stay intact, this is why it's called print instead of draw
@@ -423,3 +470,5 @@ def render_buffer(buffer_to_render):
             if y > end_y:
                 break
         pass
+
+

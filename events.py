@@ -9,7 +9,7 @@ from misc_utils import *
 
 # This file contains data and functions about the random events defined in the game
 
-# This is an example event function, it runs screen.print_notification to notify the player of a short message
+# This is an example event function, it runs screen.print_notification to notify the player of a short message, return false if cancelled
 def event_bitten_by_zombie():
     random_survivor = get_random_survivor(False, False, False, False)
 
@@ -17,6 +17,10 @@ def event_bitten_by_zombie():
         random_survivor["bitten"] = True
 
         screen.print_notification(random_survivor["name"] + " was bitten by a zombie.")
+
+        return True
+
+    return False
 
 
 def event_whiplash():
@@ -33,6 +37,8 @@ def event_whiplash():
 
     screen.print_notification("You swerve quickly to avoid hitting a zombie and " + party_identifier + " whiplash.")
 
+    return True
+
 
 # TODO: Should this be a dictionary itself, or just a list?
 # TODO: Events should start off simple: "<random survivor> got bitten by a zombie"
@@ -48,7 +54,7 @@ events = [
 
     {
         # The percentage chance for this event to happen
-        "occurrence_chance": 1.0,
+        "occurrence_chance": 50.0,
 
         # A function to run when the event occurs
         "notification_handler_function": event_whiplash
