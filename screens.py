@@ -321,7 +321,7 @@ def draw_resting_screen():
         if survivors.survivor_list[i]["health"] == survivors.survivor_list[i]["max_health"]:
             print(survivors.survivor_list[i]["name"] + ":" + "You don't need to rest")
     # Show options to player:
-        elif survivors.survivor_list[i]["health"] <= survivors.survivor_list[i]["max_health"]: 
+        elif survivors.survivor_list[i]["health"] < survivors.survivor_list[i]["max_health"]: 
             print(survivors.survivor_list[i]["name"] + ":") 
             print("1: one hour = 10 health")
             print("2: two hours = 20 health")
@@ -339,31 +339,31 @@ def draw_resting_screen():
             if sleep_choice == "1":
                 screen.clear()
             
-                print(int(survivors.survivor_list[i]["health"]) + 10 + ".")
+                print(str(survivors.survivor_list[i]["health"] + 10) + ".")
 
             elif sleep_choice == "2":
-                print(int(survivors.survivor_list[i]["health"]) + 20 + ".")
+                print(str(survivors.survivor_list[i]["health"] + 20) + ".")
             
             elif sleep_choice == "3":
-                print(int(survivors.survivor_list[i]["health"]) + 30 + ".")
+                print(str(survivors.survivor_list[i]["health"] + 30) + ".")
               
             elif sleep_choice == "4":
-                print(int(survivors.survivor_list[i]["health"]) + 40 + ".")
+                print(str(survivors.survivor_list[i]["health"] + 40) + ".")
            
             elif sleep_choice == "5":
-                print(int(survivors.survivor_list[i]["health"]) + 50 + ".")
+                print(str(survivors.survivor_list[i]["health"] + 50) + ".")
             
             elif sleep_choice == "6":
-                print(int(survivors.survivor_list[i]["health"]) + 60 + ".")
+                print(str(survivors.survivor_list[i]["health"] + 60) + ".")
         
             elif sleep_choice == "7":
-                print(int(survivors.survivor_list[i]["health"]) + 70 + ".")
+                print(str(survivors.survivor_list[i]["health"] + 70) + ".")
          
             elif sleep_choice == "8":
-                print(int(survivors.survivor_list[i]["health"]) + 80 + ".")
+                print(str(survivors.survivor_list[i]["health"] + 80) + ".")
 
             elif sleep_choice == "9":
-                print(int(survivors.survivor_list[i]["health"]) + 90 + ".")
+                print(str(survivors.survivor_list[i]["health"] + 90) + ".")
 
             else:
                 print("Please enter a number between 1 and 9.")
