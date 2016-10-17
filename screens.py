@@ -275,7 +275,19 @@ def draw_city_screen():
 def draw_trading_screen():
     screen.clear()
 
+    def draw_inventory(): # Lists the group's items in inventory
+        print("Your group has:")
+        print(str(survivors.group_money) + " Money")
+        if survivors.group_inventory["Medkit"]["amount"] == 1:
+            print("1 Medtkit")
+        else:
+            print(str(survivors.group_inventory["Medkit"]["amount"]) + " Medkits")
+            print(str(survivors.group_inventory["Food"]["amount"]) + " Food")
+            print()
+
     city = get_next_city(survivors.distance_travelled)
+
+    previous_trades = []
 
     trades = []
 
@@ -414,13 +426,13 @@ def draw_resting_screen():
     screen.clear()
 
     print("This is the resting screen")
-       
+
     for i in range(0, len(survivors.survivor_list)):
         if survivors.survivor_list[i]["health"] == survivors.survivor_list[i]["max_health"]:
             print(survivors.survivor_list[i]["name"] + ":" + "You don't need to rest")
     # Show options to player:
-        elif survivors.survivor_list[i]["health"] <= survivors.survivor_list[i]["max_health"]: 
-            print(survivors.survivor_list[i]["name"] + ":") 
+        elif survivors.survivor_list[i]["health"] < survivors.survivor_list[i]["max_health"]:
+            print(survivors.survivor_list[i]["name"] + ":")
             print("1: one hour = 10 health")
             print("2: two hours = 20 health")
             print("3: three hours = 30 health")
@@ -430,7 +442,7 @@ def draw_resting_screen():
             print("7: seven hours = 70 health")
             print("8: eight hours = 80 health")
             print("9: nine hours = 90 health")
-            print("")        
+            print("")
             sleep_choice = input("How many hours would you like to sleep? ")
             sleep_choice = normalise_input(sleep_choice)
 
