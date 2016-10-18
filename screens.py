@@ -264,9 +264,9 @@ def draw_city_screen():
             # Scavenge
             open_screen(screen_list["scavenging"])
         elif selected_index == 7:
-            if survivors.group_inventory["Fuel"]["amount"] <= 0:
-                print("You do not have any fuel")
-                break
+            if "Fuel" not in survivors.group_inventory:
+                screen.print_notification("You do not have any fuel")
+                continue
             else:
                 # Continue to previous screen
                 return
@@ -811,8 +811,8 @@ def draw_scavenging_screen():
             print("Invalid input, please enter a number greater than 0")
         else:
             break
-    items_available = ["Medkit", "Food"]
-    items_added = {"Medkit": 0, "Food": 0}
+    items_available = ["Medkit", "Food","Fuel"]
+    items_added = {"Medkit": 0, "Food": 0, "Fuel": 0}
 
     # Random generators
     # Get prob - determines the probability of finding an object based on number of survivors present
@@ -847,7 +847,7 @@ def draw_scavenging_screen():
             open_screen(screen_list["dead"])
         if get_prob_val() == 1:
             items_collected += 1
-            list_number = randint(0, 1)  # Maybe medkits need to be more rare or add a limit to how many can be found?
+            list_number = randint(0, 2)  # Maybe medkits need to be more rare or add a limit to how many can be found?
             survivors.inventory_add_item(items.item_list[items_available[list_number]], 1)
             items_added[items_available[list_number]] += 1
     screen.clear()
@@ -866,10 +866,11 @@ def draw_scavenging_screen():
     if items_collected == 0:
         print("You did not find anything useful while scavenging")
     else:
-        print("You found " + str(items_added["Medkit"]) + " Medkits and " + str(items_added["Food"]) + " Food.")
+        print("You found " + str(items_added["Medkit"]) + " Medkits, " + str(items_added["Food"]) + " Food and " + str(items_added["Fuel"]) + " Fuel.")
         print("Your group now has:")
         print(str(survivors.group_inventory["Medkit"]["amount"]) + " Medkits.")
         print(str(survivors.group_inventory["Food"]["amount"]) + " Food.")
+        print(str(survivors.group_inventory["Fuel"]["amount"]) + " Fuel.")
     # Need to pass time
     print("Press any key to continue")
     screen.wait_key()
