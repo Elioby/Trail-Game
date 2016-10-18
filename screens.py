@@ -263,24 +263,10 @@ def draw_city_screen():
                 return
         else:
             # Invalid input
-            print("Please enter a number between 1 and 7.")
+            screen.print_notification("Please enter a number between 1 and 7.")
 
 
 def draw_trading_screen():
-    screen.clear()
-
-    # def draw_inventory():
-    #     print("Your group has:")
-    #     print(str(int(survivors.group_money)) + " Money")
-    #
-    #     for group_item in survivors.group_inventory.values():
-    #         if group_item["amount"] < 2:
-    #             group_item_name = group_item["item"]["name"]
-    #         else:
-    #             group_item_name = group_item["item"]["plural_name"]
-    #
-    #         print(str(int(group_item["amount"])) + " " + group_item_name)
-
     city = get_next_city(survivors.distance_travelled)
 
     trades = []
@@ -361,8 +347,6 @@ def draw_trading_screen():
         city["saved_trades"] = trades
 
     for trade in list(trades):
-        print()
-
         survivors_item = trade["survivors_item"]
         trader_item = trade["trader_item"]
         survivors_item_amount = trade["survivors_item_amount"]
@@ -383,6 +367,8 @@ def draw_trading_screen():
         decisions = ["Decline trade", "Accept trade", "Skip all further trades"]
 
         while True:
+            screen.set_cursor_visibility(False)
+
             screen.draw_decision_box(
                 "A survivor offers you a trade: " + str(int(trader_item_amount)) + " of their "
                 + trader_item_name + " for " + str(int(survivors_item_amount)) + " of your "
@@ -393,6 +379,7 @@ def draw_trading_screen():
             selected_index, finished = screen.get_decision_input(decisions, selected_index)
 
             if finished:
+                screen.set_cursor_visibility(True)
                 break
 
         if selected_index == 1:
@@ -438,71 +425,107 @@ def draw_trading_screen():
 
 # TODO: finish this off
 def draw_medkit_screen():
-    invalid_input = False
+
     while True:
-        screen.clear()
         medkit_count = 0
 
         if "Medkit" in survivors.group_inventory:
             medkit_count = survivors.group_inventory["Medkit"]["amount"]
 
-        print("The group has " + str(medkit_count) + " medical kits.")
-        print()
+        decisions = ["Go back to city screen"]
 
-        if medkit_count == 0:
-            print("Press enter to continue.")
-            screen.wait_key()
-            return
+        selected_index = 1
 
-        print("Survivors health status:")
+        survivor_count = count_survivors(True, True, True, True)
 
         for survivor in survivors.survivor_list:
-            print(str(survivor["name"]) + ": " + str(survivor["health"]))
+            if survivor["alive"]:
+                decisions.append("Use medkit on " + survivor["name"])
 
-        print()
+        while True:
+            screen.set_cursor_visibility(False)
 
-        print("You can heal:")
-        print("1: Heal " + survivors.survivor_list[0]["name"])
-        print("2: Heal " + survivors.survivor_list[1]["name"])
-        print("3: Heal " + survivors.survivor_list[2]["name"])
-        print("4: Heal " + survivors.survivor_list[3]["name"])
-        print("5: Return to city screen")
-        print()
+            decision_x, decision_y = screen.draw_decision_box("Your group has " + str(int(medkit_count)) + " " + ("Medkit" if medkit_count == 1 else "Medkits") + "." + ("\n" * (survivor_count * 2)), decisions, selected_index, max_height=(survivor_count * 6) + 2)
 
-        if invalid_input:
-            print("Please enter a number between 1 and 5.")
+            stats_y_start = decision_y + 4
+            stats_x_start = decision_x + 6
 
-        player_choice = input("What would you like to do? ")
-        player_choice = normalise_input(player_choice)
+            stats_y = stats_y_start
 
-        if player_choice == "1":
-            if survivors.survivor_list[0]["alive"]:
-                survivors.survivor_list[0]["health"] = survivors.default_health
-                survivors.inventory_remove_item(survivors.group_inventory["Medkit"]["item"], 1)
-            else:
-                print("Player is already dead.")
-        elif player_choice == "2":
-            if survivors.survivor_list[1]["alive"]:
-                survivors.survivor_list[1]["health"] = survivors.default_health
-                survivors.inventory_remove_item(survivors.group_inventory["Medkit"]["item"], 1)
-            else:
-                print("Player is already dead.")
-        elif player_choice == "3":
-            if survivors.survivor_list[2]["alive"]:
-                survivors.survivor_list[2]["health"] = survivors.default_health
-                survivors.inventory_remove_item(survivors.group_inventory["Medkit"]["item"], 1)
-            else:
-                print("Player is already dead.")
-        elif player_choice == "4":
-            if survivors.survivor_list[3]["alive"]:
-                survivors.survivor_list[3]["health"] = survivors.default_health
-                survivors.inventory_remove_item(survivors.group_inventory["Medkit"]["item"], 1)
-            else:
-                print("Player is already dead.")
-        elif player_choice == "5":
+            health_x = 0
+
+            for survivor in survivors.survivor_list:
+                survivor_name = survivor["name"]
+                name_length = len(survivor_name)
+
+                if name_length > health_x:
+                    health_x = name_length
+
+                screen.draw_text(stats_x_start, stats_y + 1, survivor_name)
+
+                stats_y += 2
+
+            stats_y = stats_y_start + 1
+
+            total_bars = 14
+
+            for survivor in survivors.survivor_list:
+                if survivor["alive"]:
+                    screen.draw_progress_bar(stats_x_start + health_x + 2, stats_y, total_bars,
+                                             survivor["health"] / survivor["max_health"])
+
+                    if survivor["zombified"]:
+                        screen.draw_text(stats_x_start + health_x + total_bars + 5, stats_y, "(ZOMBIE)")
+                    elif survivor["bitten"]:
+                        screen.draw_text(stats_x_start + health_x + total_bars + 5, stats_y, "(BITTEN)")
+                else:
+                    padding = int((total_bars - 4) / 2)
+                    screen.draw_text(stats_x_start + health_x + 2, stats_y,
+                                     "[" + (padding * " ") + "DEAD" + (padding * " ") + "]")
+
+                stats_y += 2
+
+            screen.flush()
+
+            selected_index, finished = screen.get_decision_input(decisions, selected_index)
+
+            if finished:
+                screen.set_cursor_visibility(True)
+                break
+
+        if selected_index == 1:
+            # Return to city menu screen
             return
+        elif selected_index >= 2:
+            # Search through options available to find who to kill
+
+            survivor_index = 0
+
+            selected_survivor = None
+
+            for survivor in survivors.survivor_list:
+                if survivor["alive"]:
+                    if survivor_index == selected_index - 2:
+                        selected_survivor = survivor
+                        break
+
+                    survivor_index += 1
+
+            if survivors.inventory_remove_item(items.item_list["Medkit"], 1):
+                screen.print_notification("You used the medkit on " + selected_survivor["name"] + ".")
+
+                selected_survivor["health"] = selected_survivor["max_health"]
+            else:
+                screen.print_notification("You don't have enough medkits to heal up this person.")
+            continue
         else:
-            invalid_input = True
+            print("Please enter a number between 1 and 6.")
+            continue
+
+    if "Medkit" not in survivors.group_inventory:
+        screen.print_notification("Your group has 0 Medkits remaining.")
+
+    screen.print_notification("Press any button to continue...")
 
 
 def draw_resting_screen():
@@ -539,13 +562,12 @@ def draw_resting_screen():
 
             game.pass_time(sleep_choice, False)
 
+            print("Press any button to continue...")
             screen.wait_key()
 
-            return
+            continue
         else:
             print("Please enter a number between 1 and 9.")
-
-        screen.wait_key()
 
 
 def draw_put_down_screen():
@@ -645,8 +667,6 @@ def draw_put_down_screen():
         else:
             print("Please enter a number between 1 and 6.")
             continue
-
-        return
 
 
 def draw_travelling_screen():
@@ -873,8 +893,7 @@ def draw_scavenging_screen():
                 survivors.survivor_list[x]["health"] = survivors.survivor_list[x]["health"] - get_health_val()
         if survivors.survivor_list[0]["health"] <= 0:
             screen.clear()
-            screen.print_notification("You died whilst scavenging.")
-            screen.wait_key()
+            screen.print_notification("You died whilst scavenging.", False)
             survivors.survivor_list[0]["alive"] = False
             open_screen(screen_list["dead"])
         if get_prob_val() == 1:
@@ -928,9 +947,7 @@ def draw_scavenging_screen():
     # Need to pass time
     game.pass_time(scavenging_time, False)
 
-    print("Press any key to continue")
-    time.sleep(2)
-    screen.wait_key()
+    screen.print_notification("Press any key to continue...", False)
 
 
 def draw_fuel_screen():
