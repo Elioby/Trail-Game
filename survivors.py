@@ -29,6 +29,7 @@ group_money = 40
 # The MPH (miles per tick in this case) the car is currently moving at
 car_speed = 20
 
+
 # TODO: write docs
 def inventory_add_item(item, amount):
     item_name = item["name"]

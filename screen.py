@@ -14,6 +14,8 @@ import subprocess
 import ascii_helper
 import time
 
+import screens
+
 if platform.system() == "Windows":
     import win32_structs
 
@@ -60,6 +62,22 @@ def init():
 
     front_buffer.fill("")
     back_buffer.fill("")
+
+
+def set_cursor_visibility(visible):
+    if platform.system() == "Windows":
+        cursor_info = win32_structs.CONSOLE_CURSOR_INFO()
+
+        ctypes.windll.kernel32.GetConsoleCursorInfo(stdout, ctypes.byref(cursor_info))
+
+        cursor_info.visible = visible
+
+        ctypes.windll.kernel32.SetConsoleCursorInfo(stdout, ctypes.byref(cursor_info))
+    else:
+        if visible:
+            print("\e[?25h")
+        else:
+            print("\e[?25l")
 
 
 def wait_key():
@@ -167,12 +185,57 @@ def draw_ascii_image(image_x, image_y, ascii_image):
         image_x += 1
 
 
-# TODO: draw a box of wrapped text, like notifcations but multi-line
-def draw_text_box():
-    pass
+# TODO: rename
+def do_stuff(decisions, selected_index=1):
+    decisions_count = len(decisions)
+
+    key = wait_key()
+
+    if key == b"\r":
+        return selected_index, True
+    elif key == b"\xe0":
+        key = wait_key()
+        key_ordinal = ord(key)
+
+        if key_ordinal == 80:
+            selected_index += 1
+        elif key_ordinal == 72:
+            selected_index -= 1
+
+    if selected_index > decisions_count:
+        selected_index = decisions_count
+    elif selected_index < 1:
+        selected_index = 1
+
+    return selected_index, False
 
 
-def draw_decision(body_text, decisions, decision_x=None, decision_y=None, max_width=None, max_height=None):
+def draw_decision(decision_x, decision_y, decisions, selected_index=1):
+    set_cursor_visibility(False)
+
+    decisions_count = len(decisions)
+
+    for i in range(decisions_count):
+        decision = decisions[i]
+
+        y = decision_y + (i * 2)
+
+        text_length = len(decision)
+
+        x = decision_x
+
+        if decision_x is None:
+            x = int((get_width() / 2) - ((text_length + 3) / 2))
+
+        draw_text(x + 2, y, decision)
+
+        if selected_index == i + 1:
+            draw_text(x, y, ">")
+            draw_text(x + text_length + 3, y, "<")
+
+
+# NOTE: (docs) this flushes the display for you (probably shouldn't)
+def draw_decision_box(body_text, decisions, selected_index=1, decision_x=None, decision_y=None, max_width=None, max_height=None):
     box_width = int(get_width() - get_width() / 6)
     box_height = int(get_height() - get_height() / 6)
 
@@ -189,8 +252,9 @@ def draw_decision(body_text, decisions, decision_x=None, decision_y=None, max_wi
         decision_y = int((get_height() / 2) - (box_height / 2))
 
     draw_bordered_rect(decision_x, decision_y, box_width, box_height, " ")
+    lines = draw_text_wrapped(decision_x + 6, decision_y + 3, body_text, box_width - 1, False)
 
-    draw_text_wrapped(decision_x + 6, decision_y + 3, body_text, box_width - 1, False)
+    draw_decision(decision_x + 5, decision_y + lines + 6, decisions, selected_index)
 
 
 def draw_pixel(pixel_x, pixel_y, pixel_char):
@@ -212,8 +276,6 @@ def draw_pixel(pixel_x, pixel_y, pixel_char):
 
 # TODO: (Add docs) returns the amount of vertical lines it used
 def draw_text_wrapped(text_x, text_y, text, max_length, indent=False):
-    text_length = len(text)
-
     words = text.split(" ")
 
     x = text_x
@@ -254,10 +316,9 @@ def draw_text_wrapped(text_x, text_y, text, max_length, indent=False):
 
             x += 1
 
-        if x != text_length:
-            x += 1
+        x += 1
 
-    return 1
+    return y - text_y
 
 
 def draw_text(text_x, text_y, text):

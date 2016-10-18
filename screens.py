@@ -45,7 +45,8 @@ def open_screen(new_screen):
             previous_screen = screen_stack.pop()
             current_screen = screen_stack.pop()
             screen_stack.append(current_screen)
-            dprint("Moving from the " + previous_screen["name"] + " screen to the " + current_screen["name"] + " screen.")
+            dprint(
+                "Moving from the " + previous_screen["name"] + " screen to the " + current_screen["name"] + " screen.")
             dprint("Stack size: " + str(len(screen_stack)))
         elif len(screen_stack) > 0:
             current_screen = screen_stack.pop()
@@ -70,25 +71,30 @@ def draw_starting_screen():
     start_title_x = int((screen.get_width() / 2) - (title_width / 2))
 
     while True:
-        screen.clear()
-        screen.draw_ascii_font_text(start_title_x, 0, title_text, big_font)
+        # TODO: this should really be broken down further
+        selected_index = 1
 
-        screen.draw_text(45, 11, "1. Travel to the trail")
-        screen.draw_text(45, 13, "2. Learn about the trail")
-        screen.draw_text(45, 15, "3. Exit the trail")
-        screen.draw_text(42, 17, "Enter your option: ")
-        screen.set_cursor_position(42 + 19, 17)
-        screen.flush()
+        while True:
+            screen.set_cursor_visibility(False)
+            decisions = ["Travel the trail", "Learn more about the trail", "Exit the trail"]
 
-        user_input = input()
+            screen.draw_ascii_font_text(start_title_x, 0, title_text, big_font)
+            screen.draw_decision(None, 10, decisions, selected_index)
 
-        if user_input == "1":
+            screen.flush()
+
+            selected_index, finished = screen.do_stuff(decisions, selected_index)
+
+            if finished:
+                break
+
+        screen.set_cursor_visibility(True)
+
+        if selected_index == 1:
             open_screen(screen_list["survivor_name"])
-
-            return
-        elif user_input == "2":
+        elif selected_index == 2:
             open_screen(screen_list["info"])
-        elif user_input == "3":
+        elif selected_index == 3:
             screen.clear()
             quit()
         else:
@@ -98,7 +104,15 @@ def draw_starting_screen():
 
 
 def draw_info_screen():
-    pass
+    screen.clear()
+
+    print("There should be some info here!")
+    print()
+    print("Press enter to continue...")
+
+    screen.wait_key()
+
+    open_screen(screen_list["starting"])
 
 
 def get_max_user_input(print_text, alt_text, max_length):
@@ -204,25 +218,23 @@ def draw_city_screen():
     city = cities.city_list["Los Angeles"]
 
     while True:
-        screen.clear()
-        print("You enter the city of " + city["name"])
-        print()
+        decisions = ["Get information on " + city["name"], "Put down bitten survivors", "Trade with other survivors",
+                     "Rest", "Use medkits",
+                     "Move on to " + get_next_city(survivors.distance_travelled + survivors.car_speed)["name"]]
 
-        # Show options to player:
-        print("You can:")
-        print("1: Get information on " + city["name"] + ".")
-        print("2: Check survivors status.")
-        print("3: Trade with other survivors.")
-        print("4: Go to the bar.")
-        print("5: Rest.")
-        print("6: Use medkits.")
-        print("7: Move on to " + get_next_city(survivors.distance_travelled + survivors.car_speed)["name"] + ".")
-        print("")
-        player_choice = input("What would you like to do? ")
+        selected_index = 1
 
-        # Evaluate the players decision:
-        player_choice = normalise_input(player_choice)
-        if player_choice == "1":
+        while True:
+            screen.draw_decision_box("You are in the city of " + city["name"], decisions, selected_index)
+
+            screen.flush()
+
+            selected_index, finished = screen.do_stuff(decisions, selected_index)
+
+            if finished:
+                break
+
+        if selected_index == 1:
             screen.clear()
             # Get information
             print("You are in " + city["name"] + ".")
@@ -233,43 +245,40 @@ def draw_city_screen():
 
             # Return to options
             input("Press enter to go back...")
-        elif player_choice == "2":
-            # Check status
+        elif selected_index == 2:
+            # Put down
             open_screen(screen_list["put_down"])
-        elif player_choice == "3":
+        elif selected_index == 3:
             # Trade
             open_screen(screen_list["trading"])
-        elif player_choice == "4":
-            # Bar
-            pass
-        elif player_choice == "5":
+        elif selected_index == 4:
             # Rest
             open_screen(screen_list["resting"])
-        elif player_choice == "6":
+        elif selected_index == 5:
             # Use medkit
             open_screen(screen_list["medkit"])
-        elif player_choice == "7":
+        elif selected_index == 6:
             # Continue to previous screen
             return
         else:
             # Invalid input
-            print("Please enter a number between 1 and 6.")
+            print("Please enter a number between 1 and 7.")
 
 
 def draw_trading_screen():
     screen.clear()
 
-    def draw_inventory():
-        print("Your group has:")
-        print(str(survivors.group_money) + " Money")
-
-        for group_item in survivors.group_inventory.values():
-            if group_item["amount"] < 2:
-                group_item_name = group_item["item"]["name"]
-            else:
-                group_item_name = group_item["item"]["plural_name"]
-
-            print(str(int(group_item["amount"])) + " " + group_item_name)
+    # def draw_inventory():
+    #     print("Your group has:")
+    #     print(str(int(survivors.group_money)) + " Money")
+    #
+    #     for group_item in survivors.group_inventory.values():
+    #         if group_item["amount"] < 2:
+    #             group_item_name = group_item["item"]["name"]
+    #         else:
+    #             group_item_name = group_item["item"]["plural_name"]
+    #
+    #         print(str(int(group_item["amount"])) + " " + group_item_name)
 
     city = get_next_city(survivors.distance_travelled)
 
@@ -292,7 +301,8 @@ def draw_trading_screen():
                 survivors_item = get_random_dict_value(items.item_list)
 
             if survivors_item is not None:
-                random_survivors_item_unit_value = random.randrange(survivors_item["min_value"], survivors_item["max_value"])
+                random_survivors_item_unit_value = random.randrange(survivors_item["min_value"],
+                                                                    survivors_item["max_value"])
 
             for j in range(10):
                 # TODO: let the trader offer money for items if the survivor item is not money
@@ -326,7 +336,8 @@ def draw_trading_screen():
 
                 if survivors_item is None or trader_item != survivors_item:
                     if random_survivors_item_unit_value <= 10 and survivors_item_amount <= 10:
-                        random_increase = random.randrange(11 - random_survivors_item_unit_value, 15 - random_survivors_item_unit_value)
+                        random_increase = random.randrange(11 - random_survivors_item_unit_value,
+                                                           15 - random_survivors_item_unit_value)
 
                         survivors_item_amount *= random_increase
                         trader_item_amount *= random_increase
@@ -334,14 +345,14 @@ def draw_trading_screen():
                     previous_trades.append([survivors_item, trader_item])
 
                     trades.append({"survivors_item": survivors_item, "trader_item": trader_item,
-                                   "survivors_item_amount": survivors_item_amount, "trader_item_amount": trader_item_amount})
+                                   "survivors_item_amount": survivors_item_amount,
+                                   "trader_item_amount": trader_item_amount})
 
                     break
 
-    city["saved_trades"] = trades
+        city["saved_trades"] = trades
 
-    for trade in trades:
-        draw_inventory()
+    for trade in list(trades):
         print()
 
         survivors_item = trade["survivors_item"]
@@ -359,55 +370,60 @@ def draw_trading_screen():
         if trader_item is not None:
             trader_item_name = trader_item["plural_name"]
 
-        print("1: Continue to next trade")
-        print("2: Trade " + str(int(survivors_item_amount)) + " of your " + survivors_item_name + " for " + str(
-            int(trader_item_amount)) + " of their " + trader_item_name)
-        print("3: Skip all further trades")
-        print("")
+        selected_index = 1
+
+        decisions = ["Decline trade", "Accept trade", "Skip all further trades"]
 
         while True:
-            user_input = input("What would you like to do? ")
+            screen.draw_decision_box(
+                "A survivor offers you a trade: " + str(int(trader_item_amount)) + " of their "
+                + trader_item_name + " for " + str(int(survivors_item_amount)) + " of your "
+                + survivors_item_name, decisions, selected_index)
 
-            if user_input == "1":
-                screen.clear()
+            screen.flush()
+
+            selected_index, finished = screen.do_stuff(decisions, selected_index)
+
+            if finished:
                 break
-            elif user_input == "2":
-                if survivors_item is None:
-                    if survivors.group_money >= survivors_item_amount:
-                        survivors.group_money -= survivors_item_amount
-                        screen.print_notification("Trade completed successfully.", False)
 
-                        if trader_item is None:
-                            survivors.group_money += trader_item_amount
-                        else:
-                            survivors.inventory_add_item(trader_item, trader_item_amount)
+        if selected_index == 1:
+            continue
+        elif selected_index == 2:
+            if survivors_item is None:
+                if survivors.group_money >= survivors_item_amount:
+                    survivors.group_money -= survivors_item_amount
+                    screen.print_notification("Trade completed successfully.", True)
 
-                        city["saved_trades"].remove(trade)
+                    if trader_item is None:
+                        survivors.group_money += trader_item_amount
                     else:
-                        screen.print_notification(
-                            "Trade failed, you do not have enough " + survivors_item_name + " for this trade.", False)
+                        survivors.inventory_add_item(trader_item, trader_item_amount)
+
+                    city["saved_trades"].remove(trade)
                 else:
-                    if survivors.inventory_remove_item(survivors_item, survivors_item_amount):
-                        screen.print_notification("Trade completed successfully.", False)
-
-                        if trader_item is None:
-                            survivors.group_money += trader_item_amount
-                        else:
-                            survivors.inventory_add_item(trader_item, trader_item_amount)
-
-                        city["saved_trades"].remove(trade)
-                    else:
-                        screen.print_notification(
-                            "Trade failed, you do not have enough " + survivors_item_name + " for this trade.", False)
-
-                screen.clear()
-
-                break
-            if user_input == "3":
-                screen.print_notification("Skipped all further trades.", False)
-                return
+                    screen.print_notification(
+                        "Trade failed, you do not have enough " + survivors_item_name + " for this trade.", True)
             else:
-                continue
+                if survivors.inventory_remove_item(survivors_item, survivors_item_amount):
+                    screen.print_notification("Trade completed successfully.", True)
+
+                    if trader_item is None:
+                        survivors.group_money += trader_item_amount
+                    else:
+                        survivors.inventory_add_item(trader_item, trader_item_amount)
+
+                    city["saved_trades"].remove(trade)
+                else:
+                    screen.print_notification(
+                        "Trade failed, you do not have enough " + survivors_item_name + " for this trade.", True)
+
+            continue
+        if selected_index == 3:
+            screen.print_notification("Skipped all further trades.", True)
+            return
+        else:
+            continue
 
     screen.print_notification("There are no more trades to show.", False)
 
@@ -476,7 +492,7 @@ def draw_medkit_screen():
             else:
                 print("Player is already dead.")
         elif player_choice == "5":
-            open_screen(screen_list["city"])
+            return
         else:
             invalid_input = True
 
@@ -494,7 +510,7 @@ def draw_resting_screen():
         if survivor["health"] == survivor["max_health"]:
             print(survivor["name"] + " doesn't need to rest")
         elif survivor["health"] < survivor["max_health"]:
-            print("{0} ({1} / {2}): " .format(survivor["name"], survivor["health"], survivor["max_health"]))
+            print("{0} ({1} / {2}): ".format(survivor["name"], survivor["health"], survivor["max_health"]))
             print()
             print("Gain 10 health per hour!")
             print()
@@ -627,7 +643,9 @@ def draw_travelling_screen():
         end_distance = get_end_distance()
 
         for city in cities.city_list.values():
-            screen.draw_pixel(progress_bar_box_x + 3 + int((city["distance_from_start"] / end_distance) * (progress_bar_width - 1)), 1, "|")
+            screen.draw_pixel(
+                progress_bar_box_x + 3 + int((city["distance_from_start"] / end_distance) * (progress_bar_width - 1)),
+                1, "|")
 
         screen.draw_pixel(int(progress_bar_current_x), 2, "^")
 
@@ -833,6 +851,6 @@ screen_list = {
 
         "draw_function": draw_medkit_screen,
 
-        "one_time": True
+        "one_time": False
     },
 }

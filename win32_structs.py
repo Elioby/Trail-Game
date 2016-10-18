@@ -21,6 +21,11 @@ class CHAR_INFO(ctypes.Structure):
     _fields_ = ('ascii', ctypes.c_char), ('attr', ctypes.c_uint16)
 
 
+class CONSOLE_CURSOR_INFO(ctypes.Structure):
+    _fields_ = [("size", ctypes.c_int),
+                ("visible", ctypes.c_bool)]
+
+
 class CONSOLE_SCREEN_BUFFER_INFO(ctypes.Structure):
     _fields_ = [
         ("dwSize", COORD),
