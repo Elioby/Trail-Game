@@ -264,8 +264,8 @@ def draw_city_screen():
             # Scavenge
             open_screen(screen_list["scavenging"])
         elif selected_index == 7:
-            if survivors.group_inventory["Fuel"]["amount"] <= 0:
-                screen.print_notification("You cannot leave the city until you have enough food. Try scavenging for some.", False)
+            if "Fuel" not in survivors.group_inventory:
+                screen.print_notification("You cannot leave the city until you have enough fuel. Try scavenging for some.", False)
             else:
                 # Continue to previous screen
                 return
@@ -856,8 +856,8 @@ def draw_scavenging_screen():
                 items_found[random_item["name"]]["amount"] += item_amount
             else:
                 items_found[random_item["name"]] = {"item": random_item, "amount": item_amount}
-            # TODO: add item to inventory
 
+            survivors.inventory_add_item(random_item, item_amount)
     screen.clear()
     print("During your time scavenging your party took damage:")
 
@@ -881,8 +881,10 @@ def draw_scavenging_screen():
 
         print()
         print("Your group now has:")
-        print(str(survivors.group_inventory["Medkit"]["amount"]) + " Medkits.")
-        print(str(survivors.group_inventory["Food"]["amount"]) + " Food.")
+
+        for item_found in survivors.group_inventory.values():
+            item_found_amount = int(item_found["amount"])
+            print(str(item_found_amount) + " " + (item_found["item"]["name"] if item_found_amount <= 0 else item_found["item"]["plural_name"]))
 
     # Need to pass time
     game.pass_time(scavenging_time, False)
