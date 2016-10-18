@@ -5,6 +5,8 @@
 
 import time
 from datetime import datetime, timedelta
+
+import game
 import items
 
 import ascii_helper
@@ -87,9 +89,8 @@ def draw_starting_screen():
             selected_index, finished = screen.get_decision_input(decisions, selected_index)
 
             if finished:
+                screen.set_cursor_visibility(True)
                 break
-
-        screen.set_cursor_visibility(True)
 
         if selected_index == 1:
             open_screen(screen_list["survivor_name"])
@@ -225,6 +226,7 @@ def draw_city_screen():
         selected_index = 1
 
         while True:
+            screen.set_cursor_visibility(False)
             screen.draw_decision_box("You are in the city of " + city["name"], decisions, selected_index)
 
             screen.flush()
@@ -232,6 +234,7 @@ def draw_city_screen():
             selected_index, finished = screen.get_decision_input(decisions, selected_index)
 
             if finished:
+                screen.set_cursor_visibility(True)
                 break
 
         if selected_index == 1:
@@ -512,48 +515,42 @@ def draw_medkit_screen():
 
 
 def draw_resting_screen():
-    screen.clear()
-    longest_sleep_time = 0
-    sleep_times = []
+    while True:
+        screen.clear()
 
-    for i in range(0, len(survivors.survivor_list)):
-        print("This is the resting screen")
-        print()
-        survivor = survivors.survivor_list[i]
-
-        if survivor["health"] == survivor["max_health"]:
-            print(survivor["name"] + " doesn't need to rest")
-        elif survivor["health"] < survivor["max_health"]:
+        for survivor in survivors.survivor_list:
             print("{0} ({1} / {2}): ".format(survivor["name"], survivor["health"], survivor["max_health"]))
             print()
-            print("Gain 10 health per hour!")
-            print()
-            sleep_choice = input("How many hours would you like to sleep? ")
-            screen.clear()
-            sleep_choice = int(normalise_input(sleep_choice))
 
-            if sleep_choice < 10:
-                sleep_times.append(sleep_choice)
-                if sleep_choice > longest_sleep_time:
-                    longest_sleep_time = sleep_choice
-            else:
-                print("Please enter a number between 1 and 9.")
-
-    survivors.current_datetime = survivors.current_datetime + timedelta(hours=longest_sleep_time)
-
-    print("This is the resting screen")
-    print()
-
-    for i in range(0, len(survivors.survivor_list)):
-        survivor = survivors.survivor_list[i]
-        old_health = survivor["health"]
-        survivor["health"] += sleep_times[i] * 10
-        if survivor["health"] > survivor["max_health"]:
-            survivor["health"] = survivor["max_health"]
-        print("{0} has slept for {1} hour(s) and gained {2} health.".format(survivor["name"], sleep_times[i],
-                                                                            survivor["health"] - old_health))
+        print("Each survivor gains 10 health per hour rested.")
         print()
-    screen.wait_key()
+        sleep_choice = input("How many hours would you like to rest? ")
+        screen.clear()
+
+        try:
+            sleep_choice = int(normalise_input(sleep_choice))
+        except ValueError:
+            print("Please enter a number between 1 and 9.")
+            time.sleep(1)
+
+        if sleep_choice < 10:
+            for survivor in survivors.survivor_list:
+                old_health = survivor["health"]
+                survivor["health"] += sleep_choice * 10
+                if survivor["health"] > survivor["max_health"]:
+                    survivor["health"] = survivor["max_health"]
+                print("{0} has slept for {1} hour(s) and gained {2} health.".format(survivor["name"], sleep_choice,
+                                                                                    survivor["health"] - old_health))
+
+            game.pass_time(sleep_choice, False)
+
+            screen.wait_key()
+
+            return
+        else:
+            print("Please enter a number between 1 and 9.")
+
+        screen.wait_key()
 
 
 def draw_put_down_screen():
@@ -622,6 +619,8 @@ def draw_put_down_screen():
 def draw_travelling_screen():
     if previous_screen is None:
         open_screen(screen_list["starting"])
+
+    screen.set_cursor_visibility(False)
 
     show_next_city_notification = previous_screen is not None and previous_screen["name"] == "city"
 
@@ -788,6 +787,8 @@ def draw_travelling_screen():
 
         time.sleep(0.15)
 
+        screen.set_cursor_visibility(False)
+
 
 def draw_scavenging_screen():
     screen.clear()
@@ -805,7 +806,7 @@ def draw_scavenging_screen():
             continue
 
         if scavenging_time > 4:
-            print("You cannot scavenge for that long.")
+            print("You cannot scavenge for longer than 4 hours at a time.")
         elif scavenging_time < 1:
             print("Invalid input, please enter a number greater than 0")
         else:
@@ -840,8 +841,7 @@ def draw_scavenging_screen():
                 survivors.survivor_list[x]["health"] = survivors.survivor_list[x]["health"] - get_health_val()
         if survivors.survivor_list[0]["health"] <= 0:
             screen.clear()
-            print("You died whilst scavenging.")
-            print("press any key to continue")
+            screen.print_notification("You died whilst scavenging.")
             screen.wait_key()
             survivors.survivor_list[0]["alive"] = False
             open_screen(screen_list["dead"])
@@ -874,37 +874,41 @@ def draw_scavenging_screen():
     print("Press any key to continue")
     screen.wait_key()
 
+
 def draw_fuel_screen():
-    decisions = ["Scavenge","Rest","Use medkit","Continue on trail"]
+    decisions = ["Scavenge", "Rest", "Use medkit", "Continue on trail"]
 
     selected_index = 1
 
     while True:
-        screen.draw_decision_box("You have run out of fuel and cannot travel any further, you can:", decisions, selected_index)
+        while True:
+            screen.set_cursor_visibility(False)
 
-        screen.flush()
+            screen.draw_decision_box("You have run out of fuel and cannot travel any further. You must scavenge for fuel. You may use medkits and resting in order to heal. Don't stick around too long, who knows what's hanging around here!", decisions, selected_index)
 
-        selected_index, finished = screen.do_stuff(decisions, selected_index)
+            screen.flush()
 
-        if finished:
-            break
+            selected_index, finished = screen.get_decision_input(decisions, selected_index)
 
-    if selected_index == 1:
-        # Scavenge
-        open_screen(screen_list["scavenging"])
-    elif selected_index == 2:
-        # Rest
-        open_screen(screen_list["resting"])
-    elif selected_index == 3:
-        # Medkit
-        open_screen(screen_list["medkit"])
-    elif selected_index == 4:
-        # Continue - check that fuel is greater than 1...
-        if survivors.group_inventory["Fuel"]["amount"] > 0:
-            # Continue travelling
-            print("REMOVE THIS")# NEEDS REMOVING!
-        else:
-            print("You do not have enough fuel to keep travelling.")
+            if finished:
+                screen.set_cursor_visibility(True)
+                break
+
+        if selected_index == 1:
+            # Scavenge
+            open_screen(screen_list["scavenging"])
+        elif selected_index == 2:
+            # Rest
+            open_screen(screen_list["resting"])
+        elif selected_index == 3:
+            # Medkit
+            open_screen(screen_list["medkit"])
+        elif selected_index == 4:
+            if "Fuel" in survivors.group_inventory:
+                # Continue travelling
+                return
+            else:
+                screen.print_notification("You do not have enough fuel to keep travelling.")
 
 screen_list = {
     "starting": {

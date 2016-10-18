@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # coding=utf-8
-import figlet_helper
-import screen
+
+import items
 import screens
 
 from debug import *

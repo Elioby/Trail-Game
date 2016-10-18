@@ -75,7 +75,7 @@ group_inventory = {
     "Fuel": {
         "item": items.item_list["Fuel"],
 
-        "amount": 30
+        "amount": 40
     }
 
 }

@@ -210,8 +210,6 @@ def get_decision_input(decisions, selected_index=1):
 
 
 def draw_decision(decision_x, decision_y, decisions, selected_index=1):
-    set_cursor_visibility(False)
-
     decisions_count = len(decisions)
 
     for i in range(decisions_count):
