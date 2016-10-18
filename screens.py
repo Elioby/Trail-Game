@@ -261,8 +261,12 @@ def draw_city_screen():
             # Scavenge
             open_screen(screen_list["scavenging"])
         elif selected_index == 7:
-            # Continue to previous screen
-            return
+            if survivors.group_inventory["Fuel"]["amount"] <= 0:
+                print("You do not have any fuel")
+                break
+            else:
+                # Continue to previous screen
+                return
         else:
             # Invalid input
             print("Please enter a number between 1 and 7.")
@@ -840,6 +844,37 @@ def draw_scavenging_screen():
     print("Press any key to continue")
     screen.wait_key()
 
+def draw_fuel_screen():
+    decisions = ["Scavenge","Rest","Use medkit","Continue on trail"]
+
+    selected_index = 1
+
+    while True:
+        screen.draw_decision_box("You have run out of fuel and cannot travel any further, you can:", decisions, selected_index)
+
+        screen.flush()
+
+        selected_index, finished = screen.do_stuff(decisions, selected_index)
+
+        if finished:
+            break
+
+    if selected_index == 1:
+        # Scavenge
+        open_screen(screen_list["scavenging"])
+    elif selected_index == 2:
+        # Rest
+        open_screen(screen_list["resting"])
+    elif selected_index == 3:
+        # Medkit
+        open_screen(screen_list["medkit"])
+    elif selected_index == 4:
+        # Continue - check that fuel is greater than 1...
+        if survivors.group_inventory["Fuel"]["amount"] > 0:
+            # Continue travelling
+            print("REMOVE THIS")# NEEDS REMOVING!
+        else:
+            print("You do not have enough fuel to keep travelling.")
 
 screen_list = {
     "starting": {
@@ -945,5 +980,13 @@ screen_list = {
 
         "one_time": False
 
+    },
+
+    "fuel": {
+        "name": "fuel",
+
+        "draw_function": draw_fuel_screen,
+
+        "one_time": False
     },
 }

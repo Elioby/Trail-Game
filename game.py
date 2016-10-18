@@ -55,8 +55,10 @@ def pass_time(hours, travelling=True):
     survivors.current_datetime += timedelta(hours=hours)
 
     if travelling:
-        survivors.distance_travelled += survivors.car_speed
-        # TODO: remove fuel
+        if not survivors.inventory_remove_item(items.item_list["Fuel"], hours):
+            screens.open_screen(screens.screen_list["fuel"])
+        else:
+            survivors.distance_travelled += survivors.car_speed
 
 
 # This is called every tick of the game

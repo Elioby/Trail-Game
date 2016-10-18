@@ -32,4 +32,14 @@ item_list = {
         "max_value": 2
     },
 
+    "Fuel": {
+        "name": "Fuel",
+
+        "plural_name": "Fuel",
+
+        "min_value": 25,
+
+        "max_value": 50,
+
+    },
 }
