@@ -66,6 +66,9 @@ def game_tick():
 
     screens.open_screen(screens.screen_list["travelling"])
 
+    if "Fuel" in survivors.group_inventory:
+        pass
+
     if survivors.ticks_elapsed > 3:
         for event in events:
             event_random = random.uniform(0.0, 100.0)
