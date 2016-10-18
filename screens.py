@@ -216,7 +216,11 @@ def draw_points_screen():
 
 
 def draw_city_screen():
-    city = cities.city_list["Los Angeles"]
+
+    if survivors.distance_travelled == 0:
+        city = cities.city_list["Los Angeles"]
+    else:
+        city = get_next_city(survivors.distance_travelled)
 
     while True:
         decisions = ["Get information on " + city["name"], "Put down bitten survivors", "Trade with other survivors",
