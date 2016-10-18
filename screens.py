@@ -265,8 +265,7 @@ def draw_city_screen():
             open_screen(screen_list["scavenging"])
         elif selected_index == 7:
             if survivors.group_inventory["Fuel"]["amount"] <= 0:
-                print("You do not have any fuel")
-                break
+                screen.print_notification("You cannot leave the city until you have enough food. Try scavenging for some.", False)
             else:
                 # Continue to previous screen
                 return
@@ -519,8 +518,9 @@ def draw_resting_screen():
         screen.clear()
 
         for survivor in survivors.survivor_list:
-            print("{0} ({1} / {2}): ".format(survivor["name"], survivor["health"], survivor["max_health"]))
-            print()
+            if survivor["alive"]:
+                print("{0} ({1} / {2}): ".format(survivor["name"], survivor["health"], survivor["max_health"]))
+                print()
 
         print("Each survivor gains 10 health per hour rested.")
         print()
@@ -535,12 +535,13 @@ def draw_resting_screen():
 
         if sleep_choice < 10:
             for survivor in survivors.survivor_list:
-                old_health = survivor["health"]
-                survivor["health"] += sleep_choice * 10
-                if survivor["health"] > survivor["max_health"]:
-                    survivor["health"] = survivor["max_health"]
-                print("{0} has slept for {1} hour(s) and gained {2} health.".format(survivor["name"], sleep_choice,
-                                                                                    survivor["health"] - old_health))
+                if survivor["alive"]:
+                    old_health = survivor["health"]
+                    survivor["health"] += sleep_choice * 10
+                    if survivor["health"] > survivor["max_health"]:
+                        survivor["health"] = survivor["max_health"]
+                    print("{0} has slept for {1} hour(s) and gained {2} health.".format(survivor["name"], sleep_choice,
+                                                                                        survivor["health"] - old_health))
 
             game.pass_time(sleep_choice, False)
 
@@ -557,15 +558,8 @@ def draw_put_down_screen():
     screen.clear()
     # Display the survivors status
 
-    # Players information:
-    if not survivors.survivor_list[0]["bitten"]:
-        print("Your health is " + str(survivors.survivor_list[0]["health"]) + ".")
-    else:
-        print("Your health is " + str(survivors.survivor_list[0]["health"]) + ", and you have been bitten.")
-
-    # Other survivors information:
-    for i in range(1, 4):
-        survivor = survivors.survivor_list[i]
+    # Survivors information:
+    for survivor in survivors.survivor_list:
         if survivor["alive"] and not survivor["bitten"]:
             print(survivor["name"] + " has " + str(survivor["health"]) + " health.")
         elif survivor["alive"] and survivor["bitten"] and not survivor["zombified"]:
@@ -796,7 +790,6 @@ def draw_scavenging_screen():
     print("")
     # Declaring variables
     number_of_survivors = count_survivors()
-    items_collected = 0
     # Input
     while True:
         try:
@@ -811,31 +804,31 @@ def draw_scavenging_screen():
             print("Invalid input, please enter a number greater than 0")
         else:
             break
-    items_available = ["Medkit", "Food"]
-    items_added = {"Medkit": 0, "Food": 0}
+
+    items_found = {}
 
     # Random generators
     # Get prob - determines the probability of finding an object based on number of survivors present
     def get_prob_val():
         if number_of_survivors == 4:
-            return randint(0, 2)
+            return randint(0, 5)
         elif number_of_survivors == 3:
-            return randint(0, 4)
+            return randint(0, 7)
         elif number_of_survivors == 2:
-            return randint(0, 9)
+            return randint(0, 12)
         elif number_of_survivors == 1:
-            return randint(0, 14)
+            return randint(0, 15)
 
     # Get health - determines how much health a survivor should lose based on number of survivors present
     def get_health_val():
         if number_of_survivors > 2:
-            return randint(0, 1)
-        elif number_of_survivors == 2:
             return randint(0, 2)
-        elif number_of_survivors == 1:
+        elif number_of_survivors == 2:
             return randint(0, 4)
+        elif number_of_survivors == 1:
+            return randint(0, 8)
 
-    for i in range(0, scavenging_time * 10):
+    for i in range(0, scavenging_time * 7):
         for x in range(0, 4):
             if survivors.survivor_list[x]["alive"]:
                 survivors.survivor_list[x]["health"] = survivors.survivor_list[x]["health"] - get_health_val()
@@ -846,31 +839,54 @@ def draw_scavenging_screen():
             survivors.survivor_list[0]["alive"] = False
             open_screen(screen_list["dead"])
         if get_prob_val() == 1:
-            items_collected += 1
-            list_number = randint(0, 1)  # Maybe medkits need to be more rare or add a limit to how many can be found?
-            survivors.inventory_add_item(items.item_list[items_available[list_number]], 1)
-            items_added[items_available[list_number]] += 1
+            random_item = get_random_dict_value(items.item_list)
+            random_item_unit_value = random.randrange(random_item["min_value"], random_item["max_value"])
+
+            item_amount = 1
+
+            if random_item_unit_value <= 20:
+                random_increase = random.randrange(21 - random_item_unit_value,
+                                                   25 - random_item_unit_value)
+
+                item_amount *= random_increase
+
+            item_amount = int(item_amount)
+
+            if random_item["name"] in items_found:
+                items_found[random_item["name"]]["amount"] += item_amount
+            else:
+                items_found[random_item["name"]] = {"item": random_item, "amount": item_amount}
+            # TODO: add item to inventory
+
     screen.clear()
     print("During your time scavenging your party took damage:")
-    print("Your health is " + str(survivors.survivor_list[0]["health"]))
 
-    for i in range(1, 4):
-        if survivors.survivor_list[i]["alive"] and survivors.survivor_list[i]["health"] > 0:
-            print(survivors.survivor_list[i]["name"] + " has " + str(survivors.survivor_list[i]["health"]) + " health.")
-        elif survivors.survivor_list[i]["alive"] and survivors.survivor_list[i]["health"] <= 0:
-            print(survivors.survivor_list[i]["name"] + " died while scavenging")
-            survivors.survivor_list[i]["alive"] = False
+    for survivor in survivors.survivor_list:
+        if survivor["alive"] and survivor["health"] > 0:
+            print(survivor["name"] + " has " + str(survivor["health"]) + " health.")
+        elif survivor["alive"] and survivor["health"] <= 0:
+            print(survivor["name"] + " died while scavenging")
+            survivor["alive"] = False
 
     print("")
 
-    if items_collected == 0:
-        print("You did not find anything useful while scavenging")
+    if len(items_found) == 0:
+        print("You did not find anything useful while scavenging.")
     else:
-        print("You found " + str(items_added["Medkit"]) + " Medkits and " + str(items_added["Food"]) + " Food.")
+        print("While scavenging you found the following items:")
+
+        for item_found in items_found.values():
+            item_found_amount = int(item_found["amount"])
+            print(str(item_found_amount) + " " + (item_found["item"]["name"] if item_found_amount <= 0 else item_found["item"]["plural_name"]))
+
+        print()
         print("Your group now has:")
         print(str(survivors.group_inventory["Medkit"]["amount"]) + " Medkits.")
         print(str(survivors.group_inventory["Food"]["amount"]) + " Food.")
+
     # Need to pass time
+    game.pass_time(scavenging_time, False)
+
     print("Press any key to continue")
     screen.wait_key()
 
