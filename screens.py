@@ -220,7 +220,7 @@ def draw_city_screen():
 
     while True:
         decisions = ["Get information on " + city["name"], "Put down bitten survivors", "Trade with other survivors",
-                     "Rest", "Use medkits",
+                     "Rest", "Use medkits", "Scavenge",
                      "Move on to " + get_next_city(survivors.distance_travelled + survivors.car_speed)["name"]]
 
         selected_index = 1
@@ -259,6 +259,9 @@ def draw_city_screen():
             # Use medkit
             open_screen(screen_list["medkit"])
         elif selected_index == 6:
+            # Scavenge
+            open_screen(screen_list["scavenging"])
+        elif selected_index == 7:
             # Continue to previous screen
             return
         else:
@@ -757,6 +760,7 @@ def draw_travelling_screen():
 
         time.sleep(0.15)
 
+
 def draw_scavenging_screen():
     screen.clear()
     print("Scavenging Screen")
@@ -768,55 +772,57 @@ def draw_scavenging_screen():
     while True:
         scavenging_time = int(input("How long would you like to scavenge for? "))
         if scavenging_time > 4:
-            print("You cannont scavenge for that long.")
+            print("You cannot scavenge for that long.")
         elif scavenging_time < 1:
             print("Invalid input, please enter a number greater than 0")
         else:
             break
-    items_available = ["Medkit","Food"]
+    items_available = ["Medkit", "Food"]
     items_added = {"Medkit": 0, "Food": 0}
+
     # Random generators
-    # Get prob - determines the proababily of finding an object based on number of survivors present
+    # Get prob - determines the probability of finding an object based on number of survivors present
     def get_prob_val():
         if number_of_survivors == 4:
-            return randint(0,2)
+            return randint(0, 2)
         elif number_of_survivors == 3:
-            return randint(0,4)
+            return randint(0, 4)
         elif number_of_survivors == 2:
-            return randint(0,9)
+            return randint(0, 9)
         elif number_of_survivors == 1:
-            return randint(0,14)
+            return randint(0, 14)
+
     # Get health - determines how much health a survivor should lose based on number of survivors present
     def get_health_val():
         if number_of_survivors > 2:
-            return randint(0,1)
+            return randint(0, 1)
         elif number_of_survivors == 2:
-            return randint(0,2)
+            return randint(0, 2)
         elif number_of_survivors == 1:
-            return randint(0,4)
+            return randint(0, 4)
 
-    for i in range (0,scavenging_time * 10):
-        for x in range(0,4):
-            if survivors.survivor_list[x]["alive"] == True:
+    for i in range(0, scavenging_time * 10):
+        for x in range(0, 4):
+            if survivors.survivor_list[x]["alive"]:
                 survivors.survivor_list[x]["health"] = survivors.survivor_list[x]["health"] - get_health_val()
         if survivors.survivor_list[0]["health"] <= 0:
             screen.clear()
             print("You died whilst scavenging.")
             print("press any key to continue")
             screen.wait_key()
-            survivors.survivor_list[0]["alive"] == False
+            survivors.survivor_list[0]["alive"] = False
             open_screen(screen_list["dead"])
         if get_prob_val() == 1:
             items_collected += 1
-            list_number = randint(0,1)# Maybe medkits need to be more rare or add a limit to how many can be found?
-            survivors.inventory_add_item(items.item_list[items_available[list_number]],1)
+            list_number = randint(0, 1)  # Maybe medkits need to be more rare or add a limit to how many can be found?
+            survivors.inventory_add_item(items.item_list[items_available[list_number]], 1)
             items_added[items_available[list_number]] += 1
     screen.clear()
     print("During your time scavenging your party took damage:")
     print("Your health is " + str(survivors.survivor_list[0]["health"]))
-    for i in range (1,4):
+    for i in range(1, 4):
         if survivors.survivor_list[i]["alive"] == True and survivors.survivor_list[i]["health"] > 0:
-            print(survivors.survivor_list[i]["name"] + " has " + str(survivors.survivor_list[i]["health"]) + " health." )
+            print(survivors.survivor_list[i]["name"] + " has " + str(survivors.survivor_list[i]["health"]) + " health.")
         elif survivors.survivor_list[i]["alive"] == True and survivors.survivor_list[i]["health"] <= 0:
             print(survivors.survivor_list[i]["name"] + " died while scavenging")
             survivors.survivor_list[i]["alive"] = False
@@ -832,6 +838,7 @@ def draw_scavenging_screen():
     # Need to pass time
     print("Press any key to continue")
     screen.wait_key()
+
 
 screen_list = {
     "starting": {
