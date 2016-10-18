@@ -24,7 +24,7 @@ city_list = {
 
         # A brief (1 sentence?) description of the city
         "description": """
-You have arrived in Phoenix Arizona a city once known for being a great
+You have arrived in Phoenix Arizona, a city once known for being a great
 tourist destination which has now resorted to ruins. The town has been
 overrun by zombies for quite some time however there is a local stronghold
 that you can seek refuge at.

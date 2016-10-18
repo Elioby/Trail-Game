@@ -29,6 +29,9 @@ group_money = 40
 # The MPH (miles per tick in this case) the car is currently moving at
 car_speed = 20
 
+# If it is foggy or not
+foggy = False
+
 
 # TODO: write docs
 def inventory_add_item(item, amount):

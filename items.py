@@ -39,9 +39,9 @@ item_list = {
         "plural_name": "Fuel",
 
         # The minimum one of this item can be sold for in dollars.
-        "min_value": 4,
+        "min_value": 3,
 
         # The maximum one of this item can be sold for in dollars.
-        "max_value": 6
+        "max_value": 5
     },
 }
