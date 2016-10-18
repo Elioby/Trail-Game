@@ -215,7 +215,6 @@ def draw_points_screen():
 
 
 def draw_city_screen():
-    # TODO: think of some way to reliably get the city here
     city = cities.city_list["Los Angeles"]
 
     while True:
@@ -820,14 +819,16 @@ def draw_scavenging_screen():
     screen.clear()
     print("During your time scavenging your party took damage:")
     print("Your health is " + str(survivors.survivor_list[0]["health"]))
+
     for i in range(1, 4):
-        if survivors.survivor_list[i]["alive"] == True and survivors.survivor_list[i]["health"] > 0:
+        if survivors.survivor_list[i]["alive"] and survivors.survivor_list[i]["health"] > 0:
             print(survivors.survivor_list[i]["name"] + " has " + str(survivors.survivor_list[i]["health"]) + " health.")
-        elif survivors.survivor_list[i]["alive"] == True and survivors.survivor_list[i]["health"] <= 0:
+        elif survivors.survivor_list[i]["alive"] and survivors.survivor_list[i]["health"] <= 0:
             print(survivors.survivor_list[i]["name"] + " died while scavenging")
             survivors.survivor_list[i]["alive"] = False
 
     print("")
+
     if items_collected == 0:
         print("You did not find anything useful while scavenging")
     else:
