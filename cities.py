@@ -11,7 +11,9 @@ city_list = {
         "name": "Los Angeles",
 
         # A brief (1 sentence?) description of the city
-        "description": "The second-largest city in the United States. Known for being the center of the American entertainment industry",
+        "description":  """
+LA DESCRIPTION
+                        """,
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 0,
@@ -21,7 +23,12 @@ city_list = {
         "name": "Phoenix",
 
         # A brief (1 sentence?) description of the city
-        "description": "The capital and largest city of the state of Arizona. It has a desert climate.",
+        "description": """
+You have arrived in Phoenix Arizona a city once known for being a great
+tourist destination which has now resorted to ruins. The town has been
+overrun by zombies for quite some time however there is a local stronghold
+that you can seek refuge at.
+""",
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 300,
@@ -41,7 +48,15 @@ city_list = {
         "name": "Oklahoma City",
 
         # A brief (1 sentence?) description of the city
-        "description": "The capital and largest city of the state of Oklahoma.",
+        "description":  """
+You have now arrived at Oklahoma city. A city largely known for
+its Republican values not to mention a quite successful basketball
+franchise in the Oklahoma city thunder. However that was the past now
+it has quite a significant zombie presence but you will be pleased
+to hear that it's not as bad as how things were at Phoenix. There
+is a survivor base nearby the downtown district area and a few
+abandoned stores that might have a few items that you can scavenge.
+                        """,
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 1300,
@@ -51,7 +66,15 @@ city_list = {
         "name": "St Louis",
 
         # A brief (1 sentence?) description of the city
-        "description": "An independent city and inland port in the state of Missouri.",
+        "description":  """
+You have now arrived at Oklahoma city. A city largely known for
+its Republican values not to mention a quite successful basketball
+franchise in the Oklahoma city thunder. However that was the past now
+it has quite a significant zombie presence but you will be pleased
+to hear that it's not as bad as how things were at Phoenix. There
+is a survivor base nearby the downtown district area and a few
+abandoned stores that might have a few items that you can scavenge.
+                        """,
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 1800,
@@ -91,7 +114,13 @@ city_list = {
         "name": "New York",
 
         # A brief (1 sentence?) description of the city
-        "description": "A global city in the state of New York. Known for being the most populous in the United States.",
+        "description":  """
+Welcome to the big apple, also known as New York, one of the most premier
+big cities to live in. It boasts a wide range of high profile celebrities
+including none other than the NFL cover boy Odell Beckham Jnr. You would
+be pleased to find out that there isn't much of a zombie presence of
+majority of new yorkers fled to either the west coast or down south.
+                        """,
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 3000,
