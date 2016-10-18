@@ -314,12 +314,19 @@ def draw_trading_screen():
                 if survivors_item is None or random.randrange(1, 100) <= 60:
                     trader_item = get_random_dict_value(items.item_list)
 
+                use_trade = True
+
                 for previous_trade in previous_trades:
                     if previous_trade[0] == survivors_item and previous_trade[1] == trader_item:
+                        use_trade = False
                         break
 
                     if previous_trade[1] == survivors_item and previous_trade[0] == trader_item:
+                        use_trade = False
                         break
+
+                if not use_trade:
+                    continue
 
                 random_trader_item_unit_value = 1
 
