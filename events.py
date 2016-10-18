@@ -62,13 +62,16 @@ def event_sits_on():
 
     return False
 
+
 def event_fake_fuel():
-    if survivors.group_inventory["Fuel"]["amount"] >= 10:
-        survivors.group_inventory["Fuel"]["amount"] -= 10
-        #screen.print_notification("While checking your supplies you've discovered that one of your fuel cans is actually filled with water.")
-        screen.print_notification("You've found one of your fuel cans is actually filled with water")
-        return True
+    if "Fuel" in survivors.group_inventory:
+        if survivors.group_inventory["Fuel"]["amount"] >= 10:
+            survivors.group_inventory["Fuel"]["amount"] -= 10
+            screen.print_notification("You find one of your fuel cans is actually filled with water.")
+            return True
+
     return False
+
 
 events_list = [
 

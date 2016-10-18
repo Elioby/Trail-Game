@@ -12,9 +12,6 @@ import shutil
 import platform
 import subprocess
 import ascii_helper
-import time
-
-import screens
 
 if platform.system() == "Windows":
     import win32_structs
@@ -253,6 +250,8 @@ def draw_decision_box(body_text, decisions, selected_index=1, decision_x=None, d
 
     draw_decision(decision_x + 5, decision_y + lines + 6, decisions, selected_index)
 
+    return decision_x, decision_y
+
 
 def draw_pixel(pixel_x, pixel_y, pixel_char):
     if pixel_char != "" and pixel_char != " ":
@@ -374,6 +373,7 @@ def draw_ascii_font_text(text_x, text_y, text, font):
 
 # NOTE: this function does not use the front or back buffer as we want the front buffer to stay intact, this is why it's called print instead of draw
 def print_notification(message, redraw_on_exit=True):
+    set_cursor_visibility(False)
     message_length = len(message)
 
     x_start = (width / 2) - (message_length / 2)
@@ -419,6 +419,8 @@ def print_notification(message, redraw_on_exit=True):
 
     if redraw_on_exit:
         refresh()
+
+    set_cursor_visibility(True)
 
 
 def stdout_write_flush(message):
