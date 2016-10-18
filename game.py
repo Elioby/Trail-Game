@@ -7,7 +7,7 @@ import screens
 from debug import *
 from misc_utils import *
 
-from events import events
+import events
 import survivors
 
 from datetime import timedelta
@@ -70,7 +70,7 @@ def game_tick():
         pass
 
     if survivors.ticks_elapsed > 3:
-        for event in events:
+        for event in events.events_list:
             event_random = random.uniform(0.0, 100.0)
             if event["occurrence_chance"] > event_random:
                 event_function = None
@@ -83,6 +83,9 @@ def game_tick():
 
                     if did_execute:
                         # NOTE: We don't want more than one event per tick if the event worked
+
+                        events.events_list.remove(event)
+
                         break
 
     for survivor in survivors.survivor_list:

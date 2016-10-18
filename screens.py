@@ -84,7 +84,7 @@ def draw_starting_screen():
 
             screen.flush()
 
-            selected_index, finished = screen.do_stuff(decisions, selected_index)
+            selected_index, finished = screen.get_decision_input(decisions, selected_index)
 
             if finished:
                 break
@@ -229,7 +229,7 @@ def draw_city_screen():
 
             screen.flush()
 
-            selected_index, finished = screen.do_stuff(decisions, selected_index)
+            selected_index, finished = screen.get_decision_input(decisions, selected_index)
 
             if finished:
                 break
@@ -385,7 +385,7 @@ def draw_trading_screen():
 
             screen.flush()
 
-            selected_index, finished = screen.do_stuff(decisions, selected_index)
+            selected_index, finished = screen.get_decision_input(decisions, selected_index)
 
             if finished:
                 break
@@ -618,11 +618,11 @@ def draw_travelling_screen():
     car_wheel_image_1 = ascii_helper.load_image("resources/car_wheel_1.ascii")
     car_wheel_image_2 = ascii_helper.load_image("resources/car_wheel_2.ascii")
 
-    survivor_x_start = int(screen.get_width() / 10)
-    survivor_y_start = screen.get_height() - (len(survivors.survivor_list) * 2) - 1
+    stats_x_start = int(screen.get_width() / 10)
+    stats_y_start = screen.get_height() - ((len(survivors.survivor_list) + 1) * 2) - 1
 
     car_x = int((screen.get_width() / 2) - (car_body_image["width"] / 2))
-    car_y = survivor_y_start - car_body_image["height"] - 5
+    car_y = stats_y_start - car_body_image["height"] - 5
 
     iterations = 0
     wheel = 0
@@ -652,41 +652,59 @@ def draw_travelling_screen():
 
         screen.draw_pixel(int(progress_bar_current_x), 2, "^")
 
-        # Draw survivors stats
-        survivor_y = survivor_y_start
+        # Draw survivors and car stats
+        stats_y = stats_y_start
 
         health_x = 0
 
+        name_length = len("Fuel")
+
+        if name_length > health_x:
+            health_x = name_length
+
+        screen.draw_text(stats_x_start, stats_y + 1, "Fuel")
+
+        stats_y += 2
+
         for survivor in survivors.survivor_list:
             survivor_name = survivor["name"]
-            survivor_name_length = len(survivor_name)
+            name_length = len(survivor_name)
 
-            if survivor_name_length > health_x:
-                health_x = survivor_name_length
+            if name_length > health_x:
+                health_x = name_length
 
-            screen.draw_text(survivor_x_start, survivor_y + 1, survivor_name)
+            screen.draw_text(stats_x_start, stats_y + 1, survivor_name)
 
-            survivor_y += 2
+            stats_y += 2
 
-        survivor_y = survivor_y_start + 1
+        stats_y = stats_y_start + 1
 
         total_bars = 14
 
+        fuel_amount = 0
+
+        if "Fuel" in survivors.group_inventory:
+            fuel_amount = survivors.group_inventory["Fuel"]["amount"]
+
+        screen.draw_progress_bar(stats_x_start + health_x + 2, stats_y, total_bars, fuel_amount / max(fuel_amount, 60))
+
+        stats_y += 2
+
         for survivor in survivors.survivor_list:
             if survivor["alive"]:
-                screen.draw_progress_bar(survivor_x_start + health_x + 2, survivor_y, total_bars,
+                screen.draw_progress_bar(stats_x_start + health_x + 2, stats_y, total_bars,
                                          survivor["health"] / survivor["max_health"])
 
                 if survivor["zombified"]:
-                    screen.draw_text(survivor_x_start + health_x + total_bars + 5, survivor_y, "(ZOMBIE)")
+                    screen.draw_text(stats_x_start + health_x + total_bars + 5, stats_y, "(ZOMBIE)")
                 elif survivor["bitten"]:
-                    screen.draw_text(survivor_x_start + health_x + total_bars + 5, survivor_y, "(BITTEN)")
+                    screen.draw_text(stats_x_start + health_x + total_bars + 5, stats_y, "(BITTEN)")
             else:
                 padding = int((total_bars - 4) / 2)
-                screen.draw_text(survivor_x_start + health_x + 2, survivor_y,
+                screen.draw_text(stats_x_start + health_x + 2, stats_y,
                                  "[" + (padding * " ") + "DEAD" + (padding * " ") + "]")
 
-            survivor_y += 2
+            stats_y += 2
 
         # Draw stats
         next_city = get_next_city(survivors.distance_travelled)
@@ -698,7 +716,7 @@ def draw_travelling_screen():
 
         stat_lines = ["Time: " + format_time(survivors.current_datetime),
                       "Date: " + format_date(survivors.current_datetime),
-                      "Next City: " + next_city["name"], "Food: " + str(amount_of_food)]
+                      "Next City: " + next_city["name"], "Food: " + str(int(amount_of_food))]
 
         longest_line = 0
 
@@ -708,7 +726,7 @@ def draw_travelling_screen():
                 longest_line = stat_line_length
 
         stat_x = int(screen.get_width() - longest_line - (screen.get_width() / 10) + 2)
-        stat_y = survivor_y_start + 1
+        stat_y = stats_y_start + 1
 
         for stat_line in stat_lines:
             screen.draw_text(stat_x, stat_y, stat_line)
@@ -769,7 +787,12 @@ def draw_scavenging_screen():
     items_collected = 0
     # Input
     while True:
-        scavenging_time = int(input("How long would you like to scavenge for? "))
+        try:
+            scavenging_time = int(input("How long would you like to scavenge for? "))
+        except ValueError:
+            print("Invalid input, please enter a number greater than 0")
+            continue
+
         if scavenging_time > 4:
             print("You cannot scavenge for that long.")
         elif scavenging_time < 1:

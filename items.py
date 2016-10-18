@@ -32,4 +32,17 @@ item_list = {
         "max_value": 2
     },
 
+    "Fuel": {
+        "name": "Fuel",
+
+        # This is just for when you print information about items
+        "plural_name": "Fuel",
+
+        # The minimum one of this item can be sold for in dollars.
+        "min_value": 1,
+
+        # The maximum one of this item can be sold for in dollars.
+        "max_value": 2
+    },
+
 }

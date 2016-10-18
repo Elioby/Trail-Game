@@ -72,6 +72,12 @@ group_inventory = {
         "amount": 100
     },
 
+    "Fuel": {
+        "item": items.item_list["Fuel"],
+
+        "amount": 60
+    }
+
 }
 
 # A list of "survivors", where the first element is the player, and the following 3 are the players friends.

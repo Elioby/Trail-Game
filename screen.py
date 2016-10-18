@@ -185,8 +185,7 @@ def draw_ascii_image(image_x, image_y, ascii_image):
         image_x += 1
 
 
-# TODO: rename
-def do_stuff(decisions, selected_index=1):
+def get_decision_input(decisions, selected_index=1):
     decisions_count = len(decisions)
 
     key = wait_key()
