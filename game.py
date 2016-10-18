@@ -66,7 +66,7 @@ def game_tick():
 
     screens.open_screen(screens.screen_list["travelling"])
 
-    if "Fuel" in survivors.group_inventory:
+    if "Fuel" not in survivors.group_inventory:
         pass
 
     if survivors.ticks_elapsed > 3:
