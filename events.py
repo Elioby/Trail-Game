@@ -62,6 +62,13 @@ def event_sits_on():
 
     return False
 
+def event_fake_fuel():
+    if survivors.group_inventory["Fuel"]["amount"] >= 10:
+        survivors.group_inventory["Fuel"]["amount"] -= 10
+        #screen.print_notification("While checking your supplies you've discovered that one of your fuel cans is actually filled with water.")
+        screen.print_notification("You've found one of your fuel cans is actually filled with water")
+        return True
+    return False
 
 events_list = [
 
@@ -87,6 +94,15 @@ events_list = [
 
         # A function to run when the event occurs
         "notification_handler_function": event_sits_on
+    },
+
+    {
+        # The percentage chance for this event to happen
+        "occurrence_chance": 3.0,
+
+        # A function to run when the event occurs
+        "notification_handler_function": event_fake_fuel
+
     },
 
 ]
