@@ -16,7 +16,7 @@ from datetime import timedelta
 
 
 # You must use this method when changing the time
-def pass_time(hours):
+def pass_time(hours, travelling=True):
     if survivors.current_datetime.hour == 20 or (int(survivors.current_datetime.hour) < 20 < int(survivors.current_datetime.hour + hours)):
         amount_of_food = 0
         food = None
@@ -53,7 +53,10 @@ def pass_time(hours):
 
     survivors.ticks_elapsed += hours
     survivors.current_datetime += timedelta(hours=hours)
-    survivors.distance_travelled += survivors.car_speed
+
+    if travelling:
+        survivors.distance_travelled += survivors.car_speed
+        # TODO: remove fuel
 
 
 # This is called every tick of the game

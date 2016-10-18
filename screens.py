@@ -215,7 +215,6 @@ def draw_points_screen():
 
 
 def draw_city_screen():
-    # TODO: think of some way to reliably get the city here
     city = cities.city_list["Los Angeles"]
 
     while True:
