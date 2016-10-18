@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 # coding=utf-8
-import figlet_helper
-import screen
+
+import items
 import screens
 
 from debug import *
 from misc_utils import *
 
-from events import events
+import events
 import survivors
 
 from datetime import timedelta
@@ -55,8 +55,10 @@ def pass_time(hours, travelling=True):
     survivors.current_datetime += timedelta(hours=hours)
 
     if travelling:
-        survivors.distance_travelled += survivors.car_speed
-        # TODO: remove fuel
+        if not survivors.inventory_remove_item(items.item_list["Fuel"], hours):
+            screens.open_screen(screens.screen_list["fuel"])
+        else:
+            survivors.distance_travelled += survivors.car_speed
 
 
 # This is called every tick of the game
@@ -70,7 +72,7 @@ def game_tick():
         pass
 
     if survivors.ticks_elapsed > 3:
-        for event in events:
+        for event in events.events_list:
             event_random = random.uniform(0.0, 100.0)
             if event["occurrence_chance"] > event_random:
                 event_function = None
@@ -83,6 +85,9 @@ def game_tick():
 
                     if did_execute:
                         # NOTE: We don't want more than one event per tick if the event worked
+
+                        events.events_list.remove(event)
+
                         break
 
     for survivor in survivors.survivor_list:

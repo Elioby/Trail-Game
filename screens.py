@@ -5,6 +5,8 @@
 
 import time
 from datetime import datetime, timedelta
+
+import game
 import items
 
 import ascii_helper
@@ -84,12 +86,11 @@ def draw_starting_screen():
 
             screen.flush()
 
-            selected_index, finished = screen.do_stuff(decisions, selected_index)
+            selected_index, finished = screen.get_decision_input(decisions, selected_index)
 
             if finished:
+                screen.set_cursor_visibility(True)
                 break
-
-        screen.set_cursor_visibility(True)
 
         if selected_index == 1:
             open_screen(screen_list["survivor_name"])
@@ -215,51 +216,51 @@ def draw_points_screen():
 
 
 def draw_city_screen():
-    city = cities.city_list["Los Angeles"]
+    if survivors.distance_travelled == 0:
+        city = cities.city_list["Los Angeles"]
+    else:
+        city = get_next_city(survivors.distance_travelled)
 
     while True:
-        decisions = ["Get information on " + city["name"], "Put down bitten survivors", "Trade with other survivors",
-                     "Rest", "Use medkits",
+        decisions = ["Put down bitten survivors", "Trade with other survivors",
+                     "Rest", "Use medkits", "Scavenge",
                      "Move on to " + get_next_city(survivors.distance_travelled + survivors.car_speed)["name"]]
 
         selected_index = 1
 
         while True:
-            screen.draw_decision_box("You are in the city of " + city["name"], decisions, selected_index)
+            screen.set_cursor_visibility(False)
+            screen.draw_decision_box(city["description"], decisions, selected_index)
 
             screen.flush()
 
-            selected_index, finished = screen.do_stuff(decisions, selected_index)
+            selected_index, finished = screen.get_decision_input(decisions, selected_index)
 
             if finished:
+                screen.set_cursor_visibility(True)
                 break
 
         if selected_index == 1:
-            screen.clear()
-            # Get information
-            print("You are in " + city["name"] + ".")
-            print(city["description"])
-            # TODO: Maybe information on whats available, like traders, inns to stay, etc...?
-            print("The next city is " + get_next_city(survivors.distance_travelled + survivors.car_speed)["name"] + ".")
-            print()
-
-            # Return to options
-            input("Press enter to go back...")
-        elif selected_index == 2:
             # Put down
             open_screen(screen_list["put_down"])
-        elif selected_index == 3:
+        elif selected_index == 2:
             # Trade
             open_screen(screen_list["trading"])
-        elif selected_index == 4:
+        elif selected_index == 3:
             # Rest
             open_screen(screen_list["resting"])
-        elif selected_index == 5:
+        elif selected_index == 4:
             # Use medkit
             open_screen(screen_list["medkit"])
+        elif selected_index == 5:
+            # Scavenge
+            open_screen(screen_list["scavenging"])
         elif selected_index == 6:
-            # Continue to previous screen
-            return
+            if "Fuel" not in survivors.group_inventory:
+                screen.print_notification("You cannot leave the city until you have enough fuel. Try scavenging for some.", False)
+            else:
+                # Continue to previous screen
+                return
         else:
             # Invalid input
             print("Please enter a number between 1 and 7.")
@@ -311,12 +312,19 @@ def draw_trading_screen():
                 if survivors_item is None or random.randrange(1, 100) <= 60:
                     trader_item = get_random_dict_value(items.item_list)
 
+                use_trade = True
+
                 for previous_trade in previous_trades:
                     if previous_trade[0] == survivors_item and previous_trade[1] == trader_item:
+                        use_trade = False
                         break
 
                     if previous_trade[1] == survivors_item and previous_trade[0] == trader_item:
+                        use_trade = False
                         break
+
+                if not use_trade:
+                    continue
 
                 random_trader_item_unit_value = 1
 
@@ -382,7 +390,7 @@ def draw_trading_screen():
 
             screen.flush()
 
-            selected_index, finished = screen.do_stuff(decisions, selected_index)
+            selected_index, finished = screen.get_decision_input(decisions, selected_index)
 
             if finished:
                 break
@@ -498,74 +506,65 @@ def draw_medkit_screen():
 
 
 def draw_resting_screen():
-    screen.clear()
-    longest_sleep_time = 0
-    sleep_times = []
+    while True:
+        screen.clear()
 
-    for i in range(0, len(survivors.survivor_list)):
-        print("This is the resting screen")
+        for survivor in survivors.survivor_list:
+            if survivor["alive"]:
+                print("{0} ({1} / {2}): ".format(survivor["name"], survivor["health"], survivor["max_health"]))
+                print()
+
+        print("Each survivor gains 10 health per hour rested.")
         print()
-        survivor = survivors.survivor_list[i]
+        sleep_choice = input("How many hours would you like to rest? ")
 
-        if survivor["health"] == survivor["max_health"]:
-            print(survivor["name"] + " doesn't need to rest")
-        elif survivor["health"] < survivor["max_health"]:
-            print("{0} ({1} / {2}): ".format(survivor["name"], survivor["health"], survivor["max_health"]))
-            print()
-            print("Gain 10 health per hour!")
-            print()
-            sleep_choice = input("How many hours would you like to sleep? ")
-            screen.clear()
+        try:
             sleep_choice = int(normalise_input(sleep_choice))
+        except ValueError:
+            print()
+            print("<--Please enter a number between 1 and 9-->")
+            time.sleep(1)
+            continue
+        screen.clear()
 
-            if sleep_choice < 10:
-                sleep_times.append(sleep_choice)
-                if sleep_choice > longest_sleep_time:
-                    longest_sleep_time = sleep_choice
-            else:
-                print("Please enter a number between 1 and 9.")
+        if sleep_choice < 10:
+            for survivor in survivors.survivor_list:
+                if survivor["alive"]:
+                    old_health = survivor["health"]
+                    survivor["health"] += sleep_choice * 10
+                    if survivor["health"] > survivor["max_health"]:
+                        survivor["health"] = survivor["max_health"]
+                    print("{0} has slept for {1} hour(s) and gained {2} health.".format(survivor["name"], sleep_choice,
+                                                                                        survivor["health"] - old_health))
 
-    survivors.current_datetime = survivors.current_datetime + timedelta(hours=longest_sleep_time)
+            game.pass_time(sleep_choice, False)
 
-    print("This is the resting screen")
-    print()
+            screen.wait_key()
 
-    for i in range(0, len(survivors.survivor_list)):
-        survivor = survivors.survivor_list[i]
-        old_health = survivor["health"]
-        survivor["health"] += sleep_times[i] * 10
-        if survivor["health"] > survivor["max_health"]:
-            survivor["health"] = survivor["max_health"]
-        print("{0} has slept for {1} hour(s) and gained {2} health.".format(survivor["name"], sleep_times[i],
-                                                                            survivor["health"] - old_health))
-        print()
-    screen.wait_key()
+            return
+        else:
+            print("Please enter a number between 1 and 9.")
+
+        screen.wait_key()
 
 
 def draw_put_down_screen():
-    screen.clear()
+
     # Display the survivors status
-
-    # Players information:
-    if not survivors.survivor_list[0]["bitten"]:
-        print("Your health is " + str(survivors.survivor_list[0]["health"]) + ".")
-    else:
-        print("Your health is " + str(survivors.survivor_list[0]["health"]) + ", and you have been bitten.")
-
-    # Other survivors information:
-    for i in range(1, 4):
-        survivor = survivors.survivor_list[i]
-        if survivor["alive"] and not survivor["bitten"]:
-            print(survivor["name"] + " has " + str(survivor["health"]) + " health.")
-        elif survivor["alive"] and survivor["bitten"] and not survivor["zombified"]:
-            print(survivor["name"] + " has " + str(survivor["health"]) + " health, and has been bitten")
-        elif not survivor["alive"]:
-            print(survivor["name"] + " is dead.")
-
-    print("")
 
     # Display options
     while True:
+        screen.clear()
+        # Survivors information:
+        for survivor in survivors.survivor_list:
+            if survivor["alive"] and not survivor["bitten"]:
+                print(survivor["name"] + " has " + str(survivor["health"]) + " health.")
+            elif survivor["alive"] and survivor["bitten"] and not survivor["zombified"]:
+                print(survivor["name"] + " has " + str(survivor["health"]) + " health, and has been bitten")
+            elif not survivor["alive"]:
+                print(survivor["name"] + " is dead.")
+
+        print("")
         option_count = 2
         options_available = {}
 
@@ -584,7 +583,9 @@ def draw_put_down_screen():
         try:
             user_choice = int(user_choice)
         except ValueError:
-            print("Please enter a number.")
+            print()
+            print("<--Please enter a number-->")
+            time.sleep(1)
             continue
 
         if user_choice == 1:
@@ -609,17 +610,19 @@ def draw_travelling_screen():
     if previous_screen is None:
         open_screen(screen_list["starting"])
 
+    screen.set_cursor_visibility(False)
+
     show_next_city_notification = previous_screen is not None and previous_screen["name"] == "city"
 
     car_body_image = ascii_helper.load_image("resources/car_body.ascii")
     car_wheel_image_1 = ascii_helper.load_image("resources/car_wheel_1.ascii")
     car_wheel_image_2 = ascii_helper.load_image("resources/car_wheel_2.ascii")
 
-    survivor_x_start = int(screen.get_width() / 10)
-    survivor_y_start = screen.get_height() - (len(survivors.survivor_list) * 2) - 1
+    stats_x_start = int(screen.get_width() / 10)
+    stats_y_start = screen.get_height() - ((len(survivors.survivor_list) + 1) * 2) - 1
 
     car_x = int((screen.get_width() / 2) - (car_body_image["width"] / 2))
-    car_y = survivor_y_start - car_body_image["height"] - 5
+    car_y = stats_y_start - car_body_image["height"] - 5
 
     iterations = 0
     wheel = 0
@@ -649,41 +652,59 @@ def draw_travelling_screen():
 
         screen.draw_pixel(int(progress_bar_current_x), 2, "^")
 
-        # Draw survivors stats
-        survivor_y = survivor_y_start
+        # Draw survivors and car stats
+        stats_y = stats_y_start
 
         health_x = 0
 
+        name_length = len("Fuel")
+
+        if name_length > health_x:
+            health_x = name_length
+
+        screen.draw_text(stats_x_start, stats_y + 1, "Fuel")
+
+        stats_y += 2
+
         for survivor in survivors.survivor_list:
             survivor_name = survivor["name"]
-            survivor_name_length = len(survivor_name)
+            name_length = len(survivor_name)
 
-            if survivor_name_length > health_x:
-                health_x = survivor_name_length
+            if name_length > health_x:
+                health_x = name_length
 
-            screen.draw_text(survivor_x_start, survivor_y + 1, survivor_name)
+            screen.draw_text(stats_x_start, stats_y + 1, survivor_name)
 
-            survivor_y += 2
+            stats_y += 2
 
-        survivor_y = survivor_y_start + 1
+        stats_y = stats_y_start + 1
 
         total_bars = 14
 
+        fuel_amount = 0
+
+        if "Fuel" in survivors.group_inventory:
+            fuel_amount = survivors.group_inventory["Fuel"]["amount"]
+
+        screen.draw_progress_bar(stats_x_start + health_x + 2, stats_y, total_bars, fuel_amount / max(fuel_amount, 60))
+
+        stats_y += 2
+
         for survivor in survivors.survivor_list:
             if survivor["alive"]:
-                screen.draw_progress_bar(survivor_x_start + health_x + 2, survivor_y, total_bars,
+                screen.draw_progress_bar(stats_x_start + health_x + 2, stats_y, total_bars,
                                          survivor["health"] / survivor["max_health"])
 
                 if survivor["zombified"]:
-                    screen.draw_text(survivor_x_start + health_x + total_bars + 5, survivor_y, "(ZOMBIE)")
+                    screen.draw_text(stats_x_start + health_x + total_bars + 5, stats_y, "(ZOMBIE)")
                 elif survivor["bitten"]:
-                    screen.draw_text(survivor_x_start + health_x + total_bars + 5, survivor_y, "(BITTEN)")
+                    screen.draw_text(stats_x_start + health_x + total_bars + 5, stats_y, "(BITTEN)")
             else:
                 padding = int((total_bars - 4) / 2)
-                screen.draw_text(survivor_x_start + health_x + 2, survivor_y,
+                screen.draw_text(stats_x_start + health_x + 2, stats_y,
                                  "[" + (padding * " ") + "DEAD" + (padding * " ") + "]")
 
-            survivor_y += 2
+            stats_y += 2
 
         # Draw stats
         next_city = get_next_city(survivors.distance_travelled)
@@ -695,7 +716,7 @@ def draw_travelling_screen():
 
         stat_lines = ["Time: " + format_time(survivors.current_datetime),
                       "Date: " + format_date(survivors.current_datetime),
-                      "Next City: " + next_city["name"], "Food: " + str(amount_of_food)]
+                      "Next City: " + next_city["name"], "Food: " + str(int(amount_of_food))]
 
         longest_line = 0
 
@@ -705,7 +726,7 @@ def draw_travelling_screen():
                 longest_line = stat_line_length
 
         stat_x = int(screen.get_width() - longest_line - (screen.get_width() / 10) + 2)
-        stat_y = survivor_y_start + 1
+        stat_y = stats_y_start + 1
 
         for stat_line in stat_lines:
             screen.draw_text(stat_x, stat_y, stat_line)
@@ -756,6 +777,8 @@ def draw_travelling_screen():
 
         time.sleep(0.15)
 
+        screen.set_cursor_visibility(False)
+
 
 def draw_scavenging_screen():
     screen.clear()
@@ -763,79 +786,143 @@ def draw_scavenging_screen():
     print("")
     # Declaring variables
     number_of_survivors = count_survivors()
-    items_collected = 0
     # Input
     while True:
-        scavenging_time = int(input("How long would you like to scavenge for? "))
+        try:
+            scavenging_time = int(input("How long would you like to scavenge for? "))
+        except ValueError:
+            print("Invalid input, please enter a number greater than 0")
+            continue
+
         if scavenging_time > 4:
-            print("You cannont scavenge for that long.")
+            print("You cannot scavenge for longer than 4 hours at a time.")
         elif scavenging_time < 1:
             print("Invalid input, please enter a number greater than 0")
         else:
             break
-    items_available = ["Medkit","Food"]
-    items_added = {"Medkit": 0, "Food": 0}
-    # Random generators
 
-    # Get prob - determines the proababily of finding an object based on number of survivors present
+    items_found = {}
+
+    # Random generators
+    # Get prob - determines the probability of finding an object based on number of survivors present
     def get_prob_val():
         if number_of_survivors == 4:
-            return randint(0, 2)
+            return randint(0, 5)
         elif number_of_survivors == 3:
-            return randint(0, 4)
+            return randint(0, 7)
         elif number_of_survivors == 2:
-            return randint(0, 9)
+            return randint(0, 12)
         elif number_of_survivors == 1:
-            return randint(0, 14)
+            return randint(0, 15)
 
     # Get health - determines how much health a survivor should lose based on number of survivors present
     def get_health_val():
         if number_of_survivors > 2:
-            return randint(0, 1)
-        elif number_of_survivors == 2:
             return randint(0, 2)
-        elif number_of_survivors == 1:
+        elif number_of_survivors == 2:
             return randint(0, 4)
+        elif number_of_survivors == 1:
+            return randint(0, 8)
 
-    for i in range(0, scavenging_time * 10):
+    for i in range(0, scavenging_time * 7):
         for x in range(0, 4):
-            if survivors.survivor_list[x]["alive"] == True:
+            if survivors.survivor_list[x]["alive"]:
                 survivors.survivor_list[x]["health"] = survivors.survivor_list[x]["health"] - get_health_val()
         if survivors.survivor_list[0]["health"] <= 0:
             screen.clear()
-            print("You died whilst scavenging.")
-            print("press any key to continue")
+            screen.print_notification("You died whilst scavenging.")
             screen.wait_key()
-            survivors.survivor_list[0]["alive"] == False
+            survivors.survivor_list[0]["alive"] = False
             open_screen(screen_list["dead"])
         if get_prob_val() == 1:
-            items_collected += 1
-            list_number = randint(0,1)  # Maybe medkits need to be more rare or add a limit to how many can be found?
-            survivors.inventory_add_item(items.item_list[items_available[list_number]],1)
-            items_added[items_available[list_number]] += 1
+            random_item = get_random_dict_value(items.item_list)
+            random_item_unit_value = random.randrange(random_item["min_value"], random_item["max_value"])
+
+            item_amount = 1
+
+            if random_item_unit_value <= 20:
+                random_increase = random.randrange(21 - random_item_unit_value,
+                                                   25 - random_item_unit_value)
+
+                item_amount *= random_increase
+
+            item_amount = int(item_amount)
+
+            if random_item["name"] in items_found:
+                items_found[random_item["name"]]["amount"] += item_amount
+            else:
+                items_found[random_item["name"]] = {"item": random_item, "amount": item_amount}
+
+            survivors.inventory_add_item(random_item, item_amount)
     screen.clear()
     print("During your time scavenging your party took damage:")
-    print("Your health is " + str(survivors.survivor_list[0]["health"]))
 
-    for i in range(1, 4):
-        if survivors.survivor_list[i]["alive"] == True and survivors.survivor_list[i]["health"] > 0:
-            print(survivors.survivor_list[i]["name"] + " has " + str(survivors.survivor_list[i]["health"]) + " health." )
-        elif survivors.survivor_list[i]["alive"] == True and survivors.survivor_list[i]["health"] <= 0:
-            print(survivors.survivor_list[i]["name"] + " died while scavenging")
-            survivors.survivor_list[i]["alive"] = False
+    for survivor in survivors.survivor_list:
+        if survivor["alive"] and survivor["health"] > 0:
+            print(survivor["name"] + " has " + str(survivor["health"]) + " health.")
+        elif survivor["alive"] and survivor["health"] <= 0:
+            print(survivor["name"] + " died while scavenging")
+            survivor["alive"] = False
 
     print("")
 
-    if items_collected == 0:
-        print("You did not find anything useful while scavenging")
+    if len(items_found) == 0:
+        print("You did not find anything useful while scavenging.")
     else:
-        print("You found " + str(items_added["Medkit"]) + " Medkits and " + str(items_added["Food"]) + " Food.")
+        print("While scavenging you found the following items:")
+
+        for item_found in items_found.values():
+            item_found_amount = int(item_found["amount"])
+            print(str(item_found_amount) + " " + (item_found["item"]["name"] if item_found_amount <= 0 else item_found["item"]["plural_name"]))
+
+        print()
         print("Your group now has:")
-        print(str(survivors.group_inventory["Medkit"]["amount"]) + " Medkits.")
-        print(str(survivors.group_inventory["Food"]["amount"]) + " Food.")
+
+        for item_found in survivors.group_inventory.values():
+            item_found_amount = int(item_found["amount"])
+            print(str(item_found_amount) + " " + (item_found["item"]["name"] if item_found_amount <= 0 else item_found["item"]["plural_name"]))
+
     # Need to pass time
+    game.pass_time(scavenging_time, False)
+
     print("Press any key to continue")
     screen.wait_key()
+
+
+def draw_fuel_screen():
+    decisions = ["Scavenge", "Rest", "Use medkit", "Continue on trail"]
+
+    selected_index = 1
+
+    while True:
+        while True:
+            screen.set_cursor_visibility(False)
+
+            screen.draw_decision_box("You have run out of fuel and cannot travel any further. You must scavenge for fuel. You may use medkits and resting in order to heal. Don't stick around too long, who knows what's hanging around here!", decisions, selected_index)
+
+            screen.flush()
+
+            selected_index, finished = screen.get_decision_input(decisions, selected_index)
+
+            if finished:
+                screen.set_cursor_visibility(True)
+                break
+
+        if selected_index == 1:
+            # Scavenge
+            open_screen(screen_list["scavenging"])
+        elif selected_index == 2:
+            # Rest
+            open_screen(screen_list["resting"])
+        elif selected_index == 3:
+            # Medkit
+            open_screen(screen_list["medkit"])
+        elif selected_index == 4:
+            if "Fuel" in survivors.group_inventory:
+                # Continue travelling
+                return
+            else:
+                screen.print_notification("You do not have enough fuel to keep travelling.")
 
 screen_list = {
     "starting": {
@@ -941,5 +1028,13 @@ screen_list = {
 
         "one_time": False
 
+    },
+
+    "fuel": {
+        "name": "fuel",
+
+        "draw_function": draw_fuel_screen,
+
+        "one_time": False
     },
 }
