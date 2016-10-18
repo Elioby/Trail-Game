@@ -230,7 +230,7 @@ def draw_city_screen():
 
         while True:
             screen.set_cursor_visibility(False)
-            screen.draw_decision_box(city["description"], decisions, selected_index)
+            screen.draw_decision_box(city["description"].replace("\n", " ").strip(), decisions, selected_index)
 
             screen.flush()
 
@@ -547,56 +547,103 @@ def draw_resting_screen():
 
 
 def draw_put_down_screen():
-    screen.clear()
     # Display the survivors status
-
-    # Survivors information:
-    for survivor in survivors.survivor_list:
-        if survivor["alive"] and not survivor["bitten"]:
-            print(survivor["name"] + " has " + str(survivor["health"]) + " health.")
-        elif survivor["alive"] and survivor["bitten"] and not survivor["zombified"]:
-            print(survivor["name"] + " has " + str(survivor["health"]) + " health, and has been bitten")
-        elif not survivor["alive"]:
-            print(survivor["name"] + " is dead.")
-
-    print("")
 
     # Display options
     while True:
-        option_count = 2
-        options_available = {}
+        decisions = ["Go back to city screen"]
 
-        print("1: Go back")
-        print("2: Commit suicide")
+        selected_index = 1
 
-        for i in range(1, len(survivors.survivor_list)):
-            if survivors.survivor_list[i]["alive"]:
-                option_count += 1
-                options_available.update({option_count: i})
-                print(str(option_count) + ": Put down " + str(survivors.survivor_list[i]["name"]) + ".")
+        survivor_count = count_survivors(True, True, True, True)
 
-        # Evaluate users input:
-        user_choice = input("What would you like to do? ")
+        survivor_index = 0
+        for survivor in survivors.survivor_list:
+            if survivor_index == 0:
+                decisions.append("Put down yourself")
+            else:
+                if survivor["alive"]:
+                    decisions.append("Put down " + survivor["name"])
 
-        try:
-            user_choice = int(user_choice)
-        except ValueError:
-            print("Please enter a number.")
-            continue
+            survivor_index += 1
 
-        if user_choice == 1:
+        while True:
+            screen.set_cursor_visibility(False)
+
+            decision_x, decision_y = screen.draw_decision_box("\n" * ((survivor_count * 2) - 2), decisions, selected_index, max_height=(survivor_count * 6))
+
+            stats_y_start = decision_y + 2
+            stats_x_start = decision_x + 6
+
+            stats_y = stats_y_start
+
+            health_x = 0
+
+            for survivor in survivors.survivor_list:
+                survivor_name = survivor["name"]
+                name_length = len(survivor_name)
+
+                if name_length > health_x:
+                    health_x = name_length
+
+                screen.draw_text(stats_x_start, stats_y + 1, survivor_name)
+
+                stats_y += 2
+
+            stats_y = stats_y_start + 1
+
+            total_bars = 14
+
+            for survivor in survivors.survivor_list:
+                if survivor["alive"]:
+                    screen.draw_progress_bar(stats_x_start + health_x + 2, stats_y, total_bars,
+                                             survivor["health"] / survivor["max_health"])
+
+                    if survivor["zombified"]:
+                        screen.draw_text(stats_x_start + health_x + total_bars + 5, stats_y, "(ZOMBIE)")
+                    elif survivor["bitten"]:
+                        screen.draw_text(stats_x_start + health_x + total_bars + 5, stats_y, "(BITTEN)")
+                else:
+                    padding = int((total_bars - 4) / 2)
+                    screen.draw_text(stats_x_start + health_x + 2, stats_y,
+                                     "[" + (padding * " ") + "DEAD" + (padding * " ") + "]")
+
+                stats_y += 2
+
+            screen.flush()
+
+            selected_index, finished = screen.get_decision_input(decisions, selected_index)
+
+            if finished:
+                screen.set_cursor_visibility(True)
+                break
+
+        if selected_index == 1:
             # Return to city menu screen
             return
-        elif user_choice == 2:
+        elif selected_index == 2:
             # Suicide
             open_screen(screen_list["dead"])
-        elif user_choice <= option_count:
+        elif selected_index >= 3:
             # Search through options available to find who to kill
-            survivors.survivor_list[options_available[user_choice]]["alive"] = False
-            print("You killed " + survivors.survivor_list[options_available[user_choice]]["name"])
+
+            survivor_index = 0
+
+            selected_survivor = None
+
+            for survivor in survivors.survivor_list:
+                if survivor["alive"]:
+                    if survivor_index == selected_index - 2:
+                        selected_survivor = survivor
+                        break
+
+                    survivor_index += 1
+
+            selected_survivor["alive"] = False
+            screen.print_notification("You put down " + selected_survivor["name"])
             continue
         else:
-            print("Please enter a number between 1 and " + str(option_count) + ".")
+            print("Please enter a number between 1 and 6.")
             continue
 
         return
