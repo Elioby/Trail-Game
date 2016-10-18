@@ -216,14 +216,13 @@ def draw_points_screen():
 
 
 def draw_city_screen():
-
     if survivors.distance_travelled == 0:
         city = cities.city_list["Los Angeles"]
     else:
         city = get_next_city(survivors.distance_travelled)
 
     while True:
-        decisions = ["Get information on " + city["name"], "Put down bitten survivors", "Trade with other survivors",
+        decisions = ["Put down bitten survivors", "Trade with other survivors",
                      "Rest", "Use medkits", "Scavenge",
                      "Move on to " + get_next_city(survivors.distance_travelled + survivors.car_speed)["name"]]
 
@@ -231,7 +230,7 @@ def draw_city_screen():
 
         while True:
             screen.set_cursor_visibility(False)
-            screen.draw_decision_box("You are in the city of " + city["name"], decisions, selected_index)
+            screen.draw_decision_box(city["description"], decisions, selected_index)
 
             screen.flush()
 
@@ -242,32 +241,21 @@ def draw_city_screen():
                 break
 
         if selected_index == 1:
-            screen.clear()
-            # Get information
-            print("You are in " + city["name"] + ".")
-            print(city["description"])
-            # TODO: Maybe information on whats available, like traders, inns to stay, etc...?
-            print("The next city is " + get_next_city(survivors.distance_travelled + survivors.car_speed)["name"] + ".")
-            print()
-
-            # Return to options
-            input("Press enter to go back...")
-        elif selected_index == 2:
             # Put down
             open_screen(screen_list["put_down"])
-        elif selected_index == 3:
+        elif selected_index == 2:
             # Trade
             open_screen(screen_list["trading"])
-        elif selected_index == 4:
+        elif selected_index == 3:
             # Rest
             open_screen(screen_list["resting"])
-        elif selected_index == 5:
+        elif selected_index == 4:
             # Use medkit
             open_screen(screen_list["medkit"])
-        elif selected_index == 6:
+        elif selected_index == 5:
             # Scavenge
             open_screen(screen_list["scavenging"])
-        elif selected_index == 7:
+        elif selected_index == 6:
             if "Fuel" not in survivors.group_inventory:
                 screen.print_notification("You cannot leave the city until you have enough fuel. Try scavenging for some.", False)
             else:
