@@ -517,13 +517,15 @@ def draw_resting_screen():
         print("Each survivor gains 10 health per hour rested.")
         print()
         sleep_choice = input("How many hours would you like to rest? ")
-        screen.clear()
 
         try:
             sleep_choice = int(normalise_input(sleep_choice))
         except ValueError:
-            print("Please enter a number between 1 and 9.")
+            print()
+            print("<--Please enter a number between 1 and 9-->")
             time.sleep(1)
+            continue
+        screen.clear()
 
         if sleep_choice < 10:
             for survivor in survivors.survivor_list:
@@ -547,22 +549,22 @@ def draw_resting_screen():
 
 
 def draw_put_down_screen():
-    screen.clear()
+
     # Display the survivors status
-
-    # Survivors information:
-    for survivor in survivors.survivor_list:
-        if survivor["alive"] and not survivor["bitten"]:
-            print(survivor["name"] + " has " + str(survivor["health"]) + " health.")
-        elif survivor["alive"] and survivor["bitten"] and not survivor["zombified"]:
-            print(survivor["name"] + " has " + str(survivor["health"]) + " health, and has been bitten")
-        elif not survivor["alive"]:
-            print(survivor["name"] + " is dead.")
-
-    print("")
 
     # Display options
     while True:
+        screen.clear()
+        # Survivors information:
+        for survivor in survivors.survivor_list:
+            if survivor["alive"] and not survivor["bitten"]:
+                print(survivor["name"] + " has " + str(survivor["health"]) + " health.")
+            elif survivor["alive"] and survivor["bitten"] and not survivor["zombified"]:
+                print(survivor["name"] + " has " + str(survivor["health"]) + " health, and has been bitten")
+            elif not survivor["alive"]:
+                print(survivor["name"] + " is dead.")
+
+        print("")
         option_count = 2
         options_available = {}
 
@@ -581,7 +583,9 @@ def draw_put_down_screen():
         try:
             user_choice = int(user_choice)
         except ValueError:
-            print("Please enter a number.")
+            print()
+            print("<--Please enter a number-->")
+            time.sleep(1)
             continue
 
         if user_choice == 1:
