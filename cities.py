@@ -10,7 +10,7 @@ city_list = {
 
         # A brief (1 sentence?) description of the city
         "description":  """
-You have now arrived in the city of angels more commonly known as Los Angeles.
+You have now arrived in the city of angels more commonly known as Los Angeles. 
 Home of the most iconic places in the world such as Hollywood, Beverly hills
 and Rodeo drive. The home of where many of the most famous hollywood actors
 has now turned into a desolate wasteland in which many of the west coast most
@@ -107,7 +107,15 @@ with so your approach could ultimately decide your fate.
         "name": "Columbus",
 
         # A brief (1 sentence?) description of the city
-        "description": "The capital and largest city of the state of Ohio.",
+        "description":  """
+Welcome to Columbus Ohio home of the world famous Ohio state university known
+as the "Buckeyes" in which some of America's greatest athletes once resided.
+NFL players such as Ezekiel " Zeke the freak" Elliot , Bradley Roby and Co.
+The recent cold weather in Ohio has made harsh conditions for both the
+survivors and the remaining presence of the undead. Food and Fuel are hard
+to come by and the remaining survivors in Columbus aren't the most welcoming
+of folks.
+                        """,
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 2200,
@@ -117,7 +125,13 @@ with so your approach could ultimately decide your fate.
         "name": "Pittsburgh",
 
         # A brief (1 sentence?) description of the city
-        "description": "A city in Pennsylvania. Known as both \"the Steel City\" for its more than 300 steel-related businesses, and as the \"City of Bridges\" for its 446 bridges.",
+        "description":  """
+This city is as blue collar as it gets hence its nickname "The steel city". A
+population of 2.36 million citizens that are known for their tough attitude
+and their hard work. In your case however this isn't much of a concern for you
+anymore as luck would have it not a soul resides here anymore. Scavenge what
+you can and rest up for the long journey ahead.
+                        """,
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 2600,
