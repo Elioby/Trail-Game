@@ -126,6 +126,7 @@ def event_admire_scenery():
 
     return True
 
+<<<<<<< HEAD
 def event_breaks_arm():
     random_survivor = get_random_survivor(True, True, False, False)
 
@@ -165,6 +166,74 @@ def event_pass_bloackade():
 
         return True
 
+=======
+def event_left_item():
+    random_survivor = get_random_survivor(False, True, False, False)
+    item_num = random.randint(1,4)
+    if item_num == 1:
+        # money
+        item = survivors.group_money
+        quantity = random.randint(5,35)
+    elif item_num == 2:
+        # medkit
+        item = items.item_list["Medkit"]
+        quantity = random.randint(1,3)
+    elif item_num == 3:
+        # food
+        item = items.item_list["Food"]
+        quantity = random.randint(5,30)
+    elif item_num == 4:
+        # fuel
+        item = items.item_list["Fuel"]
+        quantity = random.randint(5,20)
+    if random_survivor is not None:
+        if item_num ==1:
+            screen.print_notification(random_survivor["name"] + " realises they left " + "$" + str(quantity) + " behind.")
+            survivors.group_money -= quantity
+            return True
+        elif quantity > 1:
+            screen.print_notification(random_survivor["name"] + " realises they left " + str(quantity) + " " + item["plural_name"] + " behind.")
+            survivors.group_inventory[item["name"]]["amount"] -= quantity
+            return True
+        else:
+            screen.print_notification(random_survivor["name"] + " realises they left " + str(quantity) + " " + item["name"] + " behind.")
+            survivors.group_inventory[item["name"]]["amount"] -= quantity
+            return True
+    return False
+
+def event_found_item():
+    random_survivor = get_random_survivor(False, True, False, False)
+    item_num = random.randint(1,4)
+    if item_num == 1:
+        # money
+        item = survivors.group_money
+        quantity = random.randint(5,20)
+    elif item_num == 2:
+        # medkit
+        item = items.item_list["Medkit"]
+        quantity = 1
+    elif item_num == 3:
+        # food
+        item = items.item_list["Food"]
+        quantity = random.randint(1,10)
+    elif item_num == 4:
+        # fuel
+        item = items.item_list["Fuel"]
+        quantity = random.randint(1,5)
+    if random_survivor is not None:
+        if item_num ==1:
+            screen.print_notification(random_survivor["name"] + " discovered " + "$" + str(quantity) + " hidden under some bushes.")
+            survivors.group_money += quantity
+            return True
+        elif quantity > 1:
+            screen.print_notification(random_survivor["name"] + " discovered " + str(quantity) + " " + item["plural_name"] + " hidden under some bushes.")
+            survivors.group_inventory[item["name"]]["amount"] += quantity
+            return True
+        else:
+            screen.print_notification(random_survivor["name"] + " discovered " + str(quantity) + " " + item["name"] + " hidden under some bushes.")
+            survivors.group_inventory[item["name"]]["amount"] += quantity
+            return True
+>>>>>>> 50b574575664a3b42a0b7f558a9ba1cda7d8cd4c
     return False
 
 events_list = [
@@ -274,6 +343,23 @@ events_list = [
 
     {
         # The percentage chance for this event to happen
+        "occurrence_chance": 3.0,
+
+        # A function to run when the event occurs
+        "notification_handler_function": event_left_item
+
+    },
+
+    {
+        # The percentage chance for this event to happen
+        "occurrence_chance": 3.0,
+
+        # A function to run when the event occurs
+        "notification_handler_function": event_found_item
+    }
+
+    {
+        # The percentage chance for this event to happen
         "occurrence_chance": 1.0,
 
         # A function to run when the event occurs
@@ -286,6 +372,7 @@ events_list = [
 
         # A function to run when the event occurs
         "notification_handler_function": event_pass_bloackade
+
     },
 
 ]
