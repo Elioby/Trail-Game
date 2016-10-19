@@ -92,6 +92,15 @@ def draw_starting_screen():
                 break
 
         if selected_index == 1:
+            screen.set_cursor_visibility(False)
+            screen.draw_decision_box("You wake up in a dark, abandoned hospital. Looking around the room you notice that the windows are boarded up with the marks all over the walls: \"There is no escape you will all die and suffer\". You quickly get out of your bed, your legs feel shaky as you notice that the calendar says is turned to October 15th 2020. The last memory you have was a hospital visit for a friend on that exact day four years before.\n\nYou quickly compose your thoughts, and decide to head for New York. Before you leave, you gather up 3 friends you know you can count on.", ["Continue"])
+
+            screen.flush()
+
+            screen.wait_key()
+
+            screen.set_cursor_visibility(True)
+
             open_screen(screen_list["survivor_name"])
         elif selected_index == 2:
             open_screen(screen_list["info"])
@@ -126,13 +135,13 @@ def get_max_user_input(print_text, alt_text, max_length):
 
 def draw_survivor_name_screen():
     screen.clear()
-    name = get_max_user_input("Enter your name: ", "Enter a valid name: ", 16)
+    name = get_max_user_input("Try to remember your name: ", "Enter a valid name: ", 16)
     # Leave the name as default when player enters nothing
     if len(name) > 0:
         survivors.survivor_list[0]["name"] = name
 
     for i in range(0, 3):
-        name = get_max_user_input("Enter your friend's name: ", "Enter a valid friend's name: ", 16)
+        name = get_max_user_input("Enter a friend's name who you can count on: ", "Enter a valid friend's name: ", 16)
         if len(name) > 0:
             survivors.survivor_list[i + 1]["name"] = name
 
@@ -422,7 +431,6 @@ def draw_trading_screen():
 
 
 def draw_medkit_screen():
-
     while True:
         medkit_count = 0
 

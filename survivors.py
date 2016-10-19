@@ -9,7 +9,7 @@ from datetime import datetime
 
 
 # The date and time when the trail started
-start_datetime = datetime.strptime('02/07/2009 08:00:00', '%d/%m/%Y %H:%M:%S')
+start_datetime = datetime.strptime('15/10/2020 08:00:00', '%d/%m/%Y %H:%M:%S')
 
 # The current date and time (in game), use pass_time(hours) to change, never change directly
 current_datetime = start_datetime
