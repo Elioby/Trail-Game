@@ -10,7 +10,11 @@ city_list = {
 
         # A brief (1 sentence?) description of the city
         "description":  """
-                    LA DESCRIPTION
+You have now arrived in the city of angels more commonly known as Los Angeles.
+Home of the most iconic places in the world such as Hollywood, Beverly hills
+and Rodeo drive. The home of where many of the most famous hollywood actors
+has now turned into a desolate wasteland in which many of the west coast most
+infamous zombies now reside.
                         """,
 
         # The distance, in miles, from Los Angeles (the start)
@@ -36,7 +40,12 @@ that you can seek refuge at.
         "name": "Albuquerque",
 
         # A brief (1 sentence?) description of the city
-        "description": "The most populous city in the state of New Mexico, situated in the central part of the state.",
+        "description":  """
+Hola you have now arrived in Albuquerque, New Mexico, according to the stats
+it's was one of the most the populous cities in the state of New Mexico. Key
+word “was” the city has now calls home to one a new breed of zombies that will
+sense any kind of noise and movement. Good luck you're going to need it !!
+                        """,
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 700,
