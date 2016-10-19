@@ -1,23 +1,23 @@
 #!/usr/bin/python3
 # coding=utf-8
 
+from datetime import timedelta
+
+import events
 import items
 import screens
-
+import survivors
 from debug import *
 from misc_utils import *
 
-import events
-import survivors
-
-from datetime import timedelta
 
 # This is the main file for the trail game.
 
 
 # You must use this method when changing the time
 def pass_time(hours, travelling=True):
-    if survivors.current_datetime.hour == 20 or (int(survivors.current_datetime.hour) < 20 < int(survivors.current_datetime.hour + hours)):
+    if survivors.current_datetime.hour == 20 or (
+            int(survivors.current_datetime.hour) < 20 < int(survivors.current_datetime.hour + hours)):
         amount_of_food = 0
         food = None
 
@@ -36,7 +36,8 @@ def pass_time(hours, travelling=True):
 
         if amount_of_food < required_food:
             if remaining_survivors < 2:
-                screen.print_notification("You don't have enough food to fully feed yourself. This only amplifies your loneliness.")
+                screen.print_notification(
+                    "You don't have enough food to fully feed yourself. This only amplifies your loneliness.")
             else:
                 screen.print_notification("You did not have enough food to feed the party fully, they go hungry.")
 
@@ -55,7 +56,13 @@ def pass_time(hours, travelling=True):
     survivors.current_datetime += timedelta(hours=hours)
 
     if travelling:
-        if not survivors.inventory_remove_item(items.item_list["Fuel"], hours * (survivors.car_speed / 15)):
+        amount_of_fuel = 0
+
+        if "Fuel" in survivors.group_inventory:
+            amount_of_fuel = survivors.group_inventory["Fuel"]["amount"]
+
+        if not survivors.inventory_remove_item(items.item_list["Fuel"],
+                                               min(int(hours * (survivors.car_speed / 15)), amount_of_fuel)):
             screens.open_screen(screens.screen_list["fuel"])
         else:
             survivors.distance_travelled += survivors.car_speed
@@ -73,6 +80,18 @@ def game_tick():
 
     if survivors.ticks_elapsed > 0:
         for event in events.events_list:
+            if event["notification_handler_function"] is not None and event[
+                "notification_handler_function"] == events.event_bitten_by_zombie:
+                if survivors.ticks_elapsed > 26:
+                    did_execute = event["notification_handler_function"]()
+
+                    if did_execute:
+                        # NOTE: We don't want more than one event per tick if the event worked
+
+                        events.events_list.remove(event)
+
+                        break
+
             event_random = random.uniform(0.0, 100.0)
             if event["occurrence_chance"] > event_random:
                 event_function = None
@@ -98,7 +117,8 @@ def game_tick():
                 random_survivor = get_random_survivor(True, True, False, False)
                 survivor["alive"] = False
 
-                screen.print_notification(random_survivor["name"] + " managed to shoot a zombified " + survivor["name"] + " dead.")
+                screen.print_notification(
+                    random_survivor["name"] + " managed to shoot a zombified " + survivor["name"] + " dead.")
 
                 # NOTE: We don't want another zombie event this tick, as one has just been shot
                 break
@@ -108,14 +128,17 @@ def game_tick():
 
                 random_survivor["health"] -= random_damage
 
-                screen.print_notification("A zombified " + survivor["name"] + " damaged " + random_survivor["name"] + " for " + str(random_damage) + " damage.")
+                screen.print_notification(
+                    "A zombified " + survivor["name"] + " damaged " + random_survivor["name"] + " for " + str(
+                        random_damage) + " damage.")
             else:
                 random_survivor = get_random_survivor(False, False, False, False)
 
                 if random_survivor is not None:
                     random_survivor["bitten"] = True
 
-                    screen.print_notification("A zombified " + survivor["name"] + " bit " + random_survivor["name"] + ".")
+                    screen.print_notification(
+                        "A zombified " + survivor["name"] + " bit " + random_survivor["name"] + ".")
 
     for survivor in survivors.survivor_list:
         if survivor["alive"] and survivor["bitten"] and not survivor["zombified"]:

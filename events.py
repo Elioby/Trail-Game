@@ -3,7 +3,6 @@
 import game
 import items
 import screen
-import survivors
 
 from misc_utils import *
 
@@ -51,14 +50,17 @@ def event_sits_on():
             random_item_amount = 1
 
             if random_item["item"]["min_value"] <= 10:
-                random_item_amount = random.randrange(11 - random_item["item"]["min_value"], 15 - random_item["item"]["min_value"])
+                random_item_amount = random.randrange(11 - random_item["item"]["min_value"],
+                                                      15 - random_item["item"]["min_value"])
 
             if random_item["amount"] < random_item_amount:
                 random_item_amount = random_item["amount"]
 
             survivors.inventory_remove_item(random_item["item"], random_item_amount)
 
-            screen.print_notification(random_survivor["name"] + " sits on " + str(random_item_amount) + " " + random_item["item"]["name"] + " and ruins it.")
+            screen.print_notification(
+                random_survivor["name"] + " sits on " + str(int(random_item_amount)) + " " + random_item["item"][
+                    "name"] + " and ruins it.")
             return True
 
     return False
@@ -126,14 +128,17 @@ def event_admire_scenery():
 
     return True
 
+
 def event_breaks_arm():
     random_survivor = get_random_survivor(True, True, False, False)
 
     random_survivor["health"] -= 10
 
-    screen.print_notification(random_survivor["name"] + " has broken their arm by getting it stuck in the steering wheel.")
+    screen.print_notification(
+        random_survivor["name"] + " has broken their arm by getting it stuck in the steering wheel.")
 
     return True
+
 
 def event_dog_maul():
     random_survivor = get_random_survivor(True, True, False, False)
@@ -143,6 +148,7 @@ def event_dog_maul():
     screen.print_notification(random_survivor["name"] + " has been mauled by a rabid dog.")
 
     return True
+
 
 def event_bandit_blockade():
     if survivors.foggy or survivors.bandit_blockade:
@@ -155,9 +161,10 @@ def event_bandit_blockade():
         return True
 
 
-def event_pass_bloackade():
+def event_pass_blockade():
     if survivors.bandit_blockade:
-        screen.print_notification("You pass the bandit blockade and your heart rate starts to return to normal as you regain speed.")
+        screen.print_notification(
+            "You pass the bandit blockade and your heart rate starts to return to normal as you regain speed.")
 
         survivors.bandit_blockade = False
         survivors.car_speed = 40
@@ -166,48 +173,53 @@ def event_pass_bloackade():
 
     return False
 
+
 def event_left_item():
     random_survivor = get_random_survivor(False, True, False, False)
-    item_num = random.randint(1,4)
+    item_num = random.randint(1, 4)
     if item_num == 1:
         # money
         item = survivors.group_money
-        quantity = random.randint(5,35)
+        quantity = random.randint(5, 35)
     elif item_num == 2:
         # medkit
         item = items.item_list["Medkit"]
-        quantity = random.randint(1,3)
+        quantity = random.randint(1, 3)
     elif item_num == 3:
         # food
         item = items.item_list["Food"]
-        quantity = random.randint(5,30)
+        quantity = random.randint(5, 30)
     elif item_num == 4:
         # fuel
         item = items.item_list["Fuel"]
-        quantity = random.randint(5,20)
+        quantity = random.randint(5, 20)
     if random_survivor is not None:
-        if item_num ==1:
-            screen.print_notification(random_survivor["name"] + " realises they left " + "$" + str(quantity) + " behind.")
+        if item_num == 1:
+            screen.print_notification(
+                random_survivor["name"] + " realises they left " + str(quantity) + " Money behind.")
             survivors.group_money -= quantity
             return True
         elif quantity > 1:
-            screen.print_notification(random_survivor["name"] + " realises they left " + str(quantity) + " " + item["plural_name"] + " behind.")
+            screen.print_notification(random_survivor["name"] + " realises they left " + str(quantity) + " " + item[
+                "plural_name"] + " behind.")
             survivors.group_inventory[item["name"]]["amount"] -= quantity
             return True
         else:
-            screen.print_notification(random_survivor["name"] + " realises they left " + str(quantity) + " " + item["name"] + " behind.")
+            screen.print_notification(
+                random_survivor["name"] + " realises they left " + str(quantity) + " " + item["name"] + " behind.")
             survivors.group_inventory[item["name"]]["amount"] -= quantity
             return True
 
     return False
 
+
 def event_found_item():
     random_survivor = get_random_survivor(False, True, False, False)
-    item_num = random.randint(1,4)
+    item_num = random.randint(1, 4)
     if item_num == 1:
         # money
         item = survivors.group_money
-        quantity = random.randint(5,20)
+        quantity = random.randint(5, 20)
     elif item_num == 2:
         # medkit
         item = items.item_list["Medkit"]
@@ -215,26 +227,30 @@ def event_found_item():
     elif item_num == 3:
         # food
         item = items.item_list["Food"]
-        quantity = random.randint(1,10)
+        quantity = random.randint(1, 10)
     elif item_num == 4:
         # fuel
         item = items.item_list["Fuel"]
-        quantity = random.randint(1,5)
+        quantity = random.randint(1, 5)
     if random_survivor is not None:
-        if item_num ==1:
-            screen.print_notification(random_survivor["name"] + " discovered " + "$" + str(quantity) + " hidden under some bushes.")
+        if item_num == 1:
+            screen.print_notification(
+                random_survivor["name"] + " discovered " + str(quantity) + " Money hidden under some bushes.")
             survivors.group_money += quantity
             return True
         elif quantity > 1:
-            screen.print_notification(random_survivor["name"] + " discovered " + str(quantity) + " " + item["plural_name"] + " hidden under some bushes.")
+            screen.print_notification(random_survivor["name"] + " discovered " + str(quantity) + " " + item[
+                "plural_name"] + " hidden under some bushes.")
             survivors.group_inventory[item["name"]]["amount"] += quantity
             return True
         else:
-            screen.print_notification(random_survivor["name"] + " discovered " + str(quantity) + " " + item["name"] + " hidden under some bushes.")
+            screen.print_notification(random_survivor["name"] + " discovered " + str(quantity) + " " + item[
+                "name"] + " hidden under some bushes.")
             survivors.group_inventory[item["name"]]["amount"] += quantity
             return True
 
     return False
+
 
 events_list = [
 
@@ -309,7 +325,7 @@ events_list = [
 
     {
         # The percentage chance for this event to happen
-        "occurrence_chance": 20.0,
+        "occurrence_chance": 40.0,
 
         # A function to run when the event occurs
         "notification_handler_function": event_fog_clear
@@ -343,23 +359,6 @@ events_list = [
 
     {
         # The percentage chance for this event to happen
-        "occurrence_chance": 3.0,
-
-        # A function to run when the event occurs
-        "notification_handler_function": event_left_item
-
-    },
-
-    {
-        # The percentage chance for this event to happen
-        "occurrence_chance": 3.0,
-
-        # A function to run when the event occurs
-        "notification_handler_function": event_found_item
-    },
-
-    {
-        # The percentage chance for this event to happen
         "occurrence_chance": 1.0,
 
         # A function to run when the event occurs
@@ -371,7 +370,7 @@ events_list = [
         "occurrence_chance": 40.0,
 
         # A function to run when the event occurs
-        "notification_handler_function": event_pass_bloackade
+        "notification_handler_function": event_pass_blockade
 
     },
 

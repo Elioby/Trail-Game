@@ -9,12 +9,12 @@ city_list = {
         "name": "Los Angeles",
 
         # A brief (1 sentence?) description of the city
-        "description":  """
-You have now arrived in the city of angels more commonly known as Los Angeles.
-Home of the most iconic places in the world such as Hollywood, Beverly hills
-and Rodeo drive. The home of where many of the most famous hollywood actors
-has now turned into a desolate wasteland in which many of the west coast most
-infamous zombies now reside.
+        "description": """
+You have now arrived in the city of angels, more commonly known as Los Angeles.
+Home to the most iconic places in the world such as Hollywood, Beverly Hills
+and Rodeo Drive. The home of many of the most famous hollywood actors
+has now turned into a desolate wasteland in which many of the west coasts most
+infamous zombies reside.
                         """,
 
         # The distance, in miles, from Los Angeles (the start)
@@ -40,7 +40,7 @@ that you can seek refuge at.
         "name": "Albuquerque",
 
         # A brief (1 sentence?) description of the city
-        "description":  """
+        "description": """
 Hola you have now arrived in Albuquerque, New Mexico, according to the stats
 it's was one of the most the populous cities in the state of New Mexico. Key
 word: "was". The city now calls home to a new breed of zombies that will
@@ -55,7 +55,7 @@ sense any kind of noise and movement. Good luck, you're going to need it!
         "name": "Oklahoma City",
 
         # A brief (1 sentence?) description of the city
-        "description":  """
+        "description": """
 You have now arrived at Oklahoma city. A city largely known for
 its Republican values not to mention a quite successful basketball
 franchise in the Oklahoma city thunder. However that was the past now
@@ -73,7 +73,7 @@ abandoned stores that might have a few items that you can scavenge.
         "name": "St Louis",
 
         # A brief (1 sentence?) description of the city
-        "description":  """
+        "description": """
 You have now arrived at Oklahoma city. A city largely known for
 its Republican values not to mention a quite successful basketball
 franchise in the Oklahoma city thunder. However that was the past now
@@ -121,7 +121,7 @@ abandoned stores that might have a few items that you can scavenge.
         "name": "New York",
 
         # A brief (1 sentence?) description of the city
-        "description":  """
+        "description": """
 Welcome to the big apple, also known as New York, one of the most premier
 big cities to live in. It boasts a wide range of high profile celebrities
 including none other than the NFL cover boy Odell Beckham Jnr. You would

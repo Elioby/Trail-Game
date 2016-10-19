@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # coding=utf-8
 
-import items
-
 from datetime import datetime
+
+import items
 
 # This file contains data about the survivors in the game
 
@@ -35,8 +35,21 @@ foggy = False
 # If you are being blocked by bandits
 bandit_blockade = False
 
-# TODO: write docs
+is_first_time_scavenging = True
+
+
 def inventory_add_item(item, amount):
+    """Adds an item of amount to the inventory.
+
+    Args:
+        item (dict): A dictionary from the items.item_list list.
+        amount (int): The amount to add to the group inventory.
+
+    Returns:
+        None
+
+    """
+
     item_name = item["name"]
     if item_name in group_inventory:
         group_inventory[item_name]["amount"] += amount
@@ -44,9 +57,18 @@ def inventory_add_item(item, amount):
         group_inventory[item_name] = {"item": item, "amount": amount}
 
 
-# TODO: write docs
-# Returns true if it worked, false if failed
 def inventory_remove_item(item, amount):
+    """Removes an item of amount from the inventory.
+
+    Args:
+        item (dict): A dictionary from the items.item_list list.
+        amount (int): The amount to add to the group inventory.
+
+    Returns:
+        bool: True if the removing was successful, False if they didn't have enough of that item.
+
+    """
+
     item_name = item["name"]
     if item_name in group_inventory:
         group_item = group_inventory[item_name]

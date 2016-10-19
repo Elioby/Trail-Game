@@ -4,14 +4,14 @@
 # This file contains functions to help you operate the screen, such as clearing, drawing and flushing
 # 	This is only for complex screens like the traveling screen, for other screens, use the print and input functions 
 
-import os
-import pip
-import sys
 import ctypes
-import shutil
+import os
 import platform
+import shutil
 import subprocess
-import ascii_helper
+import sys
+
+import pip
 
 if platform.system() == "Windows":
     import win32_structs
@@ -41,6 +41,13 @@ buffer_end = {"x": 0, "y": 0}
 
 
 def init():
+    """Initialise the screen, call this before using any other functions.
+
+    Returns:
+        None
+
+    """
+
     global stdout
     global front_buffer
     global back_buffer
@@ -62,6 +69,16 @@ def init():
 
 
 def set_cursor_visibility(visible):
+    """Change the cursor visibility status
+
+    Args:
+        visible (bool): True to show the cursor, False to hide.
+
+    Returns:
+        None
+
+    """
+
     if platform.system() == "Windows":
         cursor_info = win32_structs.CONSOLE_CURSOR_INFO()
 
@@ -78,6 +95,13 @@ def set_cursor_visibility(visible):
 
 
 def wait_key():
+    """Wait for a key to be pressed and return that key from the function.
+
+    Returns:
+        basestring: Return a byte string with the key code.
+
+    """
+
     result = None
     if platform.system() == "Windows":
         import msvcrt
@@ -102,6 +126,13 @@ def wait_key():
 
 
 def clear():
+    """Clear the console screen.
+
+    Returns:
+        None
+
+    """
+
     if platform.system() == "Windows":
         os.system("cls")
     else:
@@ -109,26 +140,42 @@ def clear():
 
 
 def get_width():
+    """Get the width of the console screen.
+
+    Returns:
+        int: Width of the console screen.
+
+    """
+
     return width
 
 
 def get_height():
+    """Get the height of the console screen.
+
+    Returns:
+        int: Height of the console screen.
+
+    """
+
     return height
 
 
-def draw_rect(rect_x, rect_y, rect_width, rect_height):
-    min_x = max(rect_x, 0)
-    max_x = min(rect_x + rect_width, width)
-
-    min_y = max(rect_y, 0)
-    max_y = min(rect_y + rect_height, height)
-
-    for x in range(min_x, max_x):
-        for y in range(min_y, max_y):
-            back_buffer[x][y] = "#"
-
-
 def draw_bordered_rect(rect_x, rect_y, rect_width, rect_height, fill_char=" "):
+    """Draw a bordered rectangle to the screen.
+
+    Args:
+        rect_x (int): The x position of the rect.
+        rect_y (int): The y position of the rect.
+        rect_width (int): The width of the rect.
+        rect_height (int): The height of the rect.
+        fill_char (str): A single character string defining what the rect should be filled with (clears by default).
+
+    Returns:
+        None
+
+    """
+
     for x in range(rect_x + 1, rect_x + rect_width - 1):
         draw_pixel(x, rect_y, "═")
 
@@ -153,12 +200,37 @@ def draw_bordered_rect(rect_x, rect_y, rect_width, rect_height, fill_char=" "):
 
 
 def draw_progress_bar(bar_x, bar_y, length, progress):
+    """Draw a progress bar to the screen.
+
+    Args:
+        bar_x (int): The x position of the progress bar.
+        bar_y (int): The y position of the progress bar.
+        length (int): The length (width) of the progress bar.
+        progress (float): A value between 0 and 1 defining how far along the progress bar should be filled.
+
+    Returns:
+        None
+
+    """
+
     remaining_bars = int(max(progress * length, 1))
 
     draw_text(bar_x, bar_y, "[" + ("█" * remaining_bars) + (" " * (length - remaining_bars)) + "]")
 
 
 def draw_ascii_image(image_x, image_y, ascii_image):
+    """Draw an ascii image to the screen.
+
+    Args:
+        image_x (int): The x position of the image.
+        image_y (int): The y position of the image.
+        ascii_image (dict): A image dictionary returned from ascii_helper.load_image().
+
+    Returns:
+        None
+
+    """
+
     image_buffer = ascii_image["image_buffer"]
     image_width = ascii_image["width"]
     image_height = ascii_image["height"]
@@ -252,7 +324,8 @@ def draw_decision(decision_x, decision_y, decisions, selected_index=1):
             draw_text(x + text_length + 3, y, "<")
 
 
-def draw_decision_box(body_text, decisions, selected_index=1, decision_x=None, decision_y=None, max_width=None, max_height=None):
+def draw_decision_box(body_text, decisions, selected_index=1, decision_x=None, decision_y=None, max_width=None,
+                      max_height=None):
     """Draw a box with a set of decision options.
 
     Args:
@@ -508,11 +581,32 @@ def print_notification(message, redraw_on_exit=True):
 
 
 def stdout_write_flush(message):
+    """Write a message to stdout and flush (display) it to the screen.
+
+    Args:
+        message (str): The message you want to show.
+
+    Returns:
+        None
+
+    """
+
     sys.stdout.write(message)
     sys.stdout.flush()
 
 
 def set_cursor_position(cursor_x, cursor_y):
+    """Sets the x and y position of the console cursor, where [0,0] is the top left of the screen.
+
+    Args:
+        cursor_x (int): The x position of the cursor.
+        cursor_y (int): The y position of the cursor.
+
+    Returns:
+        None
+
+    """
+
     if platform.system() == "Windows":
         adjusted_position = win32_structs.COORD(int(cursor_x), int(cursor_y))
 
@@ -521,12 +615,25 @@ def set_cursor_position(cursor_x, cursor_y):
         stdout_write_flush("\033[" + str(int(cursor_y) + 1) + ";" + str(int(cursor_x) + 1) + "H")
 
 
-# Re-renders the front buffer to the screen
 def refresh():
+    """Re-renders the front buffer (current buffer) to the screen.
+
+    Returns:
+        None
+
+    """
+
     render_buffer(front_buffer)
 
 
 def flush():
+    """Clear the back buffer and draw it's contents to the screen.
+
+    Returns:
+        None
+
+    """
+
     render_buffer(back_buffer)
 
     numpy.copyto(front_buffer, back_buffer)
@@ -535,6 +642,16 @@ def flush():
 
 
 def render_buffer(buffer_to_render):
+    """Render a numpy character array to the screen.
+
+    Args:
+        buffer_to_render (chararray): A character array from numpy for which you want to render.
+
+    Returns:
+        None
+
+    """
+
     if platform.system() == "Windows":
         buf = (win32_structs.CHAR_INFO * (width * height))()
 
@@ -568,7 +685,8 @@ def render_buffer(buffer_to_render):
         if console_handle == 0:
             raise ctypes.WinError()
 
-        if ctypes.windll.kernel32.WriteConsoleOutputA(console_handle, ctypes.byref(buf), win32_structs.COORD(width, height),
+        if ctypes.windll.kernel32.WriteConsoleOutputA(console_handle, ctypes.byref(buf),
+                                                      win32_structs.COORD(width, height),
                                                       win32_structs.COORD(0, 0),
                                                       ctypes.byref(win32_structs.SMALL_RECT(0, 0, width, height))) == 0:
             raise ctypes.WinError()
@@ -613,6 +731,3 @@ def render_buffer(buffer_to_render):
 
             if y > end_y:
                 break
-        pass
-
-

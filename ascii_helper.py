@@ -3,10 +3,11 @@
 
 # This file contains functions for reading, processing and altering ascii art
 
-import pip
-import sys
 import codecs
 import subprocess
+import sys
+
+import pip
 
 try:
     import numpy

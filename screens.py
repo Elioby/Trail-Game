@@ -4,17 +4,15 @@
 # This file contains data on the screens in the game
 
 import time
-from datetime import datetime, timedelta
-
-import game
-import items
+from random import randint
 
 import ascii_helper
 import figlet_helper
+import game
+import items
 import screen
 from debug import dprint
 from misc_utils import *
-from random import randint
 
 screen_stack = []
 
@@ -243,7 +241,7 @@ def draw_city_screen():
 
         while True:
             screen.set_cursor_visibility(False)
-            screen.draw_decision_box(city["description"].replace("\n", "").strip(), decisions, selected_index)
+            screen.draw_decision_box(city["description"].replace("\n", " ").strip(), decisions, selected_index)
 
             screen.flush()
 
@@ -397,11 +395,13 @@ def draw_trading_screen():
                 if item["name"] in survivors.group_inventory:
                     item_amount = survivors.group_inventory[item["name"]]["amount"]
 
-                screen.draw_text(decision_x + 6, decision_y + 3 + (item_index * 2), item["name"] + ": " + str(int(item_amount)))
+                screen.draw_text(decision_x + 6, decision_y + 3 + (item_index * 2),
+                                 item["name"] + ": " + str(int(item_amount)))
 
                 item_index += 1
 
-            screen.draw_text(decision_x + 6, decision_y + 3 + (item_index * 2), "Money: " + str(int(survivors.group_money)))
+            screen.draw_text(decision_x + 6, decision_y + 3 + (item_index * 2),
+                             "Money: " + str(int(survivors.group_money)))
 
             item_index += 1
 
@@ -475,7 +475,7 @@ def draw_medkit_screen():
             screen.set_cursor_visibility(False)
 
             decision_x, decision_y = screen.draw_decision_box("Your group has " + str(int(medkit_count)) + " " + (
-            "Medkit" if medkit_count == 1 else "Medkits") + "." + ("\n" * (survivor_count * 2)), decisions,
+                "Medkit" if medkit_count == 1 else "Medkits") + "." + ("\n" * (survivor_count * 2)), decisions,
                                                               selected_index, max_height=(survivor_count * 6) + 2)
 
             stats_y_start = decision_y + 4
@@ -966,6 +966,15 @@ def draw_scavenging_screen():
 
     print("")
 
+    if survivors.is_first_time_scavenging and "Fuel" not in items_found:
+        random_item = items.item_list["Fuel"]
+        item_amount = random.randrange(10, 40)
+
+        items_found["Fuel"] = {"item": random_item, "amount": item_amount}
+        survivors.inventory_add_item(random_item, item_amount)
+
+    survivors.is_first_time_scavenging = False
+
     if len(items_found) == 0:
         print("You did not find anything useful while scavenging.")
     else:
@@ -974,7 +983,7 @@ def draw_scavenging_screen():
         for item_found in items_found.values():
             item_found_amount = int(item_found["amount"])
             print(str(item_found_amount) + " " + (
-            item_found["item"]["name"] if item_found_amount <= 0 else item_found["item"]["plural_name"]))
+                item_found["item"]["name"] if item_found_amount <= 0 else item_found["item"]["plural_name"]))
 
         print()
         print("Your group now has:")
@@ -982,7 +991,7 @@ def draw_scavenging_screen():
         for item_found in survivors.group_inventory.values():
             item_found_amount = int(item_found["amount"])
             print(str(item_found_amount) + " " + (
-            item_found["item"]["name"] if item_found_amount <= 0 else item_found["item"]["plural_name"]))
+                item_found["item"]["name"] if item_found_amount <= 0 else item_found["item"]["plural_name"]))
 
     # Need to pass time
     game.pass_time(scavenging_time, False)
