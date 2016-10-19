@@ -3,7 +3,6 @@
 
 # This file contains data about the items defined in the game
 
-# TODO: Should this be a dictionary itself, or just a list?
 item_list = {
 
     "Medkit": {

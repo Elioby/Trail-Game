@@ -3,8 +3,6 @@
 
 # This file contains data about the cities you travel through
 
-# TODO: Should this be a dictionary itself, or just a list?
-# TODO: add descriptions for each of the cities
 city_list = {
 
     "Los Angeles": {

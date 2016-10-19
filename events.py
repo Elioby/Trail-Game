@@ -116,18 +116,6 @@ def event_fog_clear():
     return False
 
 
-# TODO: finish
-def event_useless_trade():
-    random_survivor = get_random_survivor(False, True, False, False)
-
-    if random_survivor is not None:
-        screen.print_notification(random_survivor["name"] + " trades x for something useless.")
-
-        return True
-
-    return False
-
-
 def event_admire_scenery():
     random_survivor = get_random_survivor(False, True, False, False)
 
@@ -214,15 +202,6 @@ events_list = [
 
         # A function to run when the event occurs
         "notification_handler_function": event_fog_clear
-
-    },
-
-    {
-        # The percentage chance for this event to happen
-        "occurrence_chance": 1.0,
-
-        # A function to run when the event occurs
-        "notification_handler_function": event_useless_trade
 
     },
 

@@ -74,7 +74,6 @@ def draw_starting_screen():
     start_title_x = int((screen.get_width() / 2) - (title_width / 2))
 
     while True:
-        # TODO: this should really be broken down further
         selected_index = 1
 
         while True:
@@ -188,7 +187,6 @@ def draw_win_screen():
     open_screen(screen_list["points"])
 
 
-# TODO: this needs some prettifying
 def draw_points_screen():
     screen.clear()
 
@@ -198,11 +196,13 @@ def draw_points_screen():
 
     points += count_survivors(True, False, False, False) * 250
 
-    score_title_image = ascii_helper.load_image("resources/numbers/score_title.ascii")
-    score_title_x = int((screen.get_width() / 2) - (score_title_image["width"] / 2))
+    big_font = figlet_helper.load_font("resources/fonts/big.flf")
 
-    screen.draw_ascii_image(score_title_x, 0, score_title_image)
-    screen.draw_ascii_numbers(0, score_title_image["height"] + 5, int(points))
+    score_title_x = int((screen.get_width() / 2) - (figlet_helper.get_text_width("Total Score", big_font) / 2))
+    score_x = int((screen.get_width() / 2) - (figlet_helper.get_text_width(str(int(points)), big_font) / 2))
+
+    screen.draw_ascii_font_text(score_title_x, 1, "Total Score", big_font)
+    screen.draw_ascii_font_text(score_x, big_font["height"] + 1, str(int(points)), big_font)
 
     screen.flush()
 
@@ -292,7 +292,6 @@ def draw_trading_screen():
                                                                     survivors_item["max_value"])
 
             for j in range(10):
-                # TODO: let the trader offer money for items if the survivor item is not money
                 trader_item = None
 
                 if survivors_item is None or random.randrange(1, 100) <= 60:
@@ -317,7 +316,6 @@ def draw_trading_screen():
                 if trader_item is not None:
                     random_trader_item_unit_value = random.randrange(trader_item["min_value"], trader_item["max_value"])
 
-                # TODO: what if this doesn't convert to int exactly?
                 survivors_item_amount = random_trader_item_unit_value / random_survivors_item_unit_value
 
                 if survivors_item_amount < 1:
@@ -423,7 +421,6 @@ def draw_trading_screen():
     screen.print_notification("There are no more trades to show.", False)
 
 
-# TODO: finish this off
 def draw_medkit_screen():
 
     while True:
@@ -525,7 +522,7 @@ def draw_medkit_screen():
     if "Medkit" not in survivors.group_inventory:
         screen.print_notification("Your group has 0 Medkits remaining.")
 
-    screen.print_notification("Press any button to continue...")
+    screen.print_notification("Press any button to continue...", False)
 
 
 def draw_resting_screen():
@@ -538,6 +535,7 @@ def draw_resting_screen():
                 print()
 
         print("Each survivor gains 10 health per hour rested.")
+        print("Type 0 hours to go back to the city screen.")
         print()
         sleep_choice = input("How many hours would you like to rest? ")
 
@@ -545,27 +543,27 @@ def draw_resting_screen():
             sleep_choice = int(normalise_input(sleep_choice))
         except ValueError:
             print()
-            print("<--Please enter a number between 1 and 9-->")
+            print("<--Please enter a number between 0 and 9-->")
             time.sleep(1)
             continue
         screen.clear()
 
         if sleep_choice < 10:
-            for survivor in survivors.survivor_list:
-                if survivor["alive"]:
-                    old_health = survivor["health"]
-                    survivor["health"] += sleep_choice * 10
-                    if survivor["health"] > survivor["max_health"]:
-                        survivor["health"] = survivor["max_health"]
-                    print("{0} has slept for {1} hour(s) and gained {2} health.".format(survivor["name"], sleep_choice,
-                                                                                        survivor["health"] - old_health))
+            if sleep_choice > 0:
+                for survivor in survivors.survivor_list:
+                    if survivor["alive"]:
+                        old_health = survivor["health"]
+                        survivor["health"] += sleep_choice * 10
+                        if survivor["health"] > survivor["max_health"]:
+                            survivor["health"] = survivor["max_health"]
+                        print("{0} has slept for {1} hour(s) and gained {2} health.".format(survivor["name"], sleep_choice,
+                                                                                            survivor["health"] - old_health))
 
             game.pass_time(sleep_choice, False)
 
-            print("Press any button to continue...")
-            screen.wait_key()
+            screen.print_notification("Press any button to continue...", False)
 
-            continue
+            return
         else:
             print("Please enter a number between 1 and 9.")
 
@@ -845,18 +843,21 @@ def draw_travelling_screen():
 
 def draw_scavenging_screen():
     screen.clear()
-    print("Scavenging Screen")
+    print("Type 0 hours to go back to the city screen.")
     print("")
     # Declaring variables
     number_of_survivors = count_survivors()
     # Input
     while True:
         try:
-            scavenging_time = int(input("How long would you like to scavenge for? "))
+            scavenging_time = int(input("How many hours would you like to scavenge for? "))
         except ValueError:
             print("Invalid input, please enter a number greater than 0")
             continue
 
+        if scavenging_time == 0:
+            screen.print_notification("Press any key to continue...", False)
+            return
         if scavenging_time > 4:
             print("You cannot scavenge for longer than 4 hours at a time.")
         elif scavenging_time < 1:
