@@ -43,8 +43,8 @@ that you can seek refuge at.
         "description":  """
 Hola you have now arrived in Albuquerque, New Mexico, according to the stats
 it's was one of the most the populous cities in the state of New Mexico. Key
-word “was” the city has now calls home to one a new breed of zombies that will
-sense any kind of noise and movement. Good luck you're going to need it !!
+word: "was". The city now calls home to a new breed of zombies that will
+sense any kind of noise and movement. Good luck, you're going to need it!
                         """,
 
         # The distance, in miles, from Los Angeles (the start)
