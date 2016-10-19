@@ -381,12 +381,12 @@ def draw_trading_screen():
 
             item_count = len(items.item_list) + 1
 
-            decision_x, decision_y = screen.draw_decision_box(("\n" * (item_count * 2 + 1))
-                                                              + "A survivor offers you a trade: "
-                                                              + str(int(trader_item_amount)) + " of their "
-                                                              + trader_item_name + " for "
-                                                              + str(int(survivors_item_amount)) + " of your "
-                                                              + survivors_item_name, decisions, selected_index)
+            decision_x, decision_y = screen.draw_decision_box(
+                                              ("\n" * (item_count * 2 + 1))
+                                              + "A survivor offers you a trade: \n\n"
+                                              + "    You -----> " + str(int(survivors_item_amount)) + " " + survivors_item_name + "\n"
+                                              + "    You <----- " + str(int(trader_item_amount)) + " " + trader_item_name,
+                                                decisions, selected_index)
 
             item_index = 0
             for item in items.item_list.values():
@@ -884,6 +884,9 @@ def draw_scavenging_screen():
     print("")
     # Declaring variables
     number_of_survivors = count_survivors()
+
+    scavenging_time = 0
+
     # Input
     while True:
         try:
