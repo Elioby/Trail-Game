@@ -5,3 +5,5 @@ See this link for instructions on how to resize the windows command line: http:/
 Simply set the width to 100, height to 40 and press OK.
 
 The project has not been tested on Linux or Mac, so there is no guarantee it will run on those operating systems, since no required operating system was not specified in the marking scheme.
+
+Our git remote project (gitlab) can be found at this location: https://gitlab.cs.cf.ac.uk/c1627813/trail-game
