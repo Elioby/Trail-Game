@@ -126,7 +126,6 @@ def event_admire_scenery():
 
     return True
 
-<<<<<<< HEAD
 def event_breaks_arm():
     random_survivor = get_random_survivor(True, True, False, False)
 
@@ -146,16 +145,15 @@ def event_dog_maul():
     return True
 
 def event_bandit_blockade():
-
     if survivors.foggy or survivors.bandit_blockade:
         return False
-
     else:
         screen.print_notification("You run into a bandit blockade and slow down to sneak past.")
         survivors.car_speed = 10
         survivors.bandit_blockade = True
 
         return True
+
 
 def event_pass_bloackade():
     if survivors.bandit_blockade:
@@ -166,7 +164,8 @@ def event_pass_bloackade():
 
         return True
 
-=======
+    return False
+
 def event_left_item():
     random_survivor = get_random_survivor(False, True, False, False)
     item_num = random.randint(1,4)
@@ -199,6 +198,7 @@ def event_left_item():
             screen.print_notification(random_survivor["name"] + " realises they left " + str(quantity) + " " + item["name"] + " behind.")
             survivors.group_inventory[item["name"]]["amount"] -= quantity
             return True
+
     return False
 
 def event_found_item():
@@ -233,7 +233,7 @@ def event_found_item():
             screen.print_notification(random_survivor["name"] + " discovered " + str(quantity) + " " + item["name"] + " hidden under some bushes.")
             survivors.group_inventory[item["name"]]["amount"] += quantity
             return True
->>>>>>> 50b574575664a3b42a0b7f558a9ba1cda7d8cd4c
+
     return False
 
 events_list = [
@@ -356,7 +356,7 @@ events_list = [
 
         # A function to run when the event occurs
         "notification_handler_function": event_found_item
-    }
+    },
 
     {
         # The percentage chance for this event to happen
