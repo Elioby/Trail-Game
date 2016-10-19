@@ -210,8 +210,8 @@ def draw_points_screen():
     score_title_x = int((screen.get_width() / 2) - (figlet_helper.get_text_width("Total Score", big_font) / 2))
     score_x = int((screen.get_width() / 2) - (figlet_helper.get_text_width(str(int(points)), big_font) / 2))
 
-    screen.draw_ascii_font_text(score_title_x, 1, "Total Score", big_font)
-    screen.draw_ascii_font_text(score_x, big_font["height"] + 1, str(int(points)), big_font)
+    screen.draw_ascii_font_text(score_title_x - 1, 1, "Total Score", big_font)
+    screen.draw_ascii_font_text(score_x - 1, big_font["height"] + 1, str(int(points)), big_font)
 
     screen.flush()
 

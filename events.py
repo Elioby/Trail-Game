@@ -124,6 +124,8 @@ def event_admire_scenery():
 
         game.pass_time(1, False)
 
+    return True
+
 
 events_list = [
 
