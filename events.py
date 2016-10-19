@@ -99,7 +99,7 @@ def event_fog():
     screen.print_notification("You head into an area of heavy fog and have to drive slowly.")
 
     survivors.foggy = True
-    survivors.car_speed = 5
+    survivors.car_speed = 10
 
     return True
 
@@ -109,7 +109,7 @@ def event_fog_clear():
         screen.print_notification("The sky clears up and you return to normal driving speed")
 
         survivors.foggy = False
-        survivors.car_speed = 20
+        survivors.car_speed = 40
 
         return True
 
@@ -126,6 +126,46 @@ def event_admire_scenery():
 
     return True
 
+def event_breaks_arm():
+    random_survivor = get_random_survivor(True, True, False, False)
+
+    random_survivor["health"] -= 10
+
+    screen.print_notification(random_survivor["name"] + " has broken their arm by getting it stuck in the steering wheel.")
+
+    return True
+
+def event_dog_maul():
+    random_survivor = get_random_survivor(True, True, False, False)
+
+    random_survivor["health"] -= 30
+
+    screen.print_notification(random_survivor["name"] + " has been mauled by a rabid dog.")
+
+    return True
+
+def event_bandit_blockade():
+
+    if survivors.foggy or survivors.bandit_blockade:
+        return False
+
+    else:
+        screen.print_notification("You run into a bandit blockade and slow down to sneak past.")
+        survivors.car_speed = 10
+        survivors.bandit_blockade = True
+
+        return True
+
+def event_pass_bloackade():
+    if survivors.bandit_blockade:
+        screen.print_notification("You pass the bandit blockade and your heart rate starts to return to normal as you regain speed.")
+
+        survivors.bandit_blockade = False
+        survivors.car_speed = 40
+
+        return True
+
+    return False
 
 events_list = [
 
@@ -214,6 +254,38 @@ events_list = [
         # A function to run when the event occurs
         "notification_handler_function": event_admire_scenery
 
+    },
+
+    {
+        # The percentage chance for this event to happen
+        "occurrence_chance": 2.0,
+
+        # A function to run when the event occurs
+        "notification_handler_function": event_breaks_arm
+    },
+
+    {
+        # The percentage chance for this event to happen
+        "occurrence_chance": 1.0,
+
+        # A function to run when the event occurs
+        "notification_handler_function": event_dog_maul
+    },
+
+    {
+        # The percentage chance for this event to happen
+        "occurrence_chance": 1.0,
+
+        # A function to run when the event occurs
+        "notification_handler_function": event_bandit_blockade
+    },
+
+    {
+        # The percentage chance for this event to happen
+        "occurrence_chance": 40.0,
+
+        # A function to run when the event occurs
+        "notification_handler_function": event_pass_bloackade
     },
 
 ]

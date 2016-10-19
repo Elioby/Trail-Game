@@ -873,7 +873,7 @@ def draw_travelling_screen():
         if road > 1:
             road = 0
 
-        time.sleep(0.35 - (survivors.car_speed / 100.0))
+        time.sleep(0.5 - (survivors.car_speed / 100.0))
 
         screen.set_cursor_visibility(False)
 

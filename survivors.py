@@ -27,11 +27,13 @@ default_health = 100
 group_money = 40
 
 # The MPH (miles per tick in this case) the car is currently moving at
-car_speed = 20
+car_speed = 40
 
 # If it is foggy or not
 foggy = False
 
+# If you are being blocked by bandits
+bandit_blockade = False
 
 # TODO: write docs
 def inventory_add_item(item, amount):

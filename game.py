@@ -55,7 +55,7 @@ def pass_time(hours, travelling=True):
     survivors.current_datetime += timedelta(hours=hours)
 
     if travelling:
-        if not survivors.inventory_remove_item(items.item_list["Fuel"], hours):
+        if not survivors.inventory_remove_item(items.item_list["Fuel"], hours * (survivors.car_speed / 15)):
             screens.open_screen(screens.screen_list["fuel"])
         else:
             survivors.distance_travelled += survivors.car_speed
@@ -71,7 +71,7 @@ def game_tick():
     if "Fuel" not in survivors.group_inventory:
         pass
 
-    if survivors.ticks_elapsed > 3:
+    if survivors.ticks_elapsed > 0:
         for event in events.events_list:
             event_random = random.uniform(0.0, 100.0)
             if event["occurrence_chance"] > event_random:
