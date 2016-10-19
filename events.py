@@ -163,8 +163,7 @@ def event_bandit_blockade():
 
 def event_pass_blockade():
     if survivors.bandit_blockade:
-        screen.print_notification(
-            "You pass the bandit blockade and your heart rate starts to return to normal as you regain speed.")
+        screen.print_notification("You pass the bandit blockade and you regain normal speed.")
 
         survivors.bandit_blockade = False
         survivors.car_speed = 40
@@ -272,7 +271,7 @@ events_list = [
 
     {
         # The percentage chance for this event to happen
-        "occurrence_chance": 1.0,
+        "occurrence_chance": 2.0,
 
         # A function to run when the event occurs
         "notification_handler_function": event_sits_on
@@ -280,7 +279,7 @@ events_list = [
 
     {
         # The percentage chance for this event to happen
-        "occurrence_chance": 3.0,
+        "occurrence_chance": 1.0,
 
         # A function to run when the event occurs
         "notification_handler_function": event_fake_fuel
@@ -289,7 +288,7 @@ events_list = [
 
     {
         # The percentage chance for this event to happen
-        "occurrence_chance": 1.0,
+        "occurrence_chance": 2.0,
 
         # A function to run when the event occurs
         "notification_handler_function": event_vending_machine
@@ -307,7 +306,7 @@ events_list = [
 
     {
         # The percentage chance for this event to happen
-        "occurrence_chance": 3.0,
+        "occurrence_chance": 1.0,
 
         # A function to run when the event occurs
         "notification_handler_function": event_zombie_tear
@@ -316,7 +315,7 @@ events_list = [
 
     {
         # The percentage chance for this event to happen
-        "occurrence_chance": 1.0,
+        "occurrence_chance": 2.0,
 
         # A function to run when the event occurs
         "notification_handler_function": event_fog
@@ -343,7 +342,7 @@ events_list = [
 
     {
         # The percentage chance for this event to happen
-        "occurrence_chance": 2.0,
+        "occurrence_chance": 3.0,
 
         # A function to run when the event occurs
         "notification_handler_function": event_breaks_arm
@@ -351,7 +350,7 @@ events_list = [
 
     {
         # The percentage chance for this event to happen
-        "occurrence_chance": 1.0,
+        "occurrence_chance": 3.0,
 
         # A function to run when the event occurs
         "notification_handler_function": event_dog_maul
