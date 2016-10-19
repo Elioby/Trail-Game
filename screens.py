@@ -93,7 +93,9 @@ def draw_starting_screen():
 
         if selected_index == 1:
             screen.set_cursor_visibility(False)
-            screen.draw_decision_box("You wake up in a dark, abandoned hospital. Looking around the room you notice that the windows are boarded up with the marks all over the walls: \"There is no escape you will all die and suffer\". You quickly get out of your bed, your legs feel shaky as you notice that the calendar says is turned to October 15th 2020. The last memory you have was a hospital visit for a friend on that exact day four years before.\n\nYou quickly compose your thoughts, and decide to head for New York. Before you leave, you gather up 3 friends you know you can count on.", ["Continue"])
+            screen.draw_decision_box(
+                "You wake up in a dark, abandoned hospital. Looking around the room you notice that the windows are boarded up with the marks all over the walls: \"There is no escape you will all die and suffer\". You quickly get out of your bed, your legs feel shaky as you notice that the calendar says is turned to October 15th 2020. The last memory you have was a hospital visit for a friend on that exact day four years before.\n\nYou quickly compose your thoughts, and decide to head for New York. Before you leave, you gather up 3 friends you know you can count on.",
+                ["Continue"])
 
             screen.flush()
 
@@ -149,7 +151,7 @@ def draw_survivor_name_screen():
 
 
 def draw_dead_screen():
-    screen.clear()
+    screen.set_cursor_visibility(False)
 
     game_over_image = ascii_helper.load_image("resources/dead_game_over.ascii")
     tombstone_image = ascii_helper.load_image("resources/dead_tombstone.ascii")
@@ -170,7 +172,7 @@ def draw_dead_screen():
 
 
 def draw_win_screen():
-    screen.clear()
+    screen.set_cursor_visibility(False)
 
     big_font = figlet_helper.load_font("resources/fonts/big.flf")
     contessa_font = figlet_helper.load_font("resources/fonts/contessa.flf")
@@ -189,7 +191,7 @@ def draw_win_screen():
 
     screen.flush()
 
-    time.sleep(6)
+    time.sleep(4)
 
     screen.print_notification("Press any key to continue.", False)
 
@@ -197,13 +199,15 @@ def draw_win_screen():
 
 
 def draw_points_screen():
-    screen.clear()
+    screen.set_cursor_visibility(False)
 
     points = 0
 
     points += survivors.distance_travelled
 
-    points += count_survivors(True, False, False, False) * 250
+    for survivor in survivors.survivor_list:
+        if survivor["alive"]:
+            points += survivor["health"]
 
     big_font = figlet_helper.load_font("resources/fonts/big.flf")
 
@@ -266,7 +270,8 @@ def draw_city_screen():
             open_screen(screen_list["scavenging"])
         elif selected_index == 6:
             if "Fuel" not in survivors.group_inventory:
-                screen.print_notification("You cannot leave the city until you have enough fuel. Try scavenging for some.", False)
+                screen.print_notification(
+                    "You cannot leave the city until you have enough fuel. Try scavenging for some.", False)
             else:
                 # Continue to previous screen
                 return
@@ -376,10 +381,29 @@ def draw_trading_screen():
         while True:
             screen.set_cursor_visibility(False)
 
-            screen.draw_decision_box(
-                "A survivor offers you a trade: " + str(int(trader_item_amount)) + " of their "
-                + trader_item_name + " for " + str(int(survivors_item_amount)) + " of your "
-                + survivors_item_name, decisions, selected_index)
+            item_count = len(items.item_list) + 1
+
+            decision_x, decision_y = screen.draw_decision_box(("\n" * (item_count * 2 + 1))
+                                                              + "A survivor offers you a trade: "
+                                                              + str(int(trader_item_amount)) + " of their "
+                                                              + trader_item_name + " for "
+                                                              + str(int(survivors_item_amount)) + " of your "
+                                                              + survivors_item_name, decisions, selected_index)
+
+            item_index = 0
+            for item in items.item_list.values():
+                item_amount = 0
+
+                if item["name"] in survivors.group_inventory:
+                    item_amount = survivors.group_inventory[item["name"]]["amount"]
+
+                screen.draw_text(decision_x + 6, decision_y + 3 + (item_index * 2), item["name"] + ": " + str(int(item_amount)))
+
+                item_index += 1
+
+            screen.draw_text(decision_x + 6, decision_y + 3 + (item_index * 2), "Money: " + str(int(survivors.group_money)))
+
+            item_index += 1
 
             screen.flush()
 
@@ -450,7 +474,9 @@ def draw_medkit_screen():
         while True:
             screen.set_cursor_visibility(False)
 
-            decision_x, decision_y = screen.draw_decision_box("Your group has " + str(int(medkit_count)) + " " + ("Medkit" if medkit_count == 1 else "Medkits") + "." + ("\n" * (survivor_count * 2)), decisions, selected_index, max_height=(survivor_count * 6) + 2)
+            decision_x, decision_y = screen.draw_decision_box("Your group has " + str(int(medkit_count)) + " " + (
+            "Medkit" if medkit_count == 1 else "Medkits") + "." + ("\n" * (survivor_count * 2)), decisions,
+                                                              selected_index, max_height=(survivor_count * 6) + 2)
 
             stats_y_start = decision_y + 4
             stats_x_start = decision_x + 6
@@ -564,8 +590,10 @@ def draw_resting_screen():
                         survivor["health"] += sleep_choice * 10
                         if survivor["health"] > survivor["max_health"]:
                             survivor["health"] = survivor["max_health"]
-                        print("{0} has slept for {1} hour(s) and gained {2} health.".format(survivor["name"], sleep_choice,
-                                                                                            survivor["health"] - old_health))
+                        print("{0} has slept for {1} hour(s) and gained {2} health.".format(survivor["name"],
+                                                                                            sleep_choice,
+                                                                                            survivor[
+                                                                                                "health"] - old_health))
 
             game.pass_time(sleep_choice, False)
 
@@ -598,7 +626,8 @@ def draw_put_down_screen():
         while True:
             screen.set_cursor_visibility(False)
 
-            decision_x, decision_y = screen.draw_decision_box("\n" * ((survivor_count * 2) - 2), decisions, selected_index, max_height=(survivor_count * 6))
+            decision_x, decision_y = screen.draw_decision_box("\n" * ((survivor_count * 2) - 2), decisions,
+                                                              selected_index, max_height=(survivor_count * 6))
 
             stats_y_start = decision_y + 2
             stats_x_start = decision_x + 6
@@ -944,14 +973,16 @@ def draw_scavenging_screen():
 
         for item_found in items_found.values():
             item_found_amount = int(item_found["amount"])
-            print(str(item_found_amount) + " " + (item_found["item"]["name"] if item_found_amount <= 0 else item_found["item"]["plural_name"]))
+            print(str(item_found_amount) + " " + (
+            item_found["item"]["name"] if item_found_amount <= 0 else item_found["item"]["plural_name"]))
 
         print()
         print("Your group now has:")
 
         for item_found in survivors.group_inventory.values():
             item_found_amount = int(item_found["amount"])
-            print(str(item_found_amount) + " " + (item_found["item"]["name"] if item_found_amount <= 0 else item_found["item"]["plural_name"]))
+            print(str(item_found_amount) + " " + (
+            item_found["item"]["name"] if item_found_amount <= 0 else item_found["item"]["plural_name"]))
 
     # Need to pass time
     game.pass_time(scavenging_time, False)
@@ -968,7 +999,9 @@ def draw_fuel_screen():
         while True:
             screen.set_cursor_visibility(False)
 
-            screen.draw_decision_box("You have run out of fuel and cannot travel any further. You must scavenge for fuel. You may use medkits and resting in order to heal. Don't stick around too long, who knows what's hanging around here!", decisions, selected_index)
+            screen.draw_decision_box(
+                "You have run out of fuel and cannot travel any further. You must scavenge for fuel. You may use medkits and resting in order to heal. Don't stick around too long, who knows what's hanging around here!",
+                decisions, selected_index)
 
             screen.flush()
 
@@ -993,6 +1026,7 @@ def draw_fuel_screen():
                 return
             else:
                 screen.print_notification("You do not have enough fuel to keep travelling.")
+
 
 screen_list = {
     "starting": {
