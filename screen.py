@@ -183,6 +183,17 @@ def draw_ascii_image(image_x, image_y, ascii_image):
 
 
 def get_decision_input(decisions, selected_index=1):
+    """Wait until the user inputs a key, and adjust the selected_index accordingly.
+
+    Args:
+        decisions (list): A list of str that will be shown as the options on this screen
+        selected_index (int): The currently selected option (one indexed).
+
+    Returns:
+        tuple: First the new selected_index, then a bool stating if they have selected this option as final.
+
+    """
+
     decisions_count = len(decisions)
 
     key = wait_key()
@@ -207,6 +218,19 @@ def get_decision_input(decisions, selected_index=1):
 
 
 def draw_decision(decision_x, decision_y, decisions, selected_index=1):
+    """Draw a list of options, with one selected.
+
+    Args:
+        decision_x (int): The x position of the box.
+        decision_y (int): The y position of the box.
+        decisions (list): A list of str that will be shown as the options on this screen
+        selected_index (int): The currently selected option (one indexed).
+
+    Returns:
+        None
+
+    """
+
     decisions_count = len(decisions)
 
     for i in range(decisions_count):
@@ -228,8 +252,23 @@ def draw_decision(decision_x, decision_y, decisions, selected_index=1):
             draw_text(x + text_length + 3, y, "<")
 
 
-# NOTE: (docs) this flushes the display for you (probably shouldn't)
 def draw_decision_box(body_text, decisions, selected_index=1, decision_x=None, decision_y=None, max_width=None, max_height=None):
+    """Draw a box with a set of decision options.
+
+    Args:
+        body_text (str): The text at the top of the box.
+        decisions (list): A list of str that will be shown as the options on this screen
+        selected_index (int): The currently selected option (one indexed).
+        decision_x (int): The x position of the box, leave to None for centering.
+        decision_y (int): The y position of the box, leave to None for centering.
+        max_width (int): The maximum width of the box, leave to None for auto adjusting.
+        max_height (int): The maximum height of the box, leave to None for auto adjusting.
+
+    Returns:
+        tuple: The chosen x and y values of the top left of the box. Useful if you used the auto centering feature.
+
+    """
+
     box_width = int(get_width() - get_width() / 6)
     box_height = int(get_height() - get_height() / 6)
 
@@ -254,6 +293,18 @@ def draw_decision_box(body_text, decisions, selected_index=1, decision_x=None, d
 
 
 def draw_pixel(pixel_x, pixel_y, pixel_char):
+    """Draw a pixel at x and y, it will clip to the size of the screen.
+
+    Args:
+        pixel_x (int): The x position of the pixel.
+        pixel_y (int): The y position of the pixel.
+        pixel_char (str): A single character string that you want to fill the pixel with
+
+    Returns:
+        None
+
+    """
+
     if pixel_char != "" and pixel_char != " ":
         if buffer_start["y"] is None or pixel_y < buffer_start["y"]:
             buffer_start["y"] = pixel_y
@@ -270,8 +321,21 @@ def draw_pixel(pixel_x, pixel_y, pixel_char):
         back_buffer[pixel_x][pixel_y] = str(pixel_char).encode(sys.stdout.encoding)
 
 
-# TODO: (Add docs) returns the amount of vertical lines it used
 def draw_text_wrapped(text_x, text_y, text, max_length, indent=False):
+    """Draw some text, and wrap it to the next line if it goes over max_length.
+
+    Args:
+        text_x (int): The x position of the text.
+        text_y (int): The y position of the text.
+        text (str): The text you want to print, may include "\n" to force newlines.
+        max_length (int): The maximum length the text should print until it wraps to the next line.
+        indent (bool): If the wrapped lines should be indented from the first line or not, by default it's False.
+
+    Returns:
+        int: The amount of vertical lines used.
+
+    """
+
     words = text.split(" ")
 
     x = text_x
@@ -318,6 +382,18 @@ def draw_text_wrapped(text_x, text_y, text, max_length, indent=False):
 
 
 def draw_text(text_x, text_y, text):
+    """Draw some text.
+
+    Args:
+        text_x (int): The x position of the text.
+        text_y (int): The y position of the text.
+        text (str): The text you want to print.
+
+    Returns:
+        None
+
+    """
+
     text = text
     text_length = len(text)
 
@@ -325,22 +401,20 @@ def draw_text(text_x, text_y, text):
         draw_pixel(x + text_x, text_y, text[x])
 
 
-def draw_ascii_numbers(x, y, input_number):
-    ascii_numbers = []
-    x_spacing = 2
-    x_offset = 0
-    input_number = str(input_number)
-
-    for i in range(0, 9):
-        ascii_numbers.append(ascii_helper.load_image("resources/numbers/" + str(i) + ".ascii"))
-
-    for i in range(0, len(input_number)):
-        num = int(input_number[i])
-        draw_ascii_image(x + x_offset, y, ascii_numbers[num])
-        x_offset += ascii_numbers[num]["width"] + x_spacing
-
-
 def draw_ascii_font_text(text_x, text_y, text, font):
+    """Draw some text in an ascii font.
+
+    Args:
+        text_x (int): The x position of the text.
+        text_y (int): The y position of the text.
+        text (str): The text you want to print.
+        font (dict): A font dictionary returned from figlet_helper.load_font().
+
+    Returns:
+        None
+
+    """
+
     last_width = 0
 
     for char in text:
@@ -371,8 +445,18 @@ def draw_ascii_font_text(text_x, text_y, text, font):
                 char_x += 1
 
 
-# NOTE: this function does not use the front or back buffer as we want the front buffer to stay intact, this is why it's called print instead of draw
 def print_notification(message, redraw_on_exit=True):
+    """Draws a notification and waits for a key, doesn't use the back buffer to keep it intact.
+
+    Args:
+        message (str): Some text to notify the player with.
+        redraw_on_exit (bool): If the function should redraw the previous screen or not.
+
+    Returns:
+        None
+
+    """
+
     set_cursor_visibility(False)
     message_length = len(message)
 
