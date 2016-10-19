@@ -91,7 +91,13 @@ abandoned stores that might have a few items that you can scavenge.
         "name": "Indianapolis",
 
         # A brief (1 sentence?) description of the city
-        "description": "The capital and largest city of the state of Indiana ",
+        "description":  """
+The capital city of Indiana, a state more famously known for the ease of
+selling firearms you will be pleased to hear that the local stronghold is doing
+more than their fair share of holding their ground against the incoming hordes
+of zombies. However the leader can be described as a difficult person to reason
+with so your approach could ultimately decide your fate.
+                        """,
 
         # The distance, in miles, from Los Angeles (the start)
         "distance_from_start": 2000,
